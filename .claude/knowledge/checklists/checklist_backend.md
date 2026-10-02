@@ -47,6 +47,8 @@ Aplicar a qualquer diff que toque `backend/**`. Base: `conventions/backend_conve
 
 - [ ] Formato único `{ error: { code, message, details } }` em toda resposta de erro
 - [ ] `code` em `SCREAMING_SNAKE_CASE`, vindo de catálogo único
+- [ ] Erro lançado pelo `code` do catálogo; status e mensagem não são passados à mão
+- [ ] Todo `code` do catálogo do backend consta em `api_contract.md` §Catálogo de `code`s
 - [ ] Middleware de erro centralizado; sem `try/catch` repetido por controller
 - [ ] Status HTTP correto: `400` validação, `401` sem token, `403` perfil, `404` ausente ou alheia, `409` regra
 - [ ] Regra de negócio nova tem `code` correspondente no catálogo
@@ -63,6 +65,7 @@ Aplicar a qualquer diff que toque `backend/**`. Base: `conventions/backend_conve
 - [ ] **Toda regra de negócio tem teste automatizado em `backend/tests/`, sem depender de UI**
 - [ ] **Regra de negócio sem teste no mesmo commit é achado**
 - [ ] Toda rota protegida tem teste de `401` sem token; toda rota `[lead]` tem teste de `403` com `qa`
+- [ ] Cada causa de `401` tem teste próprio, asserindo o `code` que só ela produz — `TOKEN_MISSING`, `TOKEN_INVALID`, `TOKEN_EXPIRED`
 - [ ] O service é exercitável sem HTTP e sem subir a aplicação
 - [ ] Dependência externa (conexão, relógio, identificador) entra por parâmetro ou `config/`, não instanciada dentro da regra
 - [ ] Caminho de erro coberto, não só o caminho feliz

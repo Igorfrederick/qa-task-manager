@@ -8,6 +8,49 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [01/10/2026] O `code` carrega o status, num catálogo único
+
+**Decisão:** o catálogo de `code`s cobre todos os erros da API — validação, autenticação, rota inexistente, erro interno e regras de negócio — e é um único objeto em `backend/src/utils/errors.js`, que associa cada `code` ao seu status HTTP e à sua mensagem: `code → { status, message }`. Há uma única classe de erro, construída pelo `code` — status e mensagem vêm do catálogo, nunca de quem lança. O catálogo nasce num commit `refactor:` que leva para ele os `code`s que já existem (`VALIDATION_ERROR`, `EMAIL_TAKEN`, `NOT_FOUND`, `INTERNAL_ERROR`), imediatamente antes do commit de login, que acrescenta o primeiro `code` da família `401`.
+
+**Motivo:** a família `401` decide a forma: quatro `code`s com o mesmo `401`, e nenhum `code` com dois status. A relação `code → status` é uma função — cada `code` tem exatamente um status —, e por isso o status é atributo do `code`, não uma estrutura à parte. Mudar o status de um `code` é mudança de contrato com ou sem esta escolha: `api_contract.md` declara o status de cada `code`, e o E2E assere os dois.
+
+Guardar a mensagem no catálogo dá a ela o teste de unidade que a entrada *Erros da API asseverados por `code`* promete: a mensagem é testada sobre o catálogo, e não pelo E2E.
+
+**Por que não no próprio commit de login:** levar `EMAIL_TAKEN` e `VALIDATION_ERROR` para o catálogo não muda comportamento — é refatoração —, e o login é feature; `commit_conventions.md` proíbe misturar os dois. A forma foi decidida com a família `401` em mãos — nomeada na entrada logo abaixo —, e não inferida de um caso só.
+
+**Consequência registrada:** mensagem fixa por `code`. `EMAIL_TAKEN` e `NOT_FOUND` deixam de interpolar o e-mail e a rota, e o JSON malformado passa a responder com a mensagem de `VALIDATION_ERROR`. Mensagem é apresentação pelo contrato; `code` e status não mudam.
+
+**Alternativa descartada:** `code` sem status, com um mapa `code → status` no middleware de erro — duas estruturas com as mesmas chaves, que podem dessincronizar, sem ganho: nenhum `code` precisa de status diferente conforme o contexto. Uma classe por `code` (`EmailTakenError`, `InvalidCredentialsError`…) — repete o catálogo em forma de hierarquia, e cada `code` novo custaria uma classe.
+**Decidido por:** Igor Frederick, em 01/10/2026.
+
+---
+
+## [01/10/2026] Nomes dos `code`s de autenticação e autorização
+
+**Decisão:** a família de autenticação e autorização tem cinco `code`s.
+
+| `code` | Status | Quando |
+|---|---|---|
+| `INVALID_CREDENTIALS` | `401` | Login com e-mail inexistente ou com senha errada |
+| `TOKEN_MISSING` | `401` | Requisição sem `Authorization: Bearer <token>` |
+| `TOKEN_INVALID` | `401` | Assinatura, formato ou algoritmo inválido, ou token de usuário que não existe mais |
+| `TOKEN_EXPIRED` | `401` | `exp` vencido |
+| `FORBIDDEN` | `403` | Perfil autenticado sem permissão para a rota |
+
+**Motivo:** três `code`s de token, e não um `UNAUTHORIZED` genérico, porque o consumidor que precisa da distinção é o teste. O teste de token expirado só prova que a expiração é validada se asserir um `code` que só a expiração produz; com `code` único, um token montado errado no próprio teste — segredo trocado, formato quebrado — o faria passar pelo motivo errado. É o critério de asserções específicas da rubrica aplicado à API. Para o frontend a distinção não custa nada: `frontend_conventions.md` trata qualquer `401` do mesmo jeito, encerrando a sessão.
+
+`INVALID_CREDENTIALS` é um só para os dois erros de login porque o contrato exige resposta igual. `TOKEN_INVALID` cobre também o token bem formado de usuário que já não existe: para quem chama, a credencial não identifica ninguém, e o `401` leva o frontend a encerrar a sessão, onde um `404` o deixaria preso numa tela de erro.
+
+`FORBIDDEN` é o nome que a entrada *Tarefa de outra pessoa responde `404`* já usa para o `403` que ela descarta.
+
+**Alternativa descartada:** `UNAUTHORIZED` único para toda falha de token — menos `code`s, e asserção que não distingue a causa.
+
+**Fora do escopo, registrado:** `TOKEN_EXPIRED` não é gatilho de renovação. Não há refresh token no v1 (`CLAUDE.md` §2); o `code` existe para o teste e para a mensagem.
+
+**Decidido por:** Igor Frederick, em 01/10/2026.
+
+---
+
 ## [01/10/2026] Protocolo de trabalho enxuto para o prazo de 09/10
 
 **Decisão:** modo geração como padrão quando nenhum modo é declarado; plano de commits aprovado por fatia, não por arquivo; o `code-reviewer` roda uma vez por PR, com nova rodada só diante de achado CRITICAL ou HIGH; o `revisor-pdi` roda uma vez, antes da entrega.

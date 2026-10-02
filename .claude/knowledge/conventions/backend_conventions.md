@@ -90,7 +90,8 @@ O que cabe ao backend garantir:
 
 - Middleware de erro centralizado; `try/catch` repetido em cada controller é achado
 - `code` nascido de um catálogo único, nunca montado ad hoc no controller
-- Regra de negócio nova exige `code` novo no catálogo
+- O catálogo, em `utils/errors.js`, associa cada `code` ao seu status e à sua mensagem. O erro é lançado pelo `code`: status e mensagem vêm do catálogo, nunca de quem lança — decisão de 01/10/2026 em `docs/decisions.md`
+- Regra de negócio nova exige `code` novo no catálogo, e o `code` novo entra em `api_contract.md` §Catálogo de `code`s antes ou junto do código que o lança
 - O status devolvido corresponde à camada que detectou a falha: validação de payload no middleware, violação de domínio no service
 
 ## Modelagem

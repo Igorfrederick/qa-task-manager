@@ -99,7 +99,7 @@ Corpo do erro de validação:
 
 A regra 3 não falha: um `userId` enviado no payload é descartado, e a tarefa nasce com o dono do token. Não tem `code` de catálogo, e se testa observando o dono da tarefa criada, não violando.
 
-**Autenticação e autorização** são critério próprio da rubrica e ficam fora da tabela: token ausente ou inválido responde `401`; credencial inválida no login responde `401` sem revelar se errou o e-mail ou a senha; perfil autenticado sem permissão responde `403`. Os `code`s dessa família nascem com o catálogo, no commit de login.
+**Autenticação e autorização** são critério próprio da rubrica e ficam fora da tabela: token ausente ou inválido responde `401`; credencial inválida no login responde `401` sem revelar se errou o e-mail ou a senha; perfil autenticado sem permissão responde `403`. Os `code`s dessa família estão em `api_contract.md` §Catálogo de `code`s.
 
 ### Telas
 
@@ -274,7 +274,5 @@ Regras permanentes para qualquer agente neste repositório:
 
 Confirmar antes de implementar a parte correspondente:
 
-- **Forma do catálogo de `code`s**, e se o `code` carrega o status HTTP — decidir no commit de login, quando a família `401` der a informação
-- **Nomes dos `code`s da família `401`/`403`** — nascem com o catálogo
 - **Armazenamento do token no frontend** — `localStorage` exige entrada em `docs/decisions.md` (anti-padrão em `frontend_conventions.md`). Pesa na escolha que o `storageState` do Playwright, usado na autenticação por fixture, guarda `localStorage` mas não `sessionStorage`
 - **Abordagem de estilo do frontend** — CSS Modules, nativo do Vite, dispensa biblioteca nova
