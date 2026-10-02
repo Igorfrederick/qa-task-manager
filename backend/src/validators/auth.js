@@ -1,0 +1,28 @@
+import { z } from 'zod'
+
+import { ROLE_VALUES } from '../utils/roles.js'
+
+/**
+ * Schemas de entrada das rotas de autenticação.
+ *
+ * Só invariante de entrada — o que se julga olhando apenas o payload. Falha
+ * aqui é `400` com `details`. Unicidade de e-mail depende do estado do banco,
+ * é invariante de domínio e vive no service, com `409`.
+ */
+export const registerSchema = z.object({
+  name: z
+    .string({ required_error: 'Informe o nome' })
+    .trim()
+    .min(2, 'O nome precisa de ao menos 2 caracteres')
+    .max(120, 'O nome pode ter no máximo 120 caracteres'),
+  email: z
+    .string({ required_error: 'Informe o e-mail' })
+    .trim()
+    .toLowerCase()
+    .email('E-mail em formato inválido'),
+  password: z
+    .string({ required_error: 'Informe a senha' })
+    .min(8, 'A senha precisa de ao menos 8 caracteres')
+    .max(72, 'A senha pode ter no máximo 72 caracteres'),
+  role: z.enum(ROLE_VALUES, { errorMap: () => ({ message: 'Perfil inválido' }) }).optional(),
+})

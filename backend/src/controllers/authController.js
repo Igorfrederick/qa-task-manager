@@ -1,0 +1,19 @@
+import { registerUser } from '../services/userService.js'
+
+/**
+ * Entrada e saída HTTP das rotas de autenticação. Nenhuma regra de negócio.
+ *
+ * Sem `try/catch`: o handler é `async`, e erro em função assíncrona não chega
+ * sozinho ao middleware de erro no Express 4 — por isso o `.catch(next)`. É
+ * encaminhamento, não tratamento: nada aqui decide status nem monta corpo de
+ * erro. Quem decide é quem lançou; quem escreve a resposta é o middleware.
+ */
+export function register(req, res, next) {
+  registerUser(req.body)
+    .then((user) => {
+      // `res.json` chama `toJSON`, e o transform do schema remove
+      // `passwordHash`. A remoção não depende de o controller lembrar dela.
+      res.status(201).json({ user })
+    })
+    .catch(next)
+}

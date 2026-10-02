@@ -1,0 +1,20 @@
+# MongoDB de desenvolvimento e teste.
+#
+#   docker compose up -d      sobe o banco
+#   docker compose down       encerra, preservando os dados
+#   docker compose down -v    encerra e descarta os dados
+#
+# Sem credencial: a instância ouve apenas em 127.0.0.1 e existe para
+# desenvolvimento local. Nada aqui vale fora da máquina de quem clonou.
+services:
+  mongo:
+    image: mongo:7
+    container_name: task-manager-mongo
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:27017:27017'
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
