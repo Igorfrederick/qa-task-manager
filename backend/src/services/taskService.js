@@ -24,16 +24,22 @@ function ownerScope(user) {
 }
 
 /**
- * Tarefas que o usuário alcança, da mais recente para a mais antiga.
+ * Tarefas que o usuário alcança, da mais recente para a mais antiga,
+ * opcionalmente filtradas por status e prioridade.
+ *
+ * O escopo é espalhado por último: nenhum filtro sobrescreve o dono, mesmo
+ * que um dia o schema de query passe a aceitar outro campo.
  *
  * A ordem é fixa: ordenação configurável está fora do escopo do v1. O `_id`
  * desempata tarefas criadas no mesmo milissegundo.
  *
  * @param {{ id: string, role: string }} user usuário autenticado
+ * @param {{ status?: string, priority?: string }} [filters] já validados pelo
+ *        schema Zod no middleware
  * @returns {Promise<import('mongoose').Document[]>} tarefas com `owner` preenchido
  */
-export async function listTasks(user) {
-  return Task.find(ownerScope(user))
+export async function listTasks(user, filters = {}) {
+  return Task.find({ ...filters, ...ownerScope(user) })
     .sort({ createdAt: -1, _id: -1 })
     .populate('owner', OWNER_FIELDS)
 }

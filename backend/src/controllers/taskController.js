@@ -9,7 +9,7 @@ import { createTask, listTasks } from '../services/taskService.js'
  * em função assíncrona não chega sozinho ao middleware de erro.
  */
 export function list(req, res, next) {
-  listTasks(req.user)
+  listTasks(req.user, req.query)
     .then((tasks) => {
       res.status(200).json({ tasks })
     })

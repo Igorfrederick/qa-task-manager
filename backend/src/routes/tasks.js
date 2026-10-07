@@ -2,8 +2,8 @@ import { Router } from 'express'
 
 import { create, list } from '../controllers/taskController.js'
 import { requireAuth } from '../middlewares/auth.js'
-import { validateBody } from '../middlewares/validate.js'
-import { createTaskSchema } from '../validators/task.js'
+import { validateBody, validateQuery } from '../middlewares/validate.js'
+import { createTaskSchema, listTasksQuerySchema } from '../validators/task.js'
 
 /**
  * Rotas de tarefa. Definição e middleware, nenhuma lógica.
@@ -17,5 +17,5 @@ export const taskRouter = Router()
 
 taskRouter.use(requireAuth)
 
-taskRouter.get('/', list)
+taskRouter.get('/', validateQuery(listTasksQuerySchema), list)
 taskRouter.post('/', validateBody(createTaskSchema), create)

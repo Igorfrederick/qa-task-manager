@@ -15,6 +15,7 @@ import { AppError } from '../utils/errors.js'
  * normalização seria trabalho jogado fora.
  */
 export const validateBody = validateRequestPart('body')
+export const validateQuery = validateRequestPart('query')
 
 /**
  * Um middleware por parte da requisição — corpo, query ou parâmetro de rota.

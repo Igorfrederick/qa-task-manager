@@ -31,3 +31,13 @@ export const createTaskSchema = z.object({
   status: status.optional(),
   priority: priority.optional(),
 })
+
+/**
+ * Filtros da listagem, com os mesmos valores do corpo. Filtro fora do domínio
+ * é `400`: uma lista vazia esconderia de quem chamou que o filtro estava
+ * errado.
+ */
+export const listTasksQuerySchema = z.object({
+  status: status.optional(),
+  priority: priority.optional(),
+})

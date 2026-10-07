@@ -6,11 +6,13 @@ import { connectDatabase, disconnectDatabase } from '../../src/config/database.j
 import { Task } from '../../src/models/Task.js'
 import { User } from '../../src/models/User.js'
 import { ROLES } from '../../src/utils/roles.js'
+import { TASK_PRIORITY, TASK_STATUS } from '../../src/utils/taskEnums.js'
 import { createUserWithToken } from '../helpers/users.js'
 
 /**
  * `GET /tasks`: o `qa` recebe só as próprias tarefas; o `lead`, as do time
- * inteiro, com o dono de cada uma (regra 2).
+ * inteiro, com o dono de cada uma (regra 2). Os filtros se somam ao escopo e
+ * passam pelo schema (regra 1).
  */
 describe('GET /api/tasks', () => {
   const app = createApp()
@@ -41,10 +43,26 @@ describe('GET /api/tasks', () => {
       role: ROLES.QA,
     })
 
+    // Status e prioridade variados para os filtros; a tarefa concluída da
+    // outra QA existe para provar que filtrar não fura o escopo.
     await Task.create({ title: 'Tarefa da líder', userId: lead.user.id })
-    await Task.create({ title: 'Primeira tarefa da QA', userId: qa.user.id })
-    await Task.create({ title: 'Segunda tarefa da QA', userId: qa.user.id })
-    await Task.create({ title: 'Tarefa da outra QA', userId: otherQa.user.id })
+    await Task.create({
+      title: 'Primeira tarefa da QA',
+      status: TASK_STATUS.DONE,
+      priority: TASK_PRIORITY.HIGH,
+      userId: qa.user.id,
+    })
+    await Task.create({
+      title: 'Segunda tarefa da QA',
+      priority: TASK_PRIORITY.HIGH,
+      userId: qa.user.id,
+    })
+    await Task.create({
+      title: 'Tarefa da outra QA',
+      status: TASK_STATUS.DONE,
+      priority: TASK_PRIORITY.LOW,
+      userId: otherQa.user.id,
+    })
   })
 
   afterEach(async () => {
@@ -56,8 +74,8 @@ describe('GET /api/tasks', () => {
     await disconnectDatabase()
   })
 
-  const getTasks = (token) =>
-    request(app).get('/api/tasks').set('Authorization', `Bearer ${token}`)
+  const getTasks = (token, query = {}) =>
+    request(app).get('/api/tasks').query(query).set('Authorization', `Bearer ${token}`)
 
   const titles = (response) => response.body.tasks.map((task) => task.title)
 
@@ -87,6 +105,38 @@ describe('GET /api/tasks', () => {
 
     expect(response.status).toBe(200)
     expect(response.body.tasks).toEqual([])
+  })
+
+  it.each([
+    ['status', { status: TASK_STATUS.DONE }, ['Primeira tarefa da QA']],
+    ['prioridade', { priority: TASK_PRIORITY.HIGH }, ['Segunda tarefa da QA', 'Primeira tarefa da QA']],
+    ['status e prioridade juntos', { status: TASK_STATUS.OPEN, priority: TASK_PRIORITY.HIGH }, ['Segunda tarefa da QA']],
+  ])('filtra por %s sem sair das tarefas do qa', async (_case, query, expected) => {
+    const response = await getTasks(qa.token, query)
+
+    expect(response.status).toBe(200)
+    expect(titles(response)).toEqual(expected)
+  })
+
+  it('filtra as tarefas do time inteiro para o lead', async () => {
+    const response = await getTasks(lead.token, { status: TASK_STATUS.DONE })
+
+    expect(response.status).toBe(200)
+    expect(titles(response)).toEqual(['Tarefa da outra QA', 'Primeira tarefa da QA'])
+  })
+
+  it.each([
+    ['status fora do domínio', '?status=doing', 'status'],
+    ['prioridade fora do domínio', '?priority=urgent', 'priority'],
+    ['status repetido', '?status=open&status=done', 'status'],
+  ])('recusa filtro com %s com 400 e o campo em details', async (_case, query, field) => {
+    const response = await request(app)
+      .get(`/api/tasks${query}`)
+      .set('Authorization', `Bearer ${qa.token}`)
+
+    expect(response.status).toBe(400)
+    expect(response.body.error.code).toBe('VALIDATION_ERROR')
+    expect(response.body.error.details.map((d) => d.field)).toContain(field)
   })
 
   it('responde 401 TOKEN_MISSING sem token', async () => {

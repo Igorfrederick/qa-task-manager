@@ -75,6 +75,13 @@ describe('taskService', () => {
 
       expect(tasks.map((task) => task.title)).toEqual(['Tarefa da outra QA', 'Tarefa da QA'])
     })
+
+    it('mantém o escopo do qa quando há filtro', async () => {
+      // As duas tarefas estão abertas: o filtro sozinho traria as duas.
+      const tasks = await listTasks(authenticated(qa), { status: 'open' })
+
+      expect(tasks.map((task) => task.title)).toEqual(['Tarefa da QA'])
+    })
   })
 
   describe('createTask', () => {
