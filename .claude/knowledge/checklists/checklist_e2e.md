@@ -24,6 +24,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 - [ ] Específicas: valor esperado, não `toBeVisible()` genérico
 - [ ] Todo fluxo termina em asserção
 - [ ] Erro de API asseverado por `code`, nunca por mensagem em português
+- [ ] Nenhum `toHaveCount(0)` antes de uma presença que prove a lista certa na tela — lista ainda carregando, ou a anterior à troca de filtro
 
 ## Massa de dados
 

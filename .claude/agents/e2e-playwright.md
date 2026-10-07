@@ -42,9 +42,9 @@ Sem modo declarado, vale o modo geração. Antes de começar uma fatia, apresent
 Cada linha diz **o que** garantir e **onde** está a regra por extenso. Leia a fonte antes de decidir — ela é a versão atual; esta lista é apenas o índice.
 
 - **Page Object contém locators e ações.** Não contém asserção, criação de massa nem chamada HTTP. → `e2e_conventions.md` §O que não fica no Page Object
-- **Asserção no arquivo do teste, específica, e verificando a coisa certa** — o efeito real, não um sintoma lateral. Erro de API asseverado pelo `code`, nunca pela mensagem. → `e2e_conventions.md` §Asserções
+- **Asserção no arquivo do teste, específica, e verificando a coisa certa** — o efeito real, não um sintoma lateral. Erro de API asseverado pelo `code`, nunca pela mensagem. Ausência só depois de uma presença que prove a lista certa na tela. → `e2e_conventions.md` §Asserções
 - **Massa por factory com faker; zero dado hardcoded.** Cada teste gera a sua. → `e2e_conventions.md` §Massa de dados
-- **Setup via API, auth por fixture**, nunca pela interface — **e o teste limpa o que criou**. Perfil por `test.use({ role })`, com as contas do seed; a suíte não cria usuário, porque a API não tem como excluí-lo, e nenhuma asserção conta a lista inteira. A suíte exige MongoDB em pé (`docker compose up -d` na raiz), e a falha por banco ausente precisa apontar a causa. → `e2e_conventions.md` §Setup e teardown
+- **Setup via API, auth por fixture**, nunca pela interface — **e o teste limpa o que criou**, pela fixture `taskApi`: tarefa criada pela tela entra por `taskApi.track`, sem `afterEach` em cada arquivo. Perfil por `test.use({ role })`, com as contas do seed; a suíte não cria usuário, porque a API não tem como excluí-lo, e nenhuma asserção conta a lista inteira. A suíte exige MongoDB em pé (`docker compose up -d` na raiz), e a falha por banco ausente precisa apontar a causa. → `e2e_conventions.md` §Setup e teardown
 - **Independência real:** a suíte passa em paralelo e em qualquer ordem — `--repeat-each` com `fullyParallel`, e `--workers=1`. → `e2e_conventions.md` §Independência
 - **Seletores exclusivamente `data-cy`**, por `getByTestId`. → `e2e_conventions.md` §Seletores
 - **Cada jornada roda em `desktop` e `mobile`**; a suíte sobe a aplicação, mas nunca roda o seed. → `e2e_conventions.md` §Setup e teardown

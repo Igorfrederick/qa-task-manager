@@ -41,6 +41,7 @@ Page Object que assere, crie massa ou chame a API é quebra de camada — mesma 
 - Todo fluxo termina em asserção
 - Sobre erro da API, asseveram o `code` — nunca a mensagem em português
 - Erro de validação do formulário nasce no frontend e não tem `code`: é asseverado pelo texto do campo, que é o que distingue um erro de outro no mesmo `data-cy`
+- **Ausência só depois de uma presença que prove a lista certa na tela.** Ao abrir a lista, ela ainda não chegou; ao trocar de filtro ou agir numa linha, a anterior fica na tela até a resposta. Nos dois casos, um `toHaveCount(0)` sozinho passaria sem provar nada. Abrindo a tela, a presença de uma tarefa do próprio teste vem antes da ausência; depois de trocar de filtro, o sumiço de uma tarefa que o filtro exclui vem antes da presença das que ficam
 
 ## Massa de dados
 

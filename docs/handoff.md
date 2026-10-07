@@ -15,7 +15,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
 | 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
 | 3 | Frontend — três telas | Concluído em 07/10/2026 — 3.1 (PR #4) e 3.2 (PR #5) mergeadas |
-| **4** | **E2E** | **Em revisão** — 4.1 (PR #6) mergeada; 4.2 concluída em 07/10/2026 na branch `feat/e2e-tarefas`, aguarda a passada do `code-reviewer`, PR e merge |
+| **4** | **E2E** | **Em revisão** — 4.1 (PR #6) mergeada; 4.2 concluída em 07/10/2026 na branch `feat/e2e-tarefas`: passada única do `code-reviewer` sem bloqueios, com 1 MEDIUM, 1 LOW e 3 sugestões tratados; aguarda PR e merge |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado — é o próximo |
 
 **Prazo: 09/10/2026** — 12/10 é feriado. Avaliador: Murilo Morato, tech lead.
@@ -77,13 +77,14 @@ E2E, fatia 4.1:
 E2E, fatia 4.2:
 
 - `services/TaskService.ts`: listar, criar, ler e excluir pela API, com o token de uma sessão; `ApiCallError` leva também o `code` do contrato, e a tarefa excluída se confere por `TASK_NOT_FOUND`
-- Fixture `taskApi`: um `TaskService` por perfil, `taskApi.qa` e `taskApi.lead`. Toda tarefa criada por ele é anotada com o perfil que a criou; a criada pela tela entra por `taskApi.track`, com o `_id` da resposta. No teardown, que roda também na falha, cada uma sai pela API com o token de quem a criou, e o `404` da que o teste já excluiu é ignorado — entrada de 07/10 em `docs/decisions.md`
+- Fixture `taskApi`: um `TaskService` por perfil, `taskApi.qa` e `taskApi.lead`. Toda tarefa criada por ele é anotada com o perfil que a criou; a criada pela tela entra por `taskApi.track`, com o `_id` da resposta. No teardown, que roda também na falha, cada uma sai pela API com o token de quem a criou; só o `TASK_NOT_FOUND` da que o teste já excluiu é ignorado, e uma falha não interrompe as demais exclusões — entrada de 07/10 em `docs/decisions.md`
 - `buildTask()` com faker: título e descrição com entropia, prioridade sorteada; override fixa status, prioridade ou título vazio
 - `TaskFormPage` nasce: campos, erro do título, salvar e "tarefa não encontrada". O `TaskListPage` ganha filtros, as partes de cada linha pelo `_id`, inclusive o dono, e as ações — `deleteTask()` aceita o diálogo antes do clique. Os rótulos que a lista mostra ficam em `support/taskLabels.ts`
 - Testes em `tests/tasks/`: criar pela tela, com o dono da sessão conferido na API; título vazio sem chamada à API; editar pela lista, com o formulário preenchido; concluir, reabrir e excluir, com a API confirmando; filtro por status, por prioridade e pelos dois no endereço; escopo por dono — o `qa` não vê nem abre a tarefa do `lead`, e o `lead` vê a do `qa`, com o dono, e a conclui. O teste de login com a rota pedida confere também os filtros na tela — 29 testes, 58 execuções
-- Asserção de ausência só depois de uma presença que prove a lista certa na tela: ao trocar de filtro, a lista anterior fica até a resposta
+- Asserção de ausência só depois de uma presença que prove a lista certa na tela: ao trocar de filtro, a lista anterior fica até a resposta — regra registrada em `e2e_conventions.md`, no checklist e no agente de E2E
 - Provas de mutação: sem aceitar o diálogo, a exclusão falha; com a sessão do `lead`, o teste do escopo do `qa` falha
-- Estabilidade: 290 de 290 com `--repeat-each=5` em paralelo, e 58 de 58 com `--workers=1`; depois das 348 execuções, a base voltou às 8 tarefas do seed
+- Estabilidade: 290 de 290 com `--repeat-each=5` em paralelo, e 58 de 58 com `--workers=1`; depois das 348 execuções, a base voltou às 8 tarefas do seed. Depois das correções da revisão, 58 de 58 de novo, com a base nas mesmas 8
+- Revisão: a prioridade do teste de criação deixou de ser sorteada — o padrão do formulário, `medium`, saía em um terço das execuções e não provava o select (MEDIUM); a limpeza passou a tentar cada tarefa e a ignorar só `TASK_NOT_FOUND`, e a criada pela tela é anotada antes da conferência do `201` (LOW)
 
 ---
 
