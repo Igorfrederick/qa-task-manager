@@ -1,5 +1,6 @@
 import { request } from '@playwright/test'
 
+import { ApiCallError } from '../services/ApiCallError'
 import { AuthService } from '../services/AuthService'
 import { env } from './env'
 
@@ -19,11 +20,17 @@ export default async function globalSetup(): Promise<void> {
       try {
         session = await auth.login(credentials)
       } catch (error) {
+        const cause = `Causa: ${(error as Error).message}`
+        if (error instanceof ApiCallError && error.status === 401) {
+          throw new Error(
+            `A conta ${role} do e2e/.env (${credentials.email}) não entra na API em ${env.apiUrl}.\n` +
+              'Rode `npm run seed` em backend/, com SEED_LEAD_PASSWORD e SEED_QA_PASSWORD iguais a ' +
+              `E2E_LEAD_PASSWORD e E2E_QA_PASSWORD.\n${cause}`,
+          )
+        }
         throw new Error(
-          `A conta ${role} do e2e/.env (${credentials.email}) não entra na API em ${env.apiUrl}.\n` +
-            'Rode `npm run seed` em backend/, com SEED_LEAD_PASSWORD e SEED_QA_PASSWORD iguais a ' +
-            'E2E_LEAD_PASSWORD e E2E_QA_PASSWORD.\n' +
-            `Causa: ${(error as Error).message}`,
+          `O login da conta ${role} em ${env.apiUrl} falhou, e não por credencial: confira se API_URL ` +
+            `aponta para a API do Task Manager e se ela está no ar.\n${cause}`,
         )
       }
       if (session.user.role !== role) {

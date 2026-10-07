@@ -1,5 +1,7 @@
 import type { APIRequestContext } from '@playwright/test'
 
+import { ApiCallError } from './ApiCallError'
+
 export type Role = 'qa' | 'lead'
 
 export type Credentials = {
@@ -33,7 +35,10 @@ export class AuthService {
   async login(credentials: Credentials): Promise<Session> {
     const response = await this.request.post('auth/login', { data: credentials })
     if (!response.ok()) {
-      throw new Error(`Login de ${credentials.email} respondeu ${response.status()}: ${await response.text()}`)
+      throw new ApiCallError(
+        response.status(),
+        `Login de ${credentials.email} respondeu ${response.status()}: ${await response.text()}`,
+      )
     }
     return response.json()
   }
