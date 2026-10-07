@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { Navigate, useLocation } from 'react-router'
 
 import Button from '../../components/Button/Button.jsx'
 import TextField from '../../components/TextField/TextField.jsx'
@@ -10,8 +10,8 @@ import { loginSchema } from '../../schemas/loginSchema.js'
 import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
-  const { login } = useAuth()
-  const navigate = useNavigate()
+  const { user, login } = useAuth()
+  const location = useLocation()
   const [apiError, setApiError] = useState(null)
   const {
     register,
@@ -26,10 +26,15 @@ export default function LoginPage() {
     setApiError(null)
     try {
       await login(credentials)
-      navigate('/tasks', { replace: true })
     } catch (error) {
       setApiError(error.message)
     }
+  }
+
+  // Com sessão aberta — recém-criada pelo login ou restaurada —, a tela segue
+  // para onde o usuário queria ir antes de ser mandado ao /login.
+  if (user) {
+    return <Navigate to={location.state?.from ?? '/tasks'} replace />
   }
 
   return (

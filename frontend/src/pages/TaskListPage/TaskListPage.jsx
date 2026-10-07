@@ -1,7 +1,7 @@
 export default function TaskListPage() {
   return (
-    <main>
+    <section>
       <h1>Tarefas</h1>
-    </main>
+    </section>
   )
 }

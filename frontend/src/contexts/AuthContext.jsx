@@ -1,5 +1,6 @@
-import { createContext, useState } from 'react'
+import { createContext, useCallback, useEffect, useState } from 'react'
 
+import { setUnauthorizedHandler } from '../services/api.js'
 import * as authService from '../services/authService.js'
 import { tokenStorage } from '../utils/tokenStorage.js'
 
@@ -11,6 +12,29 @@ export const AuthContext = createContext(null)
  */
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  // Com token guardado, a sessão só vale depois de a API confirmar o usuário.
+  const [isRestoring, setIsRestoring] = useState(() => tokenStorage.get() !== null)
+
+  const logout = useCallback(() => {
+    tokenStorage.clear()
+    setUser(null)
+  }, [])
+
+  useEffect(() => {
+    setUnauthorizedHandler(logout)
+  }, [logout])
+
+  // Página recarregada: o token guardado precisa de um usuário. Sem a
+  // confirmação da API — token vencido, usuário removido ou servidor fora —,
+  // não há sessão.
+  useEffect(() => {
+    if (!tokenStorage.get()) return
+    authService
+      .getMe()
+      .then(setUser)
+      .catch(logout)
+      .finally(() => setIsRestoring(false))
+  }, [logout])
 
   async function login(credentials) {
     const session = await authService.login(credentials)
@@ -18,5 +42,5 @@ export function AuthProvider({ children }) {
     setUser(session.user)
   }
 
-  return <AuthContext value={{ user, login }}>{children}</AuthContext>
+  return <AuthContext value={{ user, isRestoring, login, logout }}>{children}</AuthContext>
 }

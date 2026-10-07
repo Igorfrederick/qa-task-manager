@@ -23,3 +23,13 @@
 .primary:hover:not(:disabled) {
   background: var(--color-primary-hover);
 }
+
+.secondary {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--color-bg);
+}
