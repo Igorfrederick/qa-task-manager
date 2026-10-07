@@ -37,7 +37,12 @@ export function useTasks({ status, priority }) {
     }
   }, [status, priority, reloadCount])
 
-  const reload = useCallback(() => setReloadCount((count) => count + 1), [])
+  // Marca o carregamento já na chamada, e não só quando o efeito rodar: entre
+  // as duas renderizações, as ações da lista reabilitariam sobre dado velho.
+  const reload = useCallback(() => {
+    setIsLoading(true)
+    setReloadCount((count) => count + 1)
+  }, [])
 
   return { tasks, isLoading, error, reload }
 }

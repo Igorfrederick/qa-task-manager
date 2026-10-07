@@ -30,6 +30,7 @@ export default function TaskListPage() {
   const [actionError, setActionError] = useState(null)
 
   function handleFilterChange(name, value) {
+    setActionError(null)
     const next = new URLSearchParams(searchParams)
     if (value) {
       next.set(name, value)
