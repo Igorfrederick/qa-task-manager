@@ -1,5 +1,5 @@
 import { authenticate } from '../services/authService.js'
-import { registerUser } from '../services/userService.js'
+import { getAuthenticatedUser, registerUser } from '../services/userService.js'
 
 /**
  * Entrada e saída HTTP das rotas de autenticação. Nenhuma regra de negócio.
@@ -23,6 +23,15 @@ export function login(req, res, next) {
   authenticate(req.body)
     .then(({ token, user }) => {
       res.status(200).json({ token, user })
+    })
+    .catch(next)
+}
+
+/** `req.user` vem do middleware de autenticação; o service recebe só o id. */
+export function me(req, res, next) {
+  getAuthenticatedUser(req.user.id)
+    .then((user) => {
+      res.status(200).json({ user })
     })
     .catch(next)
 }

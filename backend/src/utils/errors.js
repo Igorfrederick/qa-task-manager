@@ -18,6 +18,11 @@ export const ERRORS = Object.freeze({
   // Um só `code` para e-mail inexistente e senha errada: o contrato exige que
   // os dois respondam igual, para não revelar quais e-mails têm conta.
   INVALID_CREDENTIALS: { status: 401, message: 'E-mail ou senha inválidos' },
+  // Três `code`s de token, e não um: cada causa de `401` tem asserção própria
+  // no teste. Para o frontend, os três encerram a sessão do mesmo jeito.
+  TOKEN_MISSING: { status: 401, message: 'Autenticação necessária' },
+  TOKEN_INVALID: { status: 401, message: 'Sessão inválida; entre novamente' },
+  TOKEN_EXPIRED: { status: 401, message: 'Sessão expirada; entre novamente' },
   NOT_FOUND: { status: 404, message: 'Rota não encontrada' },
   // `409` porque é invariante de domínio: só se julga consultando o banco. O
   // formato do e-mail é invariante de entrada e morre no schema com `400`.

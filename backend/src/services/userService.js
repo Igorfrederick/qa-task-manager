@@ -56,3 +56,22 @@ export async function registerUser({ name, email, password, role }) {
     throw error
   }
 }
+
+/**
+ * Usuário autenticado, a partir do id que veio no token.
+ *
+ * Usuário que não existe mais é `TOKEN_INVALID`, e não `404`: para quem chama,
+ * a credencial não identifica ninguém. O `401` leva o frontend a encerrar a
+ * sessão; um `404` o deixaria preso numa tela de erro.
+ *
+ * @param {string} id
+ * @returns {Promise<import('mongoose').Document>}
+ * @throws {AppError} `TOKEN_INVALID` quando o usuário do token não existe mais
+ */
+export async function getAuthenticatedUser(id) {
+  const user = await User.findById(id)
+  if (!user) {
+    throw new AppError('TOKEN_INVALID')
+  }
+  return user
+}
