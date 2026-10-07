@@ -1,5 +1,4 @@
 import { expect, test } from '../../fixtures/test'
-import { env } from '../../support/env'
 
 for (const role of ['qa', 'lead'] as const) {
   test.describe(`sessão de ${role} guardada no navegador`, () => {
@@ -24,14 +23,3 @@ for (const role of ['qa', 'lead'] as const) {
     })
   })
 }
-
-test.describe('sem sessão', () => {
-  test('a rota pedida, com os filtros, abre depois do login', async ({ page, loginPage }) => {
-    await page.goto('/tasks?status=done&priority=high')
-    await expect(page).toHaveURL('/login')
-
-    await loginPage.login(env.qa)
-
-    await expect(page).toHaveURL('/tasks?status=done&priority=high')
-  })
-})

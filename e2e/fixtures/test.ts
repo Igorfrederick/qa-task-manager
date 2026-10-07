@@ -14,7 +14,6 @@ type TestFixtures = {
   role: Role | null
   loginPage: LoginPage
   taskListPage: TaskListPage
-  authService: AuthService
 }
 
 type WorkerFixtures = {
@@ -29,8 +28,7 @@ type WorkerFixtures = {
  * deixa —, sem passar pela tela. Sem `role`, o teste começa sem sessão.
  *
  * Os Page Objects chegam por fixture, construídos sobre a página do próprio
- * teste — injeção, sem herança de BasePage. A service layer fala com a API
- * num contexto de requisição apontado para API_URL.
+ * teste — injeção, sem herança de BasePage.
  */
 export const test = base.extend<TestFixtures, WorkerFixtures>({
   role: [null, { option: true }],
@@ -71,12 +69,6 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   taskListPage: async ({ page }, use) => {
     await use(new TaskListPage(page))
-  },
-
-  authService: async ({}, use) => {
-    const apiContext = await request.newContext({ baseURL: env.apiUrl })
-    await use(new AuthService(apiContext))
-    await apiContext.dispose()
   },
 })
 

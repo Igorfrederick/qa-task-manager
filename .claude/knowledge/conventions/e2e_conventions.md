@@ -48,6 +48,7 @@ Page Object que assere, crie massa ou chame a API é quebra de camada — mesma 
 - **Zero dado hardcoded**
 - Cada teste gera a própria massa
 - Identificador que precisa ser único carrega entropia — nome fixo colide entre workers em paralelo
+- Massa gerada dentro do teste, nunca no título nem no corpo do `describe`: o Playwright carrega o arquivo de novo em cada worker, e título com valor aleatório falha com "Test not found in the worker process"
 
 ## Setup e teardown
 

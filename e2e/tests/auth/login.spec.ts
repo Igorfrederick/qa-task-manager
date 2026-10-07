@@ -16,17 +16,38 @@ test.describe('login pela tela', () => {
       page,
       loginPage,
       taskListPage,
-      authService,
+      sessions,
     }) => {
-      const { user } = await authService.login(env[role])
       await loginPage.goto()
 
       await loginPage.login(env[role])
 
       await expect(page).toHaveURL('/tasks')
-      await expect(taskListPage.userName).toHaveText(user.name)
+      await expect(taskListPage.userName).toHaveText(sessions[role].user.name)
     })
   }
+
+  // Liga a tela ao atalho das fixtures: os outros testes começam com o token
+  // no localStorage porque é esse o estado que o login deixa.
+  test('a sessão aberta pela tela sobrevive à recarga', async ({ page, loginPage, taskListPage, sessions }) => {
+    await loginPage.goto()
+    await loginPage.login(env.qa)
+    await expect(page).toHaveURL('/tasks')
+
+    await page.reload()
+
+    await expect(page).toHaveURL('/tasks')
+    await expect(taskListPage.userName).toHaveText(sessions.qa.user.name)
+  })
+
+  test('a rota pedida sem sessão, com os filtros, abre depois do login', async ({ page, loginPage }) => {
+    await page.goto('/tasks?status=done&priority=high')
+    await expect(page).toHaveURL('/login')
+
+    await loginPage.login(env.qa)
+
+    await expect(page).toHaveURL('/tasks?status=done&priority=high')
+  })
 
   const invalidCredentials = [
     { case: 'senha errada', build: () => buildCredentials({ email: env.qa.email }) },
@@ -41,9 +62,11 @@ test.describe('login pela tela', () => {
       await loginPage.login(build())
 
       const response = await loginResponse
+      const { error } = await response.json()
       expect(response.status()).toBe(401)
-      expect((await response.json()).error.code).toBe('INVALID_CREDENTIALS')
-      await expect(loginPage.errorMessage).toBeVisible()
+      expect(error.code).toBe('INVALID_CREDENTIALS')
+      // A tela mostra o que a API disse, sem o teste fixar o texto.
+      await expect(loginPage.errorMessage).toHaveText(error.message)
       await expect(page).toHaveURL('/login')
     })
   }

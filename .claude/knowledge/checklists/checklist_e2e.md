@@ -29,7 +29,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 
 - [ ] Gerada por factory com faker
 - [ ] **Zero dado hardcoded**
-- [ ] Cada teste gera a própria massa
+- [ ] Cada teste gera a própria massa, dentro do teste — nunca no título nem no corpo do `describe`
 - [ ] Identificador que precisa ser único carrega entropia — sem nome fixo que colida entre workers
 
 ## Independência
