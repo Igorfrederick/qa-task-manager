@@ -154,7 +154,7 @@ Guardar a mensagem no catálogo dá a ela o teste de unidade que a entrada *Erro
 
 **Alternativa descartada:** um gerenciador de notas — ainda mais simples, mas sem status e prioridade, que dão os filtros e os casos de teste mais úteis. Um domínio com regra própria, como agenda ou assinaturas — trocaria tempo de demonstração por tempo de regra de negócio. As etapas 4 e 5 no mesmo repositório — misturaria entregáveis com critérios de avaliação diferentes.
 
-**Alinhamento:** a confirmar com Murilo Morato, tech lead — registrar aqui a data e a resposta.
+**Alinhamento:** confirmado com Murilo Morato, tech lead, em 07/10/2026 — as etapas 1 a 3 ficam em repositório próprio, separadas das etapas 4 e 5.
 
 ---
 

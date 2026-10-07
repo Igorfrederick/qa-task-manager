@@ -13,8 +13,8 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | Passo | Entrega | Situação |
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
-| **2** | **Backend completo, contrato estável** | **Em fechamento** — 2.1 (PR #1) e 2.2 (PR #2) mergeadas; 2.3 concluída em 07/10/2026 (PR #3): duas passadas do `code-reviewer`, a segunda sem bloqueios, achados tratados; aguarda merge |
-| 3 | Frontend — três telas | Próximo |
+| 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
+| **3** | **Frontend — três telas** | **Próximo** |
 | 4 | E2E | Não iniciado |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
 
@@ -103,9 +103,8 @@ README final com a tabela critério → lugar no repositório, passada única do
 
 | # | Pendência | Por que importa |
 |---|---|---|
-| 1 | **Alinhamento com o Murilo** sobre o domínio do projeto | A entrada de 01/10 sobre o domínio, em `docs/decisions.md`, espera a data e a resposta |
-| 2 | **Decisões em aberto do frontend** — armazenamento do token e abordagem de estilo | `CLAUDE.md` §10; decidir no início do Passo 3 |
-| 3 | **Caminho do `docker compose` não verificado** — a máquina de desenvolvimento não tem Docker; o MongoDB 7 roda de um zip, fora do repositório, em `%USERPROFILE%\mongodb`, e sobe com `start-mongod.cmd` | O README manda o avaliador pelo compose: antes da entrega, alguém com Docker roda `docker compose up -d` e a suíte uma vez |
+| 1 | **Decisões em aberto do frontend** — armazenamento do token e abordagem de estilo | `CLAUDE.md` §10; decidir no início do Passo 3 |
+| 2 | **Caminho do `docker compose` não verificado** — a máquina de desenvolvimento ainda não tem Docker nem WSL; o MongoDB 7 roda de um zip, fora do repositório, em `%USERPROFILE%\mongodb`, e sobe com `start-mongod.cmd`. Decidido em 07/10: verificar nesta máquina, instalando o Docker | O README manda o avaliador pelo compose: antes da entrega, `docker compose up -d` e a suíte rodam uma vez num clone limpo |
 
 ---
 
