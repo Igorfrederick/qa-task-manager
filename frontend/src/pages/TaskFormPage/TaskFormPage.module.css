@@ -1,0 +1,32 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+  max-width: 640px;
+}
+
+.form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.notFound {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  max-width: 640px;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.notFound p {
+  color: var(--color-text-muted);
+}

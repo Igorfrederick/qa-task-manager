@@ -22,6 +22,11 @@
   border-color: var(--color-danger);
 }
 
+textarea.control {
+  min-height: calc(var(--control-min-height) * 3);
+  resize: vertical;
+}
+
 .error {
   color: var(--color-danger);
   font-size: var(--font-size-sm);

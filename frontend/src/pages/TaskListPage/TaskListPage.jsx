@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 
+import Button from '../../components/Button/Button.jsx'
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage.jsx'
 import LoadingMessage from '../../components/LoadingMessage/LoadingMessage.jsx'
 import SelectField from '../../components/SelectField/SelectField.jsx'
@@ -20,6 +21,7 @@ function readFilter(searchParams, name, values) {
 
 export default function TaskListPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const status = readFilter(searchParams, 'status', STATUS_VALUES)
   const priority = readFilter(searchParams, 'priority', PRIORITY_VALUES)
@@ -89,6 +91,7 @@ export default function TaskListPage() {
             showOwner={user.role === 'lead'}
             isBusy={isLoading || busyTaskId === task._id}
             onToggleStatus={handleToggleStatus}
+            onEdit={(task) => navigate(`/tasks/${task._id}`)}
             onDelete={handleDelete}
           />
         ))}
@@ -100,6 +103,9 @@ export default function TaskListPage() {
     <section className={styles.page}>
       <div className={styles.header}>
         <h1>Tarefas</h1>
+        <Button onClick={() => navigate('/tasks/new')} data-cy="task-list-new-button">
+          Nova tarefa
+        </Button>
       </div>
 
       <div className={styles.filters}>

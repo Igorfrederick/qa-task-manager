@@ -6,7 +6,7 @@ import styles from './TaskListPage.module.css'
  * Uma tarefa da lista, com as ações sobre ela. `showOwner` é o líder, que vê
  * as tarefas do time; `isBusy` trava as ações enquanto uma delas não volta.
  */
-export default function TaskListItem({ task, showOwner, isBusy, onToggleStatus, onDelete }) {
+export default function TaskListItem({ task, showOwner, isBusy, onToggleStatus, onEdit, onDelete }) {
   const id = task._id
   const isDone = task.status === 'done'
 
@@ -44,6 +44,15 @@ export default function TaskListItem({ task, showOwner, isBusy, onToggleStatus, 
           data-cy={isDone ? `task-list-reopen-button-${id}` : `task-list-complete-button-${id}`}
         >
           {isDone ? 'Reabrir' : 'Concluir'}
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={isBusy}
+          onClick={() => onEdit(task)}
+          aria-label={`Editar "${task.title}"`}
+          data-cy={`task-list-edit-button-${id}`}
+        >
+          Editar
         </Button>
         <Button
           variant="danger"
