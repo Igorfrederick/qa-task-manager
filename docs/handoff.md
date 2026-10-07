@@ -13,7 +13,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | Passo | Entrega | Situação |
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
-| **2** | **Backend completo, contrato estável** | **Em andamento** — 2.1 mergeada em 06/10/2026 (PR #1); 2.2 concluída em 06/10/2026, em PR, aguardando a passada do `code-reviewer`; falta 2.3 |
+| **2** | **Backend completo, contrato estável** | **Em andamento** — 2.1 mergeada em 06/10/2026 (PR #1); 2.2 concluída em 06/10/2026 (PR #2): passada única do `code-reviewer` sem bloqueios, achados tratados; aguarda merge. Falta 2.3 |
 | 3 | Frontend — três telas | Não iniciado |
 | 4 | E2E | Não iniciado |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
@@ -29,7 +29,8 @@ Backend, com testes:
 - `POST /auth/register` — exclusivo do `lead` (`requireRole`, `403 FORBIDDEN`); hash bcrypt e dupla barreira no `passwordHash` (`select: false` e `transform`)
 - `GET /tasks` e `POST /tasks`, `GET`, `PATCH` e `DELETE /tasks/:id` — o escopo por dono entra na própria consulta: o `qa` alcança só as próprias tarefas, o `lead` as do time inteiro; para o `qa`, tarefa de outra pessoa responde `404 TASK_NOT_FOUND` com o mesmo corpo da inexistente
 - Dono da tarefa sempre do token: `userId` no payload é descartado na criação e não transfere a tarefa na edição; na resposta, o dono sai como `owner: { _id, name }`
-- Filtros `status` e `priority` na listagem, validados como o corpo; id fora do formato responde `400` com `id` em `details`, nunca `500`
+- Filtros `status` e `priority` na listagem, validados como o corpo; campo fora do schema na query é descartado antes da consulta; id fora do formato responde `400` com `id` em `details`, nunca `500`
+- Respostas de `User` e `Task` na forma do contrato, sem `__v`: os testes de forma listam as chaves permitidas, não as proibidas
 - `GET /api/health`
 - Catálogo de `code`s em `utils/errors.js`, com um teste que falha se ele divergir de `api_contract.md` §Catálogo de `code`s
 - Validação das variáveis de ambiente na importação de `config/env.js`
@@ -54,7 +55,7 @@ Uma branch por fatia, PR para a `main`, uma passada do `code-reviewer` por PR. A
 
 A fatia 2.1 fechou as duas decisões em aberto do backend: o `code` carrega o status num catálogo único, e a família `401`/`403` tem cinco `code`s — entradas de 01/10 em `docs/decisions.md`.
 
-Para a 2.3: `e2e/.env.example` declara credenciais de um `lead` e de **um** `qa`, mas o plano prevê dois `qa` — o segundo existe para o E2E provar que o primeiro não vê as tarefas dele. Decidir no plano da fatia se ele ganha credencial no `.env.example` ou se o seed o cria sem login. A senha do seed não pode ser literal no código: vem de variável de ambiente, com valor fictício no `.env.example`. Os padrões de `Task` estão no model, e valem também para o seed.
+Para a 2.3: `e2e/.env.example` declara credenciais de um `lead` e de **um** `qa`, mas o plano prevê dois `qa` — o segundo existe para o E2E provar que o primeiro não vê as tarefas dele. Decidir no plano da fatia se ele ganha credencial no `.env.example` ou se o seed o cria sem login. A senha do seed não pode ser literal no código: vem de variável de ambiente, com valor fictício no `.env.example`. Os padrões, os enums e os limites de tamanho de `Task` estão no model, e valem também para o seed. **O seed apaga as tarefas junto com os usuários:** tarefa cujo dono não existe sai com `owner: null`, e um `task.owner.name` no frontend quebraria a tela do líder.
 
 ### Passo 3 — Frontend
 
