@@ -6,6 +6,7 @@ import {
   TASK_STATUS,
   TASK_STATUS_VALUES,
 } from '../utils/taskEnums.js'
+import { TASK_DESCRIPTION_MAX_LENGTH, TASK_TITLE_MAX_LENGTH } from '../utils/taskLimits.js'
 
 /**
  * Tarefa de uma pessoa do time.
@@ -19,9 +20,10 @@ import {
  * serialização traria junto o `id`, cópia de `_id`; o transform o retira da
  * resposta, e o getter `task.id` continua existindo no documento.
  *
- * Os padrões de `description`, `status` e `priority` ficam aqui, e não no
- * schema de entrada: valem para qualquer caminho de criação — a rota, o
- * service chamado direto, o seed —, e não só para o que passa pelo Zod.
+ * Os padrões de `description`, `status` e `priority` e os limites de tamanho
+ * ficam aqui, e não só no schema de entrada: valem para qualquer caminho de
+ * escrita — a rota, o service chamado direto, o seed —, e não só para o que
+ * passa pelo Zod.
  */
 
 function toResponse(_doc, ret) {
@@ -38,10 +40,12 @@ const taskSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: TASK_TITLE_MAX_LENGTH,
     },
     description: {
       type: String,
       default: '',
+      maxlength: TASK_DESCRIPTION_MAX_LENGTH,
     },
     status: {
       type: String,

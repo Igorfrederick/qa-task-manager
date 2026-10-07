@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
@@ -13,6 +14,7 @@ import {
 import { registerUser } from '../../src/services/userService.js'
 import { AppError } from '../../src/utils/errors.js'
 import { ROLES } from '../../src/utils/roles.js'
+import { TASK_DESCRIPTION_MAX_LENGTH, TASK_TITLE_MAX_LENGTH } from '../../src/utils/taskLimits.js'
 
 /**
  * Teste do service de tarefa SEM HTTP e SEM subir a aplicação.
@@ -111,6 +113,19 @@ describe('taskService', () => {
   })
 
   describe('updateTask', () => {
+    it('recusa descrição acima do limite mesmo sem o schema de entrada', async () => {
+      // Chamado direto, como o seed chamará: quem barra é o model, pelo
+      // runValidators da edição.
+      const own = await Task.create({ title: 'Tarefa da QA', userId: qa.id })
+
+      const error = await updateTask(authenticated(qa), own.id, {
+        description: 'a'.repeat(TASK_DESCRIPTION_MAX_LENGTH + 1),
+      }).catch((e) => e)
+
+      expect(error).toBeInstanceOf(mongoose.Error.ValidationError)
+      expect((await Task.findById(own.id)).description).toBe('')
+    })
+
     it('lança TASK_NOT_FOUND ao qa que edita a tarefa de outra pessoa, sem alterá-la', async () => {
       const foreign = await Task.create({ title: 'Tarefa da outra QA', userId: otherQa.id })
 
@@ -153,6 +168,15 @@ describe('taskService', () => {
   })
 
   describe('createTask', () => {
+    it('recusa título acima do limite mesmo sem o schema de entrada', async () => {
+      const error = await createTask(authenticated(qa), {
+        title: 'a'.repeat(TASK_TITLE_MAX_LENGTH + 1),
+      }).catch((e) => e)
+
+      expect(error).toBeInstanceOf(mongoose.Error.ValidationError)
+      expect(await Task.countDocuments()).toBe(0)
+    })
+
     it('grava o usuário autenticado como dono, ignorando userId nos dados', async () => {
       // Chamado direto, sem o schema de entrada que descartaria o campo: o
       // service sozinho já garante a regra 3.

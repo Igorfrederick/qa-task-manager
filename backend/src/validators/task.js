@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { TASK_PRIORITY_VALUES, TASK_STATUS_VALUES } from '../utils/taskEnums.js'
+import { TASK_DESCRIPTION_MAX_LENGTH, TASK_TITLE_MAX_LENGTH } from '../utils/taskLimits.js'
 
 /**
  * Schemas de entrada das rotas de tarefa.
@@ -23,10 +24,13 @@ export const createTaskSchema = z.object({
     .string({ required_error: 'Informe o título', invalid_type_error: 'O título precisa ser texto' })
     .trim()
     .min(1, 'Informe o título')
-    .max(120, 'O título pode ter no máximo 120 caracteres'),
+    .max(TASK_TITLE_MAX_LENGTH, `O título pode ter no máximo ${TASK_TITLE_MAX_LENGTH} caracteres`),
   description: z
     .string({ invalid_type_error: 'A descrição precisa ser texto' })
-    .max(2000, 'A descrição pode ter no máximo 2000 caracteres')
+    .max(
+      TASK_DESCRIPTION_MAX_LENGTH,
+      `A descrição pode ter no máximo ${TASK_DESCRIPTION_MAX_LENGTH} caracteres`,
+    )
     .optional(),
   status: status.optional(),
   priority: priority.optional(),
