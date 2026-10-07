@@ -66,8 +66,8 @@ export default function TaskListPage() {
   }
 
   function handleToggleStatus(task) {
-    const status = task.status === 'done' ? 'open' : 'done'
-    runAction(task._id, () => taskService.updateTask(task._id, { status }))
+    const nextStatus = task.status === 'done' ? 'open' : 'done'
+    runAction(task._id, () => taskService.updateTask(task._id, { status: nextStatus }))
   }
 
   // Confirmação pelo diálogo nativo do navegador — decisão de 07/10/2026.
