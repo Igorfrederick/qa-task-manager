@@ -97,9 +97,10 @@ describe('seedDatabase', () => {
   })
 
   it.each([
-    ['curta demais', 'curta'],
-    ['acima de 72 bytes', 'ç'.repeat(40)],
-  ])('recusa senha %s, como a API, sem apagar a base', async (_case, password) => {
+    ['do qa curta demais', 'qaPassword', 'curta', 'Senha do qa'],
+    ['do qa acima de 72 bytes', 'qaPassword', 'ç'.repeat(40), 'Senha do qa'],
+    ['do lead acima de 72 bytes', 'leadPassword', 'ç'.repeat(40), 'Senha do lead'],
+  ])('recusa senha %s, como a API, sem apagar a base', async (_case, key, password, message) => {
     const stranger = await registerUser({
       name: 'Pessoa Avulsa',
       email: 'avulsa@exemplo.test',
@@ -107,7 +108,7 @@ describe('seedDatabase', () => {
       role: ROLES.QA,
     })
 
-    await expect(seedDatabase({ ...passwords, qaPassword: password })).rejects.toThrow('Senha do qa')
+    await expect(seedDatabase({ ...passwords, [key]: password })).rejects.toThrow(message)
 
     expect(await User.exists({ _id: stranger._id })).not.toBeNull()
     expect(await User.exists({ email: 'lead@exemplo.test' })).toBeNull()
