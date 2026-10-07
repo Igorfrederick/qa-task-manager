@@ -8,6 +8,18 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] Massa do E2E com `@faker-js/faker`, na versão 10
+
+**Decisão:** as factories de `e2e/factories/` geram a massa com `@faker-js/faker` 10, com entropia no que precisa ser único. O `engines` da suíte acompanha o do faker: Node 20.19+, 22.13+ ou 23.5+.
+
+**Motivo:** a convenção de E2E pede massa por factory com faker desde 01/10, e `@faker-js/faker` é o pacote mantido. A versão 9, instalada primeiro, tinha alerta alto — GHSA-qxc2-j82w-r537, execução de código por `helpers.fake`, em todas as versões até a 10.4.0. A 10.6, instalada no lugar, está fora da faixa.
+
+**Alternativa descartada:** gerar à mão com `crypto.randomUUID` — resolve a entropia, mas não dá título nem descrição plausíveis de tarefa. Ficar na 9 — com o alerta aberto.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] Suíte E2E: `data-cy` como test id, desktop e celular, e a aplicação subida pelo Playwright
 
 **Decisão:** a config do Playwright define `testIdAttribute: 'data-cy'`, e os Page Objects localizam por `getByTestId`. Cada teste roda em dois projetos, `desktop` (Desktop Chrome) e `mobile` (Pixel 7). O `webServer` sobe a API e o frontend — ou reaproveita os que já estiverem no ar —, e um `globalSetup` confere que as contas do seed entram na API antes do primeiro teste. Banco e seed ficam fora: são pré-requisito documentado no README. O `e2e/.env` é lido por `process.loadEnvFile`, do próprio Node, e não há nova tentativa (`retries: 0`).

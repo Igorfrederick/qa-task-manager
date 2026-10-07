@@ -40,10 +40,11 @@ Page Object que assere, crie massa ou chame a API é quebra de camada — mesma 
 - Verificam **a coisa certa**: teste de criação confirma o item na lista, não o fechamento do formulário; teste de exclusão confirma pela API que a tarefa não existe mais
 - Todo fluxo termina em asserção
 - Sobre erro da API, asseveram o `code` — nunca a mensagem em português
+- Erro de validação do formulário nasce no frontend e não tem `code`: é asseverado pelo texto do campo, que é o que distingue um erro de outro no mesmo `data-cy`
 
 ## Massa de dados
 
-- Gerada por factory com faker, com overrides para o que o teste precisa fixar
+- Gerada por factory com faker (`@faker-js/faker`), com overrides para o que o teste precisa fixar
 - **Zero dado hardcoded**
 - Cada teste gera a própria massa
 - Identificador que precisa ser único carrega entropia — nome fixo colide entre workers em paralelo

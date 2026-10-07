@@ -83,4 +83,4 @@ Autenticação e autorização são critério próprio da rubrica e ficam fora d
 - [ ] Rota protegida sem sessão redireciona para `/login` (E2E)
 - [ ] Token ausente ou inválido responde `401`, distinto do `403` (`backend/tests/`)
 - [ ] `qa` tentando criar conta responde `403` (`backend/tests/`)
-- [ ] Erro asseverado pelo `code`, nunca pela mensagem em português
+- [ ] Erro da API asseverado pelo `code`, nunca pela mensagem em português; erro de validação do formulário, sem `code`, pelo texto do campo
