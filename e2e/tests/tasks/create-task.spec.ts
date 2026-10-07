@@ -21,7 +21,9 @@ test.describe('criar tarefa pela tela', () => {
     taskApi,
     sessions,
   }) => {
-    const data = buildTask()
+    // Prioridade fora do padrão do formulário, 'medium': com o padrão, a
+    // escolha no select se perderia e o teste passaria do mesmo jeito.
+    const data = buildTask({ priority: 'high' })
     await taskListPage.goto()
     await taskListPage.openNewTask()
     const creation = waitForTaskCreation(page)
