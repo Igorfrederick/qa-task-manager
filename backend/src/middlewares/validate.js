@@ -26,6 +26,10 @@ export const validateParams = validateRequestPart('params')
 function validateRequestPart(part) {
   return (schema) => (req, _res, next) => {
     try {
+      // Express 4: `req.query` e `req.params` são propriedades comuns e aceitam
+      // a atribuição. No Express 5, `req.query` é getter e esta linha lançaria;
+      // a saída é guardar o resultado em outra propriedade, nunca validar sem
+      // substituir — é a substituição que descarta o campo não declarado.
       req[part] = schema.parse(req[part])
       next()
     } catch (error) {

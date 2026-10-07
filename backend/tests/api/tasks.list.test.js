@@ -129,6 +129,8 @@ describe('GET /api/tasks', () => {
     ['status fora do domínio', '?status=doing', 'status'],
     ['prioridade fora do domínio', '?priority=urgent', 'priority'],
     ['status repetido', '?status=open&status=done', 'status'],
+    // Para não filtrar, o parâmetro é omitido; vazio é valor fora do domínio.
+    ['status vazio', '?status=', 'status'],
   ])('recusa filtro com %s com 400 e o campo em details', async (_case, query, field) => {
     const response = await request(app)
       .get(`/api/tasks${query}`)
@@ -137,6 +139,18 @@ describe('GET /api/tasks', () => {
     expect(response.status).toBe(400)
     expect(response.body.error.code).toBe('VALIDATION_ERROR')
     expect(response.body.error.details.map((d) => d.field)).toContain(field)
+  })
+
+  it('descarta filtro fora do schema antes de consultar o banco', async () => {
+    // Só status e priority chegam à consulta. Sem a substituição de req.query
+    // no middleware, este operador seria aplicado pelo MongoDB e a lista viria
+    // vazia — e um ?$where executaria JavaScript no banco.
+    const response = await request(app)
+      .get('/api/tasks?title[$regex]=nada-casa-com-isto')
+      .set('Authorization', `Bearer ${qa.token}`)
+
+    expect(response.status).toBe(200)
+    expect(titles(response)).toEqual(['Segunda tarefa da QA', 'Primeira tarefa da QA'])
   })
 
   it('responde 401 TOKEN_MISSING sem token', async () => {

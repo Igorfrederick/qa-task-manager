@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import request from 'supertest'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
@@ -106,7 +107,7 @@ describe('PATCH /api/tasks/:id', () => {
     expect(persisted.userId.toString()).toBe(qa.user.id)
   })
 
-  it('responde 200 com a tarefa como estava quando o corpo não traz campo editável', async () => {
+  it('responde 200 sem alterar os campos editáveis quando o corpo não traz nenhum', async () => {
     const response = await patchTask(qaTask.id, {})
 
     expect(response.status).toBe(200)
@@ -126,6 +127,13 @@ describe('PATCH /api/tasks/:id', () => {
 
     const persisted = await Task.findById(otherQaTask.id)
     expect(persisted.title).toBe('Tarefa da outra QA')
+  })
+
+  it('responde 404 TASK_NOT_FOUND para tarefa inexistente', async () => {
+    const response = await patchTask(new mongoose.Types.ObjectId().toString(), { title: 'Válido' })
+
+    expect(response.status).toBe(404)
+    expect(response.body.error.code).toBe('TASK_NOT_FOUND')
   })
 
   it('deixa o lead editar a tarefa de outra pessoa, sem tomar o lugar do dono', async () => {

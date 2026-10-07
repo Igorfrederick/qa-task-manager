@@ -138,6 +138,17 @@ describe('taskService', () => {
       expect((await Task.findById(foreign.id)).title).toBe('Tarefa da outra QA')
     })
 
+    it('recusa status fora do domínio mesmo sem o schema de entrada', async () => {
+      // Chamado direto, como o seed chamará: quem barra aqui é o
+      // runValidators, não o Zod.
+      const own = await Task.create({ title: 'Tarefa da QA', userId: qa.id })
+
+      const error = await updateTask(authenticated(qa), own.id, { status: 'doing' }).catch((e) => e)
+
+      expect(error).toBeInstanceOf(mongoose.Error.ValidationError)
+      expect((await Task.findById(own.id)).status).toBe('open')
+    })
+
     it('mantém o dono quando os dados trazem userId de outra pessoa', async () => {
       const own = await Task.create({ title: 'Tarefa da QA', userId: qa.id })
 
