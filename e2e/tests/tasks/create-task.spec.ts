@@ -1,13 +1,14 @@
-import type { Page } from '@playwright/test'
+import type { Page, Request } from '@playwright/test'
 
 import { buildTask } from '../../factories/taskFactory'
 import { expect, test } from '../../fixtures/test'
 import { PRIORITY_LABELS, STATUS_LABELS } from '../../support/taskLabels'
 
+const isTaskCreation = (request: Request) =>
+  request.method() === 'POST' && new URL(request.url()).pathname === '/api/tasks'
+
 function waitForTaskCreation(page: Page) {
-  return page.waitForResponse(
-    (response) => response.request().method() === 'POST' && new URL(response.url()).pathname === '/api/tasks',
-  )
+  return page.waitForResponse((response) => isTaskCreation(response.request()))
 }
 
 test.describe('criar tarefa pela tela', () => {
@@ -43,5 +44,31 @@ test.describe('criar tarefa pela tela', () => {
       status: 'open',
       owner: { _id: sessions.qa.user._id },
     })
+  })
+
+  test('título vazio: erro no campo, sem chamada à API, e nada é criado', async ({
+    page,
+    taskFormPage,
+    taskApi,
+  }) => {
+    // A API recusaria o título vazio com a mesma mensagem: sem conferir a
+    // chamada, o teste passaria mesmo sem a validação da tela.
+    const creationCalls: string[] = []
+    page.on('request', (request) => {
+      if (isTaskCreation(request)) creationCalls.push(request.url())
+    })
+    // Sem título para ancorar, a âncora é a descrição, que carrega entropia —
+    // nunca a contagem da lista, que outros testes alteram em paralelo.
+    const data = buildTask({ title: '' })
+    await taskFormPage.gotoNew()
+
+    await taskFormPage.fill(data)
+    await taskFormPage.save()
+
+    await expect(taskFormPage.titleError).toHaveText('Informe o título')
+    await expect(page).toHaveURL('/tasks/new')
+    expect(creationCalls).toEqual([])
+    const tasks = await taskApi.qa.list()
+    expect(tasks.map((task) => task.description)).not.toContain(data.description)
   })
 })
