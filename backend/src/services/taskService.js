@@ -1,4 +1,5 @@
 import { Task } from '../models/Task.js'
+import { ROLES } from '../utils/roles.js'
 
 /**
  * Regra de negócio de tarefa.
@@ -10,6 +11,32 @@ import { Task } from '../models/Task.js'
 
 /** Do dono, a resposta expõe só o nome, além do `_id`. */
 const OWNER_FIELDS = 'name'
+
+/**
+ * Escopo por dono, que entra na própria consulta (regra 2).
+ *
+ * O `lead` alcança as tarefas de todo o time; o `qa`, só as próprias. Toda
+ * consulta de tarefa parte deste filtro: não há busca seguida de comparação do
+ * dono, e por isso não há rota em que a comparação possa ser esquecida.
+ */
+function ownerScope(user) {
+  return user.role === ROLES.LEAD ? {} : { userId: user.id }
+}
+
+/**
+ * Tarefas que o usuário alcança, da mais recente para a mais antiga.
+ *
+ * A ordem é fixa: ordenação configurável está fora do escopo do v1. O `_id`
+ * desempata tarefas criadas no mesmo milissegundo.
+ *
+ * @param {{ id: string, role: string }} user usuário autenticado
+ * @returns {Promise<import('mongoose').Document[]>} tarefas com `owner` preenchido
+ */
+export async function listTasks(user) {
+  return Task.find(ownerScope(user))
+    .sort({ createdAt: -1, _id: -1 })
+    .populate('owner', OWNER_FIELDS)
+}
 
 /**
  * Cria a tarefa em nome de quem pede.

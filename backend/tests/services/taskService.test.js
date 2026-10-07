@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
 import { Task } from '../../src/models/Task.js'
 import { User } from '../../src/models/User.js'
-import { createTask } from '../../src/services/taskService.js'
+import { createTask, listTasks } from '../../src/services/taskService.js'
 import { registerUser } from '../../src/services/userService.js'
 import { ROLES } from '../../src/utils/roles.js'
 
@@ -15,6 +15,7 @@ import { ROLES } from '../../src/utils/roles.js'
  * rota: as regras 2 e 3 são do service, não do controller.
  */
 describe('taskService', () => {
+  let lead
   let qa
   let otherQa
 
@@ -26,6 +27,12 @@ describe('taskService', () => {
   })
 
   beforeEach(async () => {
+    lead = await registerUser({
+      name: 'Líder de Teste',
+      email: 'lead@exemplo.test',
+      password: 'senha-de-teste-123',
+      role: ROLES.LEAD,
+    })
     qa = await registerUser({
       name: 'QA de Teste',
       email: 'qa@exemplo.test',
@@ -49,6 +56,25 @@ describe('taskService', () => {
 
   afterAll(async () => {
     await disconnectDatabase()
+  })
+
+  describe('listTasks', () => {
+    beforeEach(async () => {
+      await Task.create({ title: 'Tarefa da QA', userId: qa.id })
+      await Task.create({ title: 'Tarefa da outra QA', userId: otherQa.id })
+    })
+
+    it('filtra pelo dono na consulta quando o usuário é qa', async () => {
+      const tasks = await listTasks(authenticated(qa))
+
+      expect(tasks.map((task) => task.title)).toEqual(['Tarefa da QA'])
+    })
+
+    it('não filtra pelo dono quando o usuário é lead', async () => {
+      const tasks = await listTasks(authenticated(lead))
+
+      expect(tasks.map((task) => task.title)).toEqual(['Tarefa da outra QA', 'Tarefa da QA'])
+    })
   })
 
   describe('createTask', () => {

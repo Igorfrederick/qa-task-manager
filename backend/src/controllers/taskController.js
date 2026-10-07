@@ -1,4 +1,4 @@
-import { createTask } from '../services/taskService.js'
+import { createTask, listTasks } from '../services/taskService.js'
 
 /**
  * Entrada e saída HTTP das rotas de tarefa. Nenhuma regra de negócio: repassa
@@ -8,6 +8,14 @@ import { createTask } from '../services/taskService.js'
  * `.catch(next)` pelo mesmo motivo de `authController.js`: no Express 4, erro
  * em função assíncrona não chega sozinho ao middleware de erro.
  */
+export function list(req, res, next) {
+  listTasks(req.user)
+    .then((tasks) => {
+      res.status(200).json({ tasks })
+    })
+    .catch(next)
+}
+
 export function create(req, res, next) {
   createTask(req.user, req.body)
     .then((task) => {

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import { create } from '../controllers/taskController.js'
+import { create, list } from '../controllers/taskController.js'
 import { requireAuth } from '../middlewares/auth.js'
 import { validateBody } from '../middlewares/validate.js'
 import { createTaskSchema } from '../validators/task.js'
@@ -17,4 +17,5 @@ export const taskRouter = Router()
 
 taskRouter.use(requireAuth)
 
+taskRouter.get('/', list)
 taskRouter.post('/', validateBody(createTaskSchema), create)
