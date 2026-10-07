@@ -23,6 +23,7 @@ export const ERRORS = Object.freeze({
   TOKEN_MISSING: { status: 401, message: 'Autenticação necessária' },
   TOKEN_INVALID: { status: 401, message: 'Sessão inválida; entre novamente' },
   TOKEN_EXPIRED: { status: 401, message: 'Sessão expirada; entre novamente' },
+  FORBIDDEN: { status: 403, message: 'Seu perfil não tem permissão para esta ação' },
   NOT_FOUND: { status: 404, message: 'Rota não encontrada' },
   // `409` porque é invariante de domínio: só se julga consultando o banco. O
   // formato do e-mail é invariante de entrada e morre no schema com `400`.
