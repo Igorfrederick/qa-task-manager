@@ -2,7 +2,7 @@
 
 Gerenciador de tarefas de um time de QA. Cada pessoa mantém as próprias tarefas; o líder enxerga as de todo o time e cria as contas.
 
-> **Estado:** em construção. Fundação do backend pronta; tarefas, frontend e E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
+> **Estado:** em construção. Autenticação do backend pronta — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder; tarefas, frontend e E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
 
 ---
 
