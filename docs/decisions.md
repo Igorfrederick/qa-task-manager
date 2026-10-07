@@ -8,6 +8,18 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] Suíte E2E: `data-cy` como test id, desktop e celular, e a aplicação subida pelo Playwright
+
+**Decisão:** a config do Playwright define `testIdAttribute: 'data-cy'`, e os Page Objects localizam por `getByTestId`. Cada teste roda em dois projetos, `desktop` (Desktop Chrome) e `mobile` (Pixel 7). O `webServer` sobe a API e o frontend — ou reaproveita os que já estiverem no ar —, e um `globalSetup` confere que as contas do seed entram na API antes do primeiro teste. Banco e seed ficam fora: são pré-requisito documentado no README. O `e2e/.env` é lido por `process.loadEnvFile`, do próprio Node, e não há nova tentativa (`retries: 0`).
+
+**Motivo:** com o test id apontado para `data-cy`, o seletor da convenção é o caminho natural da API do Playwright, e qualquer outro tipo de seletor salta à vista na revisão. Rodar no celular transforma a responsividade, critério da rubrica, em teste, e não só em captura de tela. O `webServer` reduz a execução a um comando depois do seed; o seed fica de fora porque apaga a base. Sem a conferência do `globalSetup`, senha do seed diferente da do `e2e/.env` apareceria como um 401 em cada teste, sem causa. Sem nova tentativa, teste instável aparece como falha, em vez de passar na segunda.
+
+**Alternativa descartada:** `locator('[data-cy=…]')` escrito à mão — o mesmo seletor, repetido como string em cada Page Object. Rodar o seed no `globalSetup` — a suíte apagaria a base de quem a rodasse contra o ambiente de desenvolvimento. `dotenv` — biblioteca para o que o Node já faz desde a versão 20.12. Projeto só desktop — a responsividade ficaria sem prova automatizada.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] Exclusão confirmada pelo diálogo nativo do navegador
 
 **Decisão:** excluir uma tarefa pela lista pede confirmação por `window.confirm`, antes da chamada à API. No E2E, a ação de excluir do Page Object registra a aceitação do diálogo antes do clique.

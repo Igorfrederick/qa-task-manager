@@ -14,7 +14,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 
 ## Seletores
 
-- [ ] Exclusivamente `data-cy`
+- [ ] Exclusivamente `data-cy`, por `getByTestId` — a config aponta o test id para `data-cy`
 - [ ] Nenhum seletor por classe CSS, texto visível, posição no DOM ou hierarquia de tags
 
 ## Asserções

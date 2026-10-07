@@ -57,6 +57,8 @@ Page Object que assere, crie massa ou chame a API é quebra de camada — mesma 
 
 **Pré-requisito de ambiente:** a suíte exercita a aplicação real, que exige MongoDB em pé. O caminho padrão é `docker compose up -d` na raiz do repositório; MongoDB local com `MONGODB_URI` ajustado é a alternativa. Registrado em `docs/decisions.md` e documentado no README. Quando o banco não responde, a falha precisa apontar a causa e o comando que resolve — ambiente ausente lido como código quebrado custa o tempo de quem depura o lugar errado.
 
+**Execução:** o `webServer` da config sobe a API e o frontend, ou reaproveita os que estiverem no ar; o `globalSetup` confere que as contas do seed entram na API e, se não entram, diz o comando que resolve. O seed não roda pela suíte — ele apaga a base. Cada teste roda nos projetos `desktop` e `mobile`, sem nova tentativa — decisão de 07/10/2026.
+
 ## Independência
 
 Nenhum teste depende de outro, da ordem de execução, ou de estado deixado por um anterior. Dado compartilhado entre dois testes é bug de arquitetura de teste, não conveniência.
@@ -66,6 +68,8 @@ Consequência prática: a suíte passa com `--shuffle` e em paralelo. Se não pa
 ## Seletores
 
 Exclusivamente `data-cy`. Nunca classe CSS, texto visível, posição no DOM ou hierarquia de tags — todos quebram por mudança cosmética.
+
+A config define `testIdAttribute: 'data-cy'`: o Page Object localiza por `getByTestId('login-email-input')`, sem repetir `[data-cy=…]` como string — decisão de 07/10/2026.
 
 ## Cobertura
 
