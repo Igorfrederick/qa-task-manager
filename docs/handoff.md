@@ -4,7 +4,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 **Como usar:** abra o Claude Code na raiz do repositório e comece com algo assim:
 
-> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 2 pela fatia 2.3, de seed. Apresente o plano de commits da fatia antes de escrever.
+> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 3 pela fatia 3.1, base e login. Feche antes as duas decisões em aberto do frontend (`CLAUDE.md` §10) e apresente o plano de commits da fatia antes de escrever.
 
 ---
 
@@ -13,8 +13,8 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | Passo | Entrega | Situação |
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
-| **2** | **Backend completo, contrato estável** | **Em andamento** — 2.1 mergeada em 06/10/2026 (PR #1); 2.2 concluída em 06/10/2026 (PR #2): passada única do `code-reviewer` sem bloqueios, achados tratados; aguarda merge. Falta 2.3 |
-| 3 | Frontend — três telas | Não iniciado |
+| **2** | **Backend completo, contrato estável** | **Em fechamento** — 2.1 (PR #1) e 2.2 (PR #2) mergeadas; 2.3 concluída em 07/10/2026, em PR, aguardando a passada do `code-reviewer` |
+| 3 | Frontend — três telas | Próximo |
 | 4 | E2E | Não iniciado |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
 
@@ -26,7 +26,7 @@ Backend, com testes:
 
 - `POST /auth/login` — emite JWT só com o id, em `sub`; e-mail inexistente e senha errada respondem igual, inclusive no tempo
 - `GET /auth/me` — usuário do token; `requireAuth` responde `TOKEN_MISSING`, `TOKEN_INVALID` ou `TOKEN_EXPIRED`, e confirma no banco que o usuário existe, lendo de lá o perfil; `sub` fora do formato de id também é `TOKEN_INVALID`, nunca `500`
-- `POST /auth/register` — exclusivo do `lead` (`requireRole`, `403 FORBIDDEN`); hash bcrypt e dupla barreira no `passwordHash` (`select: false` e `transform`)
+- `POST /auth/register` — exclusivo do `lead` (`requireRole`, `403 FORBIDDEN`); hash bcrypt e dupla barreira no `passwordHash` (`select: false` e `transform`); senha limitada a 72 bytes, o limite do bcrypt
 - `GET /tasks` e `POST /tasks`, `GET`, `PATCH` e `DELETE /tasks/:id` — o escopo por dono entra na própria consulta: o `qa` alcança só as próprias tarefas, o `lead` as do time inteiro; para o `qa`, tarefa de outra pessoa responde `404 TASK_NOT_FOUND` com o mesmo corpo da inexistente
 - Dono da tarefa sempre do token: `userId` no payload é descartado na criação e não transfere a tarefa na edição; na resposta, o dono sai como `owner: { _id, name }`
 - Filtros `status` e `priority` na listagem, validados como o corpo; campo fora do schema na query é descartado antes da consulta; id fora do formato responde `400` com `id` em `details`, nunca `500`
@@ -36,8 +36,9 @@ Backend, com testes:
 - Validação das variáveis de ambiente na importação de `config/env.js`
 - Middleware de erro centralizado, no formato do contrato, e middleware de validação Zod para corpo, query e parâmetro de rota (`validateBody`, `validateQuery`, `validateParams`)
 - Suíte Vitest + supertest, com `globalSetup` que aborta rápido, apontando a causa, quando o MongoDB não responde
+- `npm run seed` — recria a base com um `lead` e dois `qa` (`lead@`, `qa@` e `qa2@exemplo.test`) e 8 tarefas, pelos mesmos services da API; senhas de `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD`, iguais às do `e2e/.env`; recusa `NODE_ENV=production`
 
-Sem cadastro público, uma base vazia não tem como criar o primeiro usuário pela API: o primeiro `lead` vem do seed, na fatia 2.3. Até lá, os testes criam usuários pelo service — nos testes de API, por `tests/helpers/users.js`, que devolve o usuário e o token.
+Sem cadastro público, o primeiro `lead` vem do seed. Os testes do backend não dependem dele: criam usuários pelo service — nos testes de API, por `tests/helpers/users.js`, que devolve o usuário e o token.
 
 ---
 
@@ -55,7 +56,9 @@ Uma branch por fatia, PR para a `main`, uma passada do `code-reviewer` por PR. A
 
 A fatia 2.1 fechou as duas decisões em aberto do backend: o `code` carrega o status num catálogo único, e a família `401`/`403` tem cinco `code`s — entradas de 01/10 em `docs/decisions.md`.
 
-Para a 2.3: `e2e/.env.example` declara credenciais de um `lead` e de **um** `qa`, mas o plano prevê dois `qa` — o segundo existe para o E2E provar que o primeiro não vê as tarefas dele. Decidir no plano da fatia se ele ganha credencial no `.env.example` ou se o seed o cria sem login. A senha do seed não pode ser literal no código: vem de variável de ambiente, com valor fictício no `.env.example`. Os padrões, os enums e os limites de tamanho de `Task` estão no model, e valem também para o seed. **O seed apaga as tarefas junto com os usuários:** tarefa cujo dono não existe sai com `owner: null`, e um `task.owner.name` no frontend quebraria a tela do líder.
+A fatia 2.3 decidiu, com o Igor, em 07/10: o segundo `qa` do seed não tem credencial no `e2e/.env` — o E2E de escopo cria a própria massa, como manda `e2e_conventions.md`; o seed recria a base a cada execução, em vez de preservar dados.
+
+Para o Passo 3: o contrato declara o que a lista consome — ordem fixa, da mais recente para a mais antiga; filtro "Todos" **omite** o parâmetro, porque filtro vazio responde `400`; o dono sai em `owner: { _id, name }`. Para exercitar o login, use as credenciais do seed, no README.
 
 ### Passo 3 — Frontend
 
@@ -88,6 +91,8 @@ README final com a tabela critério → lugar no repositório, passada única do
 | Sex 09/10 | Passo 5 — entrega |
 | 10 – 12/10 | Folga |
 
+**Real:** o Passo 2 fechou em 07/10, um dia depois do previsto.
+
 **Se atrasar, corte nesta ordem:** filtros da lista; coluna de dono na lista do líder (a API mantém o campo); rodadas extras de revisão.
 
 **Não corte:** login integrado, validação de formulário, responsividade, `data-cy`, setup e teardown, testes de backend.
@@ -101,7 +106,6 @@ README final com a tabela critério → lugar no repositório, passada única do
 | 1 | **Alinhamento com o Murilo** sobre o domínio do projeto | A entrada de 01/10 sobre o domínio, em `docs/decisions.md`, espera a data e a resposta |
 | 2 | **Decisões em aberto do frontend** — armazenamento do token e abordagem de estilo | `CLAUDE.md` §10; decidir no início do Passo 3 |
 | 3 | **Caminho do `docker compose` não verificado** — a máquina de desenvolvimento não tem Docker; o MongoDB 7 roda de um zip, fora do repositório, em `%USERPROFILE%\mongodb`, e sobe com `start-mongod.cmd` | O README manda o avaliador pelo compose: antes da entrega, alguém com Docker roda `docker compose up -d` e a suíte uma vez |
-| 4 | **Limite da senha em caracteres, não em bytes** — `validators/auth.js` usa `max(72)`, mas o bcrypt trunca em 72 bytes: senha longa com acentos pode ser cortada em silêncio | Sugestão do `code-reviewer` na 2.1, anterior a ela; ajuste pequeno, cabe numa fatia seguinte |
 
 ---
 
@@ -117,7 +121,7 @@ npm ci
 npm test
 ```
 
-Para subir a API em desenvolvimento: `cp .env.example .env` em `backend/`, gerar um `JWT_SECRET` próprio (`openssl rand -base64 32`) e rodar `npm run dev`.
+Para subir a API em desenvolvimento: `cp .env.example .env` em `backend/`, gerar um `JWT_SECRET` próprio (`openssl rand -base64 32`), rodar `npm run seed` e `npm run dev`.
 
 ---
 
