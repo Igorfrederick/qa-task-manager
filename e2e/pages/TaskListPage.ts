@@ -50,6 +50,11 @@ export class TaskListPage {
     return this.page.getByTestId(`task-list-priority-${taskId}`)
   }
 
+  /** Só o lead vê o dono de cada tarefa. */
+  taskOwner(taskId: string): Locator {
+    return this.page.getByTestId(`task-list-owner-${taskId}`)
+  }
+
   async logout(): Promise<void> {
     await this.logoutButton.click()
   }

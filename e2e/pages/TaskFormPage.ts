@@ -14,6 +14,7 @@ export class TaskFormPage {
   readonly prioritySelect: Locator
   readonly titleError: Locator
   readonly saveButton: Locator
+  readonly notFound: Locator
 
   constructor(page: Page) {
     this.page = page
@@ -22,10 +23,15 @@ export class TaskFormPage {
     this.prioritySelect = page.getByTestId('task-form-priority-select')
     this.titleError = page.getByTestId('task-form-title-error')
     this.saveButton = page.getByTestId('task-form-save-button')
+    this.notFound = page.getByTestId('task-form-not-found')
   }
 
   async gotoNew(): Promise<void> {
     await this.page.goto('/tasks/new')
+  }
+
+  async goto(taskId: string): Promise<void> {
+    await this.page.goto(`/tasks/${taskId}`)
   }
 
   async fill({ title, description, priority }: TaskInput): Promise<void> {
