@@ -23,10 +23,12 @@ describe('middleware de erro', () => {
   })
 
   it('responde 400 VALIDATION_ERROR para JSON malformado', async () => {
+    // Rota pública: o que se testa é o parse do corpo, sem depender de ele
+    // rodar antes da autenticação.
     const response = await request(createApp())
-      .post('/api/auth/register')
+      .post('/api/auth/login')
       .set('Content-Type', 'application/json')
-      .send('{"name":')
+      .send('{"email":')
 
     expect(response.status).toBe(400)
     expect(response.body.error.code).toBe('VALIDATION_ERROR')
