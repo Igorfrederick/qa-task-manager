@@ -3,8 +3,9 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
 import { Task } from '../../src/models/Task.js'
 import { User } from '../../src/models/User.js'
-import { createTask, listTasks } from '../../src/services/taskService.js'
+import { createTask, getTask, listTasks } from '../../src/services/taskService.js'
 import { registerUser } from '../../src/services/userService.js'
+import { AppError } from '../../src/utils/errors.js'
 import { ROLES } from '../../src/utils/roles.js'
 
 /**
@@ -81,6 +82,25 @@ describe('taskService', () => {
       const tasks = await listTasks(authenticated(qa), { status: 'open' })
 
       expect(tasks.map((task) => task.title)).toEqual(['Tarefa da QA'])
+    })
+  })
+
+  describe('getTask', () => {
+    it('lança TASK_NOT_FOUND quando o qa pede a tarefa de outra pessoa', async () => {
+      const foreign = await Task.create({ title: 'Tarefa da outra QA', userId: otherQa.id })
+
+      const error = await getTask(authenticated(qa), foreign.id).catch((e) => e)
+
+      expect(error).toBeInstanceOf(AppError)
+      expect(error.code).toBe('TASK_NOT_FOUND')
+    })
+
+    it('devolve ao lead a tarefa de outra pessoa', async () => {
+      const foreign = await Task.create({ title: 'Tarefa da outra QA', userId: otherQa.id })
+
+      const task = await getTask(authenticated(lead), foreign.id)
+
+      expect(task.title).toBe('Tarefa da outra QA')
     })
   })
 

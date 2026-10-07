@@ -1,4 +1,5 @@
 import { Task } from '../models/Task.js'
+import { AppError } from '../utils/errors.js'
 import { ROLES } from '../utils/roles.js'
 
 /**
@@ -42,6 +43,26 @@ export async function listTasks(user, filters = {}) {
   return Task.find({ ...filters, ...ownerScope(user) })
     .sort({ createdAt: -1, _id: -1 })
     .populate('owner', OWNER_FIELDS)
+}
+
+/**
+ * Uma tarefa que o usuário alcança.
+ *
+ * Para o `qa`, tarefa de outra pessoa e tarefa que não existe percorrem o
+ * mesmo caminho: a consulta com o escopo não encontra nada, e o erro é o mesmo
+ * (regra 2).
+ *
+ * @param {{ id: string, role: string }} user usuário autenticado
+ * @param {string} id já validado no formato pelo schema de parâmetro
+ * @returns {Promise<import('mongoose').Document>} tarefa com `owner` preenchido
+ * @throws {AppError} `TASK_NOT_FOUND` quando a tarefa não existe para quem pede
+ */
+export async function getTask(user, id) {
+  const task = await Task.findOne({ _id: id, ...ownerScope(user) }).populate('owner', OWNER_FIELDS)
+  if (!task) {
+    throw new AppError('TASK_NOT_FOUND')
+  }
+  return task
 }
 
 /**

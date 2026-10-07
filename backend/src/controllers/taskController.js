@@ -1,4 +1,4 @@
-import { createTask, listTasks } from '../services/taskService.js'
+import { createTask, getTask, listTasks } from '../services/taskService.js'
 
 /**
  * Entrada e saída HTTP das rotas de tarefa. Nenhuma regra de negócio: repassa
@@ -12,6 +12,14 @@ export function list(req, res, next) {
   listTasks(req.user, req.query)
     .then((tasks) => {
       res.status(200).json({ tasks })
+    })
+    .catch(next)
+}
+
+export function show(req, res, next) {
+  getTask(req.user, req.params.id)
+    .then((task) => {
+      res.status(200).json({ task })
     })
     .catch(next)
 }

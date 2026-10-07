@@ -33,6 +33,15 @@ export const createTaskSchema = z.object({
 })
 
 /**
+ * `:id` das rotas de uma tarefa. Id fora do formato se julga olhando só a
+ * entrada: é invariante de entrada, `400` com `id` em `details` — nunca o
+ * `500` do `CastError` que o Mongoose lançaria na consulta.
+ */
+export const taskIdParamsSchema = z.object({
+  id: z.string().regex(/^[0-9a-f]{24}$/i, 'Identificador de tarefa inválido'),
+})
+
+/**
  * Filtros da listagem, com os mesmos valores do corpo. Filtro fora do domínio
  * é `400`: uma lista vazia esconderia de quem chamou que o filtro estava
  * errado.

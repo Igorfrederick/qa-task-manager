@@ -1,9 +1,9 @@
 import { Router } from 'express'
 
-import { create, list } from '../controllers/taskController.js'
+import { create, list, show } from '../controllers/taskController.js'
 import { requireAuth } from '../middlewares/auth.js'
-import { validateBody, validateQuery } from '../middlewares/validate.js'
-import { createTaskSchema, listTasksQuerySchema } from '../validators/task.js'
+import { validateBody, validateParams, validateQuery } from '../middlewares/validate.js'
+import { createTaskSchema, listTasksQuerySchema, taskIdParamsSchema } from '../validators/task.js'
 
 /**
  * Rotas de tarefa. Definição e middleware, nenhuma lógica.
@@ -19,3 +19,4 @@ taskRouter.use(requireAuth)
 
 taskRouter.get('/', validateQuery(listTasksQuerySchema), list)
 taskRouter.post('/', validateBody(createTaskSchema), create)
+taskRouter.get('/:id', validateParams(taskIdParamsSchema), show)

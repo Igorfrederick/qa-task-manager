@@ -16,6 +16,7 @@ import { AppError } from '../utils/errors.js'
  */
 export const validateBody = validateRequestPart('body')
 export const validateQuery = validateRequestPart('query')
+export const validateParams = validateRequestPart('params')
 
 /**
  * Um middleware por parte da requisição — corpo, query ou parâmetro de rota.
