@@ -2,7 +2,7 @@
 
 Gerenciador de tarefas de um time de QA. Cada pessoa mantém as próprias tarefas; o líder enxerga as de todo o time e cria as contas.
 
-> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend pronto — login integrado, rotas protegidas, lista com filtros e ações por linha, e formulário de criar e editar; E2E com autenticação pronta — login, sessão por perfil e rotas protegidas, no desktop e no celular; jornadas de tarefa em andamento — ver [docs/handoff.md](docs/handoff.md).
+> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend pronto — login integrado, rotas protegidas, lista com filtros e ações por linha, e formulário de criar e editar; E2E pronto, no desktop e no celular — login, sessão por perfil e rotas protegidas; criar, validar, editar, concluir, reabrir, excluir e filtrar tarefas; escopo por dono nos dois perfis. Falta a entrega — ver [docs/handoff.md](docs/handoff.md).
 
 ---
 
@@ -113,16 +113,16 @@ npm run report      # relatório HTML da última execução
 npm run typecheck   # TypeScript estrito, sem emitir
 ```
 
-A suíte não roda o seed — ele apaga a base. Antes do primeiro teste, ela confere que as contas do seed entram na API e, se não entram, diz o comando que resolve. Os testes começam autenticados por fixture de perfil (`test.use({ role: 'qa' })`), com o token obtido pela API; só os testes de login passam pela tela de login.
+A suíte não roda o seed — ele apaga a base. Antes do primeiro teste, ela confere que as contas do seed entram na API e, se não entram, diz o comando que resolve. Os testes começam autenticados por fixture de perfil (`test.use({ role: 'qa' })`), com o token obtido pela API; só os testes de login passam pela tela de login. Cada teste cria a própria massa pela API e a exclui no teardown, pela fixture `taskApi`, mesmo quando falha. As contas do seed são compartilhadas entre testes em paralelo: as asserções olham as tarefas do próprio teste, pelo `_id`, e nunca contam a lista inteira.
 
 | Pasta | Conteúdo |
 |---|---|
-| `tests/` | Testes por jornada: `auth/` (login, sessão, rotas protegidas) |
+| `tests/` | Testes por jornada: `auth/` (login, sessão, rotas protegidas) e `tasks/` (criar, editar, ações da lista, filtros, escopo por dono) |
 | `pages/` | Page Objects, um por tela, com locators por `data-cy` e ações, sem asserção |
 | `fixtures/` | Test base: perfil, Page Objects e service layer injetados |
 | `services/` | Chamadas à API para setup e conferência |
 | `factories/` | Massa com faker |
-| `support/` | Variáveis de ambiente e conferência inicial |
+| `support/` | Variáveis de ambiente, conferência inicial e rótulos que a lista mostra |
 
 ## Contexto
 

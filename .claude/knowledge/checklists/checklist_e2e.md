@@ -24,6 +24,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 - [ ] Específicas: valor esperado, não `toBeVisible()` genérico
 - [ ] Todo fluxo termina em asserção
 - [ ] Erro de API asseverado por `code`, nunca por mensagem em português
+- [ ] Nenhum `toHaveCount(0)` antes de uma presença que prove a lista certa na tela — lista ainda carregando, ou a anterior à troca de filtro
 
 ## Massa de dados
 
@@ -45,7 +46,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 - [ ] Autenticação por fixture, por perfil — `test.use({ role })`, sem login pela tela fora dos testes de login
 - [ ] Nenhum usuário criado pelo teste
 - [ ] Page objects injetados por fixture, sem herança de BasePage
-- [ ] O teste limpa o que criou
+- [ ] O teste limpa o que criou, pela fixture `taskApi`: tarefa criada pela tela é anotada com `taskApi.track`, e nenhum arquivo repete a limpeza em `afterEach`
 
 ## Determinismo
 

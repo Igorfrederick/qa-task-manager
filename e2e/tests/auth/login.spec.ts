@@ -40,13 +40,15 @@ test.describe('login pela tela', () => {
     await expect(taskListPage.userName).toHaveText(sessions.qa.user.name)
   })
 
-  test('a rota pedida sem sessão, com os filtros, abre depois do login', async ({ page, loginPage }) => {
+  test('a rota pedida sem sessão, com os filtros, abre depois do login', async ({ page, loginPage, taskListPage }) => {
     await page.goto('/tasks?status=done&priority=high')
     await expect(page).toHaveURL('/login')
 
     await loginPage.login(env.qa)
 
     await expect(page).toHaveURL('/tasks?status=done&priority=high')
+    await expect(taskListPage.statusFilter).toHaveValue('done')
+    await expect(taskListPage.priorityFilter).toHaveValue('high')
   })
 
   const invalidCredentials = [

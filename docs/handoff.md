@@ -4,7 +4,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 **Como usar:** abra o Claude Code na raiz do repositório e comece com algo assim:
 
-> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 4 pela fatia 4.2, jornadas de tarefa. Confira antes se o PR da 4.1 foi mergeado, e apresente o plano de commits da fatia antes de escrever.
+> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 5, entrega. Confira antes se o PR da 4.2 foi mergeado, e apresente o plano de commits antes de escrever.
 
 ---
 
@@ -15,8 +15,8 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
 | 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
 | 3 | Frontend — três telas | Concluído em 07/10/2026 — 3.1 (PR #4) e 3.2 (PR #5) mergeadas |
-| **4** | **E2E** | **Em andamento** — 4.1 concluída em 07/10/2026 na branch `feat/e2e-autenticacao`: passada única do `code-reviewer` sem bloqueios, com 3 MEDIUM, 3 LOW e 4 sugestões tratados; aguarda PR e merge. 4.2 é a próxima |
-| 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
+| **4** | **E2E** | **Em revisão** — 4.1 (PR #6) mergeada; 4.2 concluída em 07/10/2026 na branch `feat/e2e-tarefas`: passada única do `code-reviewer` sem bloqueios, com 1 MEDIUM, 1 LOW e 3 sugestões tratados; aguarda PR e merge |
+| 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado — é o próximo |
 
 **Prazo: 09/10/2026** — 12/10 é feriado. Avaliador: Murilo Morato, tech lead.
 
@@ -74,6 +74,18 @@ E2E, fatia 4.1:
 - Testes em `tests/auth/`: quatro rotas protegidas sem sessão, `/tasks/:id` incluída; login válido dos dois perfis; sessão aberta pela tela que sobrevive à recarga — o que liga a tela ao atalho das fixtures; volta à rota pedida, com filtros, depois do login; senha errada e e-mail inexistente, conferindo `INVALID_CREDENTIALS` e mostrando o `message` da resposta; campos vazios e e-mail fora do formato sem chamada à API; sessão guardada restaurada pela API; sair — 16 testes, 32 execuções
 - Estabilidade: 160 de 160 com `--repeat-each=5` em paralelo, e 32 de 32 com `--workers=1`
 
+E2E, fatia 4.2:
+
+- `services/TaskService.ts`: listar, criar, ler e excluir pela API, com o token de uma sessão; `ApiCallError` leva também o `code` do contrato, e a tarefa excluída se confere por `TASK_NOT_FOUND`
+- Fixture `taskApi`: um `TaskService` por perfil, `taskApi.qa` e `taskApi.lead`. Toda tarefa criada por ele é anotada com o perfil que a criou; a criada pela tela entra por `taskApi.track`, com o `_id` da resposta. No teardown, que roda também na falha, cada uma sai pela API com o token de quem a criou; só o `TASK_NOT_FOUND` da que o teste já excluiu é ignorado, e uma falha não interrompe as demais exclusões — entrada de 07/10 em `docs/decisions.md`
+- `buildTask()` com faker: título e descrição com entropia, prioridade sorteada; override fixa status, prioridade ou título vazio
+- `TaskFormPage` nasce: campos, erro do título, salvar e "tarefa não encontrada". O `TaskListPage` ganha filtros, as partes de cada linha pelo `_id`, inclusive o dono, e as ações — `deleteTask()` aceita o diálogo antes do clique. Os rótulos que a lista mostra ficam em `support/taskLabels.ts`
+- Testes em `tests/tasks/`: criar pela tela, com o dono da sessão conferido na API; título vazio sem chamada à API; editar pela lista, com o formulário preenchido; concluir, reabrir e excluir, com a API confirmando; filtro por status, por prioridade e pelos dois no endereço; escopo por dono — o `qa` não vê nem abre a tarefa do `lead`, e o `lead` vê a do `qa`, com o dono, e a conclui. O teste de login com a rota pedida confere também os filtros na tela — 29 testes, 58 execuções
+- Asserção de ausência só depois de uma presença que prove a lista certa na tela: ao trocar de filtro, a lista anterior fica até a resposta — regra registrada em `e2e_conventions.md`, no checklist e no agente de E2E
+- Provas de mutação: sem aceitar o diálogo, a exclusão falha; com a sessão do `lead`, o teste do escopo do `qa` falha
+- Estabilidade: 290 de 290 com `--repeat-each=5` em paralelo, e 58 de 58 com `--workers=1`; depois das 348 execuções, a base voltou às 8 tarefas do seed. Depois das correções da revisão, 58 de 58 de novo, com a base nas mesmas 8
+- Revisão: a prioridade do teste de criação deixou de ser sorteada — o padrão do formulário, `medium`, saía em um terço das execuções e não provava o select (MEDIUM); a limpeza passou a tentar cada tarefa e a ignorar só `TASK_NOT_FOUND`, e a criada pela tela é anotada antes da conferência do `201` (LOW)
+
 ---
 
 ## 2. Plano por fatias
@@ -124,20 +136,17 @@ Para o Passo 4:
 
 A fatia 4.1 decidiu a configuração da suíte, a massa com `@faker-js/faker` 10 e a autenticação por fixture de perfil, sem usuário criado por teste — três entradas de 07/10 em `docs/decisions.md`, propagadas às convenções, ao checklist e ao agente de E2E.
 
-Para a 4.2:
-
-- `TaskService` na service layer, com o token da sessão do worker (`sessions[role].token`), para criar a massa e conferir o efeito; factory de tarefa com faker e entropia no título
-- O teste limpa as tarefas que criou: uma fixture que registra os ids criados e exclui no teardown, pela API, resolve sem `afterEach` em cada arquivo
-- `TaskFormPage` e o resto do `TaskListPage`: filtros, linhas pelo `_id`, ações; `deleteTask()` aceita o diálogo antes do clique
-- Escopo por dono: a "outra pessoa" do `qa` é o `lead` — tarefa criada pela sessão do `lead` não aparece na lista do `qa`, e `/tasks/:id` dela mostra "tarefa não encontrada"; o `lead` vê a tarefa do `qa` com o nome do dono
-- Validação pela tela: título vazio mostra o erro no campo, e a API confirma que nada foi criado. Sem título para ancorar, a âncora é a descrição, com entropia: nenhuma tarefa com ela existe na listagem — nunca a contagem, que outros testes alteram em paralelo
-- O teste da rota pedida com filtros (`login.spec.ts`) pode asserir também os valores dos filtros na tela, quando o `TaskListPage` tiver os locators deles
-- Massa gerada dentro do teste, nunca no título: o Playwright recarrega o arquivo em cada worker, e título com valor aleatório falha
-- Sugestão da revisão da 4.1 não aplicada: conferir no `globalSetup` que o `API_PROXY_TARGET` do frontend aponta para a mesma API de `API_URL`. Rodar o seed durante uma execução invalida os tokens dos workers
+A fatia 4.2 decidiu a limpeza da massa pela fixture `taskApi`, com o token do perfil que criou cada tarefa — entrada de 07/10 em `docs/decisions.md`, propagada à convenção e ao checklist de E2E.
 
 ### Passo 5 — Entrega
 
-README final com a tabela critério → lugar no repositório, passada única do `revisor-pdi`, remoção dos `.gitkeep` restantes.
+README final com a tabela critério → lugar no repositório e passada única do `revisor-pdi`. Não restam `.gitkeep` no repositório.
+
+Para o Passo 5:
+
+- O `checklist_pdi.md` pede, na suíte de autenticação, "acesso negado por perfil". A interface não tem tela exclusiva do `lead` — o cadastro não tem tela, fora do v1 —, e o `403` está provado na API, em `backend/tests/`. A tabela critério → lugar do README deve apontar para lá
+- A suíte E2E roda contra o seed: antes da execução de entrega, `npm run seed` e depois `npm test` em `e2e/`, sem rodar o seed no meio — ele invalida os tokens dos workers
+- Sugestão da revisão da 4.1 ainda não aplicada: conferir no `globalSetup` que o `API_PROXY_TARGET` do frontend aponta para a mesma API de `API_URL`
 
 ---
 
@@ -152,7 +161,7 @@ README final com a tabela critério → lugar no repositório, passada única do
 | Sex 09/10 | Passo 5 — entrega |
 | 10 – 12/10 | Folga |
 
-**Real:** o Passo 2 fechou em 07/10, dois dias depois do previsto; os Passos 3 a 5 ficam entre 07 e 09/10.
+**Real:** o Passo 2 fechou em 07/10, dois dias depois do previsto; o Passo 3 também fechou em 07/10, e o Passo 4 fecha no mesmo dia, com o merge da 4.2; o Passo 5 fica entre 08 e 09/10.
 
 **Se atrasar, corte nesta ordem:** filtros da lista; coluna de dono na lista do líder (a API mantém o campo); rodadas extras de revisão.
 
