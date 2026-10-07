@@ -9,15 +9,22 @@ import { AppError } from '../utils/errors.js'
  * que recebeu dado com a forma correta — é o que permite que ele trate só de
  * regra de negócio.
  *
- * Substitui `req.body` pelo resultado do parse, e não apenas valida: o Zod
- * normaliza (`trim`, `toLowerCase`) e remove campo não declarado. Sem a
- * substituição, o controller seguiria com o payload cru e a normalização seria
- * trabalho jogado fora.
+ * Substitui a parte validada da requisição pelo resultado do parse, e não
+ * apenas valida: o Zod normaliza (`trim`, `toLowerCase`) e remove campo não
+ * declarado. Sem a substituição, o controller seguiria com a entrada crua e a
+ * normalização seria trabalho jogado fora.
  */
-export function validateBody(schema) {
-  return (req, _res, next) => {
+export const validateBody = validateRequestPart('body')
+
+/**
+ * Um middleware por parte da requisição — corpo, query ou parâmetro de rota.
+ * As três têm a mesma validação e o mesmo erro; o que muda é de onde a entrada
+ * vem e para onde o resultado volta.
+ */
+function validateRequestPart(part) {
+  return (schema) => (req, _res, next) => {
     try {
-      req.body = schema.parse(req.body)
+      req[part] = schema.parse(req[part])
       next()
     } catch (error) {
       next(error instanceof ZodError ? new AppError('VALIDATION_ERROR', toDetails(error)) : error)
