@@ -44,9 +44,10 @@ Cada linha diz **o que** garantir e **onde** está a regra por extenso. Leia a f
 - **Page Object contém locators e ações.** Não contém asserção, criação de massa nem chamada HTTP. → `e2e_conventions.md` §O que não fica no Page Object
 - **Asserção no arquivo do teste, específica, e verificando a coisa certa** — o efeito real, não um sintoma lateral. Erro de API asseverado pelo `code`, nunca pela mensagem. → `e2e_conventions.md` §Asserções
 - **Massa por factory com faker; zero dado hardcoded.** Cada teste gera a sua. → `e2e_conventions.md` §Massa de dados
-- **Setup via API, auth por fixture**, nunca pela interface — **e o teste limpa o que criou**. Usuário de teste é criado pelo `lead` via API, porque não há cadastro público. A suíte exige MongoDB em pé (`docker compose up -d` na raiz), e a falha por banco ausente precisa apontar a causa. → `e2e_conventions.md` §Setup e teardown
-- **Independência real:** a suíte passa embaralhada e em paralelo. → `e2e_conventions.md` §Independência
-- **Seletores exclusivamente `data-cy`.** → `e2e_conventions.md` §Seletores
+- **Setup via API, auth por fixture**, nunca pela interface — **e o teste limpa o que criou**. Perfil por `test.use({ role })`, com as contas do seed; a suíte não cria usuário, porque a API não tem como excluí-lo, e nenhuma asserção conta a lista inteira. A suíte exige MongoDB em pé (`docker compose up -d` na raiz), e a falha por banco ausente precisa apontar a causa. → `e2e_conventions.md` §Setup e teardown
+- **Independência real:** a suíte passa em paralelo e em qualquer ordem — `--repeat-each` com `fullyParallel`, e `--workers=1`. → `e2e_conventions.md` §Independência
+- **Seletores exclusivamente `data-cy`**, por `getByTestId`. → `e2e_conventions.md` §Seletores
+- **Cada jornada roda em `desktop` e `mobile`**; a suíte sobe a aplicação, mas nunca roda o seed. → `e2e_conventions.md` §Setup e teardown
 - **Exclusão pela tela passa pelo diálogo nativo:** a ação do Page Object aceita o diálogo antes do clique. → `e2e_conventions.md` §O que fica no Page Object
 - **Jornadas principais e regras cobertas na interface** — criar, editar, concluir, excluir, filtrar, escopo por dono e validação do formulário. A prova de cada regra na API é do `backend/tests/`; a da interface é sua. → `checklist_e2e.md` §Cobertura das regras de negócio
 - **Login e autenticação cobertos na interface:** login válido, login inválido e rota protegida sem sessão. `401` e `403` de API ficam em `backend/tests/`. → `checklist_e2e.md` §Cobertura das regras de negócio › Além das regras

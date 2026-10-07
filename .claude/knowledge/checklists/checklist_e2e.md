@@ -14,7 +14,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 
 ## Seletores
 
-- [ ] Exclusivamente `data-cy`
+- [ ] Exclusivamente `data-cy`, por `getByTestId` — a config aponta o test id para `data-cy`
 - [ ] Nenhum seletor por classe CSS, texto visível, posição no DOM ou hierarquia de tags
 
 ## Asserções
@@ -29,7 +29,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 
 - [ ] Gerada por factory com faker
 - [ ] **Zero dado hardcoded**
-- [ ] Cada teste gera a própria massa
+- [ ] Cada teste gera a própria massa, dentro do teste — nunca no título nem no corpo do `describe`
 - [ ] Identificador que precisa ser único carrega entropia — sem nome fixo que colida entre workers
 
 ## Independência
@@ -37,11 +37,13 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 - [ ] Nenhum teste depende de outro
 - [ ] Nenhum teste depende da ordem de execução
 - [ ] Nenhum dado compartilhado entre testes
-- [ ] A suíte passaria com `--shuffle` e em paralelo
+- [ ] A suíte passa com `--repeat-each` em paralelo e com `--workers=1` — o Playwright não tem `--shuffle`
+- [ ] Nenhuma asserção conta as linhas da lista inteira: as contas do seed são compartilhadas entre testes em paralelo
 
 ## Setup e teardown
 
-- [ ] Autenticação por fixture, por perfil
+- [ ] Autenticação por fixture, por perfil — `test.use({ role })`, sem login pela tela fora dos testes de login
+- [ ] Nenhum usuário criado pelo teste
 - [ ] Page objects injetados por fixture, sem herança de BasePage
 - [ ] O teste limpa o que criou
 
@@ -49,7 +51,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 
 - [ ] Nenhum `waitForTimeout`
 - [ ] Sem `if/else` no caminho principal do teste
-- [ ] Sem dependência de dado pré-existente no ambiente
+- [ ] Sem dependência de dado pré-existente no ambiente, além das contas do seed, que o `globalSetup` confere
 - [ ] Exclusão pela tela aceita o diálogo de confirmação dentro da ação do Page Object, registrado antes do clique
 
 ## Cobertura das regras de negócio
@@ -83,4 +85,4 @@ Autenticação e autorização são critério próprio da rubrica e ficam fora d
 - [ ] Rota protegida sem sessão redireciona para `/login` (E2E)
 - [ ] Token ausente ou inválido responde `401`, distinto do `403` (`backend/tests/`)
 - [ ] `qa` tentando criar conta responde `403` (`backend/tests/`)
-- [ ] Erro asseverado pelo `code`, nunca pela mensagem em português
+- [ ] Erro da API asseverado pelo `code`, nunca pela mensagem em português; erro de validação do formulário, sem `code`, pelo texto do campo

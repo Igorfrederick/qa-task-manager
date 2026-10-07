@@ -4,7 +4,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 **Como usar:** abra o Claude Code na raiz do repositório e comece com algo assim:
 
-> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 4 pela fatia 4.1, base do E2E e autenticação. Confira antes se o PR da 3.2 foi mergeado, e apresente o plano de commits da fatia antes de escrever.
+> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 4 pela fatia 4.2, jornadas de tarefa. Confira antes se o PR da 4.1 foi mergeado, e apresente o plano de commits da fatia antes de escrever.
 
 ---
 
@@ -14,8 +14,8 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
 | 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
-| **3** | **Frontend — três telas** | **Em fechamento** — 3.1 mergeada (PR #4), com duas passadas do `code-reviewer`; 3.2 concluída em 07/10/2026 na branch `feat/frontend-tarefas`: passada única do `code-reviewer` sem bloqueios, com 3 MEDIUM, 3 LOW e duas sugestões tratados; aguarda PR e merge |
-| 4 | E2E | Próximo |
+| 3 | Frontend — três telas | Concluído em 07/10/2026 — 3.1 (PR #4) e 3.2 (PR #5) mergeadas |
+| **4** | **E2E** | **Em andamento** — 4.1 concluída em 07/10/2026 na branch `feat/e2e-autenticacao`: passada única do `code-reviewer` sem bloqueios, com 3 MEDIUM, 3 LOW e 4 sugestões tratados; aguarda PR e merge. 4.2 é a próxima |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
 
 **Prazo: 09/10/2026** — 12/10 é feriado. Avaliador: Murilo Morato, tech lead.
@@ -62,6 +62,20 @@ Frontend, fatia 3.2:
 
 ---
 
+E2E, fatia 4.1:
+
+- Playwright + TypeScript estrito (`npm run typecheck`); `testIdAttribute: 'data-cy'`, e os Page Objects localizam por `getByTestId`
+- Cada teste roda em `desktop` (Desktop Chrome) e `mobile` (Pixel 7), sem nova tentativa
+- `webServer` sobe a API (`npm start`) e o frontend (`npm run dev`), ou reaproveita os que estão no ar; o seed nunca roda pela suíte
+- `globalSetup` confere que as contas do seed entram na API: `401` pede o seed; outra falha pede para conferir `API_URL`. A service layer lança `ApiCallError`, com o status
+- `fixtures/test.ts`: `test.use({ role: 'qa' | 'lead' })` põe no `storageState` o token obtido pela API uma vez por worker; `sessions` dá o token e o usuário de cada perfil; `loginPage` e `taskListPage` injetados
+- `LoginPage` e `TaskListPage` (cabeçalho: nome e "Sair"); `TaskFormPage` nasce na 4.2, com o primeiro uso
+- `factories/credentialsFactory.ts` e `factories/taskFactory.ts` (por ora, só um id de tarefa inexistente) com `@faker-js/faker` 10
+- Testes em `tests/auth/`: quatro rotas protegidas sem sessão, `/tasks/:id` incluída; login válido dos dois perfis; sessão aberta pela tela que sobrevive à recarga — o que liga a tela ao atalho das fixtures; volta à rota pedida, com filtros, depois do login; senha errada e e-mail inexistente, conferindo `INVALID_CREDENTIALS` e mostrando o `message` da resposta; campos vazios e e-mail fora do formato sem chamada à API; sessão guardada restaurada pela API; sair — 16 testes, 32 execuções
+- Estabilidade: 160 de 160 com `--repeat-each=5` em paralelo, e 32 de 32 com `--workers=1`
+
+---
+
 ## 2. Plano por fatias
 
 Uma branch por fatia, PR para a `main`, uma passada do `code-reviewer` por PR. A sequência backend → frontend → E2E continua valendo.
@@ -105,8 +119,21 @@ Para o Passo 4:
 
 | Fatia | Entrega |
 |---|---|
-| 4.1 Base e autenticação | Config do Playwright, fixtures por perfil, service layer, factories, três Page Objects, jornadas de login |
+| 4.1 Base e autenticação | Config do Playwright, fixtures por perfil, service layer, factory de credenciais, `LoginPage` e `TaskListPage`, jornadas de login e sessão |
 | 4.2 Tarefas | Jornadas de criar, editar, concluir, excluir, filtrar e escopo por dono |
+
+A fatia 4.1 decidiu a configuração da suíte, a massa com `@faker-js/faker` 10 e a autenticação por fixture de perfil, sem usuário criado por teste — três entradas de 07/10 em `docs/decisions.md`, propagadas às convenções, ao checklist e ao agente de E2E.
+
+Para a 4.2:
+
+- `TaskService` na service layer, com o token da sessão do worker (`sessions[role].token`), para criar a massa e conferir o efeito; factory de tarefa com faker e entropia no título
+- O teste limpa as tarefas que criou: uma fixture que registra os ids criados e exclui no teardown, pela API, resolve sem `afterEach` em cada arquivo
+- `TaskFormPage` e o resto do `TaskListPage`: filtros, linhas pelo `_id`, ações; `deleteTask()` aceita o diálogo antes do clique
+- Escopo por dono: a "outra pessoa" do `qa` é o `lead` — tarefa criada pela sessão do `lead` não aparece na lista do `qa`, e `/tasks/:id` dela mostra "tarefa não encontrada"; o `lead` vê a tarefa do `qa` com o nome do dono
+- Validação pela tela: título vazio mostra o erro no campo, e a API confirma que nada foi criado. Sem título para ancorar, a âncora é a descrição, com entropia: nenhuma tarefa com ela existe na listagem — nunca a contagem, que outros testes alteram em paralelo
+- O teste da rota pedida com filtros (`login.spec.ts`) pode asserir também os valores dos filtros na tela, quando o `TaskListPage` tiver os locators deles
+- Massa gerada dentro do teste, nunca no título: o Playwright recarrega o arquivo em cada worker, e título com valor aleatório falha
+- Sugestão da revisão da 4.1 não aplicada: conferir no `globalSetup` que o `API_PROXY_TARGET` do frontend aponta para a mesma API de `API_URL`. Rodar o seed durante uma execução invalida os tokens dos workers
 
 ### Passo 5 — Entrega
 

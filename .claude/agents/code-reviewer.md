@@ -92,7 +92,7 @@ Verifica que o comportamento alterado pelo diff está coberto por teste.
 - A asserção verifica a coisa certa? (teste de criação que confirma o fechamento do modal, mas não a presença do item na lista)
 - Asserção específica ou genérica demais? (`toBeVisible()` onde deveria ser o valor)
 - Asserção ausente ao fim do fluxo?
-- Fluxo determinístico — sem `if/else` no caminho principal, sem dependência de dado pré-existente
+- Fluxo determinístico — sem `if/else` no caminho principal, sem dependência de dado pré-existente além das contas do seed, que o `globalSetup` confere
 - Resiliência a paralelismo — nome ou identificador fixo que colide entre workers
 - Locator frágil
 

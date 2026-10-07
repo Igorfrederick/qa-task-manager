@@ -8,6 +8,44 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] Autenticação do E2E por fixture de perfil, com o token da API no `storageState`
+
+**Decisão:** `test.use({ role: 'qa' })` ou `{ role: 'lead' }` escolhe o perfil do teste. Uma fixture de worker entra pela API com as contas do seed, uma vez por worker, e a fixture `storageState` põe o token daquele perfil no `localStorage` antes de a página abrir: o teste começa autenticado, sem passar pela tela de login. A suíte não cria usuário — a massa de cada teste são as tarefas que ele cria e exclui, e as asserções se ancoram no `_id` delas.
+
+**Motivo:** login pela tela em cada teste custaria segundos e acoplaria toda jornada à tela de login, que tem testes próprios. O token no `storageState` é o mesmo estado que o login deixa — a entrada de 07/10 sobre o `localStorage` já contava com isso. Sair na tela só apaga o token do navegador daquele teste: o JWT não tem estado no servidor, e o token do worker segue valendo para os outros. Contas do seed, e não um usuário por teste: a API não tem rota para excluir usuário, e cada teste deixaria um que nenhum teardown remove.
+
+**Alternativa descartada:** projeto de setup do Playwright gravando o `storageState` em arquivo por perfil — token em disco, a ignorar no git, para o que uma fixture de worker faz em memória. Usuário novo por teste, criado pelo `lead` — isolamento maior, ao preço de lixo permanente na base. Login pela tela no `beforeEach` — lento e acoplado à tela de login.
+
+**Consequência registrada:** testes em paralelo dividem as contas do seed, então a lista do `qa` mostra também as tarefas de outros testes. Nenhuma asserção conta as linhas da lista inteira; cada uma olha as tarefas do próprio teste. A linha de `e2e_conventions.md` que previa usuário criado pelo teste passa a dizer que a suíte não cria usuário. A entrada de 07/10 sobre o seed segue valendo: a massa que o teste de escopo cria pelo `lead` é uma tarefa dele, e não um usuário — o caso entre dois `qa` já está provado na API, em `backend/tests/`. O Playwright não tem `--shuffle`: a prova de independência é `--repeat-each` com `fullyParallel`, mais uma rodada com `--workers=1`.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
+## [07/10/2026] Massa do E2E com `@faker-js/faker`, na versão 10
+
+**Decisão:** as factories de `e2e/factories/` geram a massa com `@faker-js/faker` 10, com entropia no que precisa ser único. O `engines` da suíte acompanha o do faker: Node 20.19+, 22.13+ ou 23.5+.
+
+**Motivo:** a convenção de E2E pede massa por factory com faker desde 01/10, e `@faker-js/faker` é o pacote mantido. A versão 9, instalada primeiro, tinha alerta alto — GHSA-qxc2-j82w-r537, execução de código por `helpers.fake`, em todas as versões até a 10.4.0. A 10.6, instalada no lugar, está fora da faixa.
+
+**Alternativa descartada:** gerar à mão com `crypto.randomUUID` — resolve a entropia, mas não dá título nem descrição plausíveis de tarefa. Ficar na 9 — com o alerta aberto.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
+## [07/10/2026] Suíte E2E: `data-cy` como test id, desktop e celular, e a aplicação subida pelo Playwright
+
+**Decisão:** a config do Playwright define `testIdAttribute: 'data-cy'`, e os Page Objects localizam por `getByTestId`. Cada teste roda em dois projetos, `desktop` (Desktop Chrome) e `mobile` (Pixel 7). O `webServer` sobe a API e o frontend — ou reaproveita os que já estiverem no ar —, e um `globalSetup` confere que as contas do seed entram na API antes do primeiro teste. Banco e seed ficam fora: são pré-requisito documentado no README. O `e2e/.env` é lido por `process.loadEnvFile`, do próprio Node, e não há nova tentativa (`retries: 0`).
+
+**Motivo:** com o test id apontado para `data-cy`, o seletor da convenção é o caminho natural da API do Playwright, e qualquer outro tipo de seletor salta à vista na revisão. Rodar no celular transforma a responsividade, critério da rubrica, em teste, e não só em captura de tela. O `webServer` reduz a execução a um comando depois do seed; o seed fica de fora porque apaga a base. Sem a conferência do `globalSetup`, senha do seed diferente da do `e2e/.env` apareceria como um 401 em cada teste, sem causa. Sem nova tentativa, teste instável aparece como falha, em vez de passar na segunda.
+
+**Alternativa descartada:** `locator('[data-cy=…]')` escrito à mão — o mesmo seletor, repetido como string em cada Page Object. Rodar o seed no `globalSetup` — a suíte apagaria a base de quem a rodasse contra o ambiente de desenvolvimento. `dotenv` — biblioteca para o que o Node já faz desde a versão 20.12. Projeto só desktop — a responsividade ficaria sem prova automatizada.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] Exclusão confirmada pelo diálogo nativo do navegador
 
 **Decisão:** excluir uma tarefa pela lista pede confirmação por `window.confirm`, antes da chamada à API. No E2E, a ação de excluir do Page Object registra a aceitação do diálogo antes do clique.
