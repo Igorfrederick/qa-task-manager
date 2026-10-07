@@ -14,7 +14,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
 | 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
-| **3** | **Frontend — três telas** | **Em andamento** — 3.1 concluída em 07/10/2026 na branch `feat/frontend-login`, em PR para revisão; 3.2 é a próxima |
+| **3** | **Frontend — três telas** | **Em andamento** — 3.1 concluída em 07/10/2026 na branch `feat/frontend-login`: passada do `code-reviewer` com 1 HIGH, 3 MEDIUM e 3 LOW, tratados; segunda rodada, restrita às correções, sem bloqueios, com dois LOW e um caso de abas também tratados; aguarda PR e merge. 3.2 é a próxima |
 | 4 | E2E | Não iniciado |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
 
@@ -46,10 +46,11 @@ Frontend, fatia 3.1:
 - Tela `/login` com erro por campo e, na falha da API, o `message` do contrato em `login-error-message`
 - `services/api.js` é a única porta para a API: chama `/api` relativo, pelo proxy do Vite, e devolve o erro do contrato como `ApiError` (`status`, `code`, `message`, `details`)
 - Token no `localStorage`, só ele, por `utils/tokenStorage.js`; a sessão é restaurada por `GET /auth/me` quando a página recarrega
-- `ProtectedRoute` único para as telas com sessão; sem sessão, `/login`, guardando o destino; `401` de chamada autenticada encerra a sessão
+- `ProtectedRoute` único para as telas com sessão; sem sessão, `/login`, guardando o destino; `401` encerra a sessão, menos no login e na resposta atrasada de um token já trocado; chamada sem token, de uma aba aberta depois que outra saiu, também encerra. A restauração que falha por outro motivo, como servidor fora, não apaga o token
+- O `/login` espera a restauração da sessão antes de mostrar o formulário; "Sair" não guarda destino, porque o `BrowserRouter` roda com `useTransitions={false}`
 - `AppLayout` com o nome do usuário e o botão "Sair"; `/tasks` ainda é só o título, à espera da 3.2
 - Componentes reutilizáveis: `Button` (`primary`, `secondary`) e `TextField` (rótulo, erro e `data-cy` do erro)
-- Verificado em navegador, em 1280 e em 375 px de largura: validação, credencial inválida, login, recarga, sair, token adulterado e ausência de rolagem horizontal
+- Verificado em navegador, em 1280 e em 375 px de largura: validação, credencial inválida, login, recarga, sair, token adulterado e ausência de rolagem horizontal; depois da revisão, também sair sem destino guardado, login com restauração lenta, `401` de token trocado e saída em outra aba
 
 ---
 
@@ -71,16 +72,21 @@ A fatia 2.3 decidiu que o seed recria a base a cada execução, que as senhas de
 
 Para o Passo 3: o contrato declara o que a lista consome — ordem fixa, da mais recente para a mais antiga; filtro "Todos" **omite** o parâmetro, porque filtro vazio responde `400`; o dono sai em `owner: { _id, name }`. Para exercitar o login, use as credenciais do seed, no README.
 
-A fatia 3.1 fechou as decisões do frontend — token no `localStorage`, CSS Modules, proxy do Vite em vez de CORS e `@hookform/resolvers` —, entradas de 07/10 em `docs/decisions.md`; o `CLAUDE.md` §10 fica sem decisões em aberto.
-
-Para a 3.2: o formulário de tarefa reusa `TextField` — a descrição pede um `textarea`, a ser resolvido no próprio componente — e `Button`. A mensagem de erro da API aparece hoje só no login, em marcação própria; com a lista e o formulário, chega ao terceiro uso, e aí vira componente.
-
 ### Passo 3 — Frontend
 
 | Fatia | Entrega |
 |---|---|
 | 3.1 Base e login | App Vite, rotas, contexto de auth, cliente HTTP, tela de login, rota protegida |
 | 3.2 Tarefas | Lista com filtros e ações por linha, formulário de criar e editar |
+
+A fatia 3.1 fechou as decisões do frontend — token no `localStorage`, CSS Modules, proxy do Vite em vez de CORS e `@hookform/resolvers` —, entradas de 07/10 em `docs/decisions.md`; o `CLAUDE.md` §10 fica sem decisões em aberto.
+
+Para a 3.2:
+
+- `Button` e `TextField` nasceram no segundo uso; o formulário de tarefa traz o terceiro. A descrição pede um `textarea`: extrair o invólucro comum — rótulo, erro e `aria` — em vez de tornar `TextField` polimórfico
+- A mensagem de erro da API aparece hoje só no login, em marcação própria; com a lista e o formulário, chega ao terceiro uso, e aí vira componente
+- Sugestões da revisão da 3.1 ainda não aplicadas: com backend fora, a restauração não abre sessão e o `/login` não diz por quê; e, pelo proxy, backend fora responde `502` sem corpo, que hoje aparece como `UNEXPECTED_RESPONSE` em vez de `NETWORK_ERROR`
+- Fora do v1, registrado: se outra aba entra como outro usuário, a aba já aberta segue mostrando o usuário antigo até recarregar; ouvir o evento `storage` no `AuthProvider` resolveria
 
 ### Passo 4 — E2E
 
