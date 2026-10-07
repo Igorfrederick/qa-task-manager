@@ -278,4 +278,5 @@ Regras permanentes para qualquer agente neste repositório:
 Confirmar antes de implementar a parte correspondente:
 
 - **Armazenamento do token no frontend** — `localStorage` exige entrada em `docs/decisions.md` (anti-padrão em `frontend_conventions.md`). Pesa na escolha que o `storageState` do Playwright, usado na autenticação por fixture, guarda `localStorage` mas não `sessionStorage`
-- **Abordagem de estilo do frontend** — CSS Modules, nativo do Vite, dispensa biblioteca nova
+
+Fechadas: **abordagem de estilo do frontend** — CSS Modules, entrada de 07/10/2026 em `docs/decisions.md`.

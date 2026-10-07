@@ -42,6 +42,14 @@ São três telas, três pastas em `pages/`. Tela nova exige sinalização antes.
 - A proteção é um componente de rota único, não uma verificação repetida em cada página
 - `404` da API na tela de edição exibe "tarefa não encontrada" — é o que o `qa` vê ao abrir a tarefa de outra pessoa
 
+## Estilo
+
+- CSS Modules: o estilo de componente e de tela vive num `.module.css` ao lado do `.jsx`
+- `src/index.css` guarda só os tokens (variáveis CSS de cor, espaçamento, raio e tipografia) e o reset; estilo de componente não entra nele
+- Cor, espaçamento e medida repetida vêm dos tokens, não de valor solto entre módulos
+
+Motivo e alternativas descartadas em `docs/decisions.md` (07/10/2026).
+
 ## Responsividade
 
 - **Interface responsiva (mobile e desktop) é entregável formal da rubrica do PDI.** Ambos os alvos são suportados e nenhum dos dois pode quebrar.

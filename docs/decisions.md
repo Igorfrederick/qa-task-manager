@@ -8,6 +8,30 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] `@hookform/resolvers` liga o React Hook Form ao schema Zod
+
+**Decisão:** os formulários do frontend validam pelo schema Zod de `schemas/`, entregue ao React Hook Form por `zodResolver`, do pacote `@hookform/resolvers`. O Zod do frontend fica no mesmo major do backend, a versão 3.
+
+**Motivo:** o stack declara React Hook Form e Zod, e os dois não se falam sem um adaptador. `@hookform/resolvers` é o adaptador mantido pelo próprio projeto do React Hook Form: o schema vira a fonte única da validação, e o erro de cada campo chega a `formState.errors` sem código de ligação escrito à mão. Com o mesmo major nas duas frentes, o schema de login do frontend se lê como o da API.
+
+**Alternativa descartada:** chamar `schema.safeParse` na submissão e copiar os erros para o formulário — validação paralela ao schema, que `frontend_conventions.md` trata como achado. Validar com as regras nativas do `register` — duplicaria no JSX o que o schema já diz.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
+## [07/10/2026] Estilo do frontend com CSS Modules
+
+**Decisão:** cada componente e cada tela tem seu `.module.css`, ao lado do `.jsx`. O CSS global, `src/index.css`, fica com os tokens — cores, espaçamento, raio, tipografia — e o reset.
+
+**Motivo:** o Vite suporta CSS Modules sem configuração e sem biblioteca. O escopo local evita colisão de classe entre telas, e o estilo fica no mesmo diretório do componente que o usa. Os tokens em variáveis CSS mantêm a interface consistente sem um sistema de design.
+
+**Alternativa descartada:** Tailwind — biblioteca nova e configuração, e o estilo passaria a disputar espaço com o `data-cy` no JSX. CSS-in-JS, como styled-components — biblioteca nova com custo de runtime. Um CSS global único — colisão de nomes à medida que as telas crescem.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] O seed recria a base, e as senhas dele ficam fora das variáveis obrigatórias
 
 **Decisão:** `npm run seed` apaga usuários e tarefas e recria o mesmo conjunto fictício — um `lead`, dois `qa` e oito tarefas —, pelos services da API, e recusa rodar com `NODE_ENV=production`. As senhas vêm de `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD`, opcionais em `config/env.js` e exigidas por `seed/run.js` antes de conectar. Os dois `qa` dividem a senha, e só o primeiro tem credencial no `e2e/.env.example`.

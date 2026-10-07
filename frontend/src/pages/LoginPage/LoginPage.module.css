@@ -1,0 +1,36 @@
+.page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--space-4);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-8) var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+}
+
+.subtitle {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: var(--space-6) var(--space-4);
+  }
+}

@@ -38,6 +38,12 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 - [ ] Proteção num componente de rota único, não repetida por página
 - [ ] `404` na tela de edição exibe "tarefa não encontrada"
 
+## Estilo
+
+- [ ] Estilo de componente e de tela em `.module.css` ao lado do `.jsx`
+- [ ] `src/index.css` só com tokens e reset
+- [ ] Cor, espaçamento e medida repetida vêm de token, não de valor solto entre módulos
+
 ## Responsividade
 
 - [ ] **Responsividade:** a interface é utilizável em mobile e desktop, sem quebra de layout nem conteúdo inacessível — critério de avaliação do PDI
