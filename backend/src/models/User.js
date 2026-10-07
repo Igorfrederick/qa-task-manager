@@ -24,8 +24,10 @@ import { ROLE_VALUES, ROLES } from '../utils/roles.js'
  * em silêncio, sem erro, sem aviso.
  */
 
-function removePasswordHash(_doc, ret) {
+function removeInternalFields(_doc, ret) {
   delete ret.passwordHash
+  // Chave de versão do Mongoose: campo interno, fora do contrato.
+  delete ret.__v
   return ret
 }
 
@@ -57,8 +59,8 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON: { transform: removePasswordHash },
-    toObject: { transform: removePasswordHash },
+    toJSON: { transform: removeInternalFields },
+    toObject: { transform: removeInternalFields },
   },
 )
 

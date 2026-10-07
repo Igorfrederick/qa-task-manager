@@ -25,6 +25,9 @@ export const ERRORS = Object.freeze({
   TOKEN_EXPIRED: { status: 401, message: 'Sessão expirada; entre novamente' },
   FORBIDDEN: { status: 403, message: 'Seu perfil não tem permissão para esta ação' },
   NOT_FOUND: { status: 404, message: 'Rota não encontrada' },
+  // Tarefa inexistente e, para o `qa`, tarefa de outra pessoa: o mesmo `code`,
+  // porque um `403` confirmaria que a tarefa existe (regra 2).
+  TASK_NOT_FOUND: { status: 404, message: 'Tarefa não encontrada' },
   // `409` porque é invariante de domínio: só se julga consultando o banco. O
   // formato do e-mail é invariante de entrada e morre no schema com `400`.
   EMAIL_TAKEN: { status: 409, message: 'Já existe usuário cadastrado com este e-mail' },

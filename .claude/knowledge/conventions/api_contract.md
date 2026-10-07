@@ -13,7 +13,7 @@ POST   /auth/register      [lead]      → { user }
 POST   /auth/login                     → { token, user }
 GET    /auth/me                        → { user }
 
-GET    /tasks                          → { tasks }   filtros opcionais: ?status=&priority=
+GET    /tasks                          → { tasks }   filtros opcionais: status, priority
 POST   /tasks                          → { task }
 GET    /tasks/:id                      → { task }
 PATCH  /tasks/:id                      → { task }
@@ -28,7 +28,9 @@ Toda rota exige token, exceto `GET /health` e `POST /auth/login`.
 
 **Dono vem do token.** O dono de uma tarefa nova é quem a cria. `userId` enviado no payload é descartado, como qualquer campo fora do schema (regra 3).
 
-`PATCH` é deliberado: a edição é parcial, e concluir ou reabrir uma tarefa envia só o `status`.
+**Listagem.** As tarefas vêm da mais recente para a mais antiga (`createdAt` decrescente). Filtro ausente não filtra; filtro presente e vazio (`?status=`) está fora do domínio e responde `400` — para não filtrar, omita o parâmetro.
+
+`PATCH` é deliberado: a edição é parcial, e concluir ou reabrir uma tarefa envia só o `status`. `PATCH` sem nenhum campo editável responde `200` com a tarefa: os campos editáveis ficam como estão, e `updatedAt` é renovado.
 
 Login com e-mail inexistente e login com senha errada respondem igual — mesmo status, mesmo `code` —, para não revelar quais e-mails têm conta.
 
