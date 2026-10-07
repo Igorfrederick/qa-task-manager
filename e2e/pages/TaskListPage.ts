@@ -1,5 +1,7 @@
 import type { Locator, Page } from '@playwright/test'
 
+import type { TaskPriority, TaskStatus } from '../services/TaskService'
+
 /**
  * Tela /tasks, com o cabeçalho da sessão — nome do usuário e saída — que
  * aparece sobre ela. Locators por data-cy e ações de baixo nível; sem asserção.
@@ -12,12 +14,16 @@ export class TaskListPage {
   readonly userName: Locator
   readonly logoutButton: Locator
   readonly newTaskButton: Locator
+  readonly statusFilter: Locator
+  readonly priorityFilter: Locator
 
   constructor(page: Page) {
     this.page = page
     this.userName = page.getByTestId('header-user-name')
     this.logoutButton = page.getByTestId('header-logout-button')
     this.newTaskButton = page.getByTestId('task-list-new-button')
+    this.statusFilter = page.getByTestId('task-filter-status-select')
+    this.priorityFilter = page.getByTestId('task-filter-priority-select')
   }
 
   async goto(): Promise<void> {
@@ -46,6 +52,15 @@ export class TaskListPage {
 
   async logout(): Promise<void> {
     await this.logoutButton.click()
+  }
+
+  // 'all' é a opção "Todos", que tira o filtro da URL.
+  async filterByStatus(status: TaskStatus | 'all'): Promise<void> {
+    await this.statusFilter.selectOption(status === 'all' ? '' : status)
+  }
+
+  async filterByPriority(priority: TaskPriority | 'all'): Promise<void> {
+    await this.priorityFilter.selectOption(priority === 'all' ? '' : priority)
   }
 
   async openNewTask(): Promise<void> {
