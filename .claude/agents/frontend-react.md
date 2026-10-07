@@ -37,10 +37,11 @@ Cada linha diz **o que** garantir e **onde** está a regra por extenso. Leia a f
 
 - **Todo elemento interativo nasce com `data-cy`**, no padrão `contexto-elemento[-identificador]`. Componente sem `data-cy` está incompleto — não é ajuste posterior. → `frontend_conventions.md` §Seletores
 - **Interface responsiva (mobile e desktop)**, entregável formal da rubrica: ambos suportados, nenhum pode quebrar. Desktop-first é ordem de trabalho, não dispensa de mobile. → `frontend_conventions.md` §Responsividade
-- **Chamada HTTP só em `services/`**, com carregamento e erro tratados em todas. → `frontend_conventions.md` §Chamadas à API
+- **Chamada HTTP só em `services/`**, por caminho relativo `/api/...`, com carregamento e erro tratados em todas; token só por `utils/tokenStorage.js`, e só ele no navegador. → `frontend_conventions.md` §Chamadas à API
 - **Rotas de tarefa protegidas por um componente único**; sem sessão, `/login`. → `frontend_conventions.md` §Rotas protegidas
 - **Componentização e reutilização:** componente reutilizável sem regra de negócio dentro, e **nenhuma duplicação de JSX que já exista como componente** — reutilização é critério da rubrica. → `frontend_conventions.md` §Componentização
 - **Formulário com schema Zod e erro por campo.** → `frontend_conventions.md` §Formulários
+- **Estilo em CSS Module ao lado do componente**; cor, espaçamento e medida repetida vêm dos tokens de `src/index.css`, que guarda só tokens e reset. → `frontend_conventions.md` §Estilo
 - **Três telas, três pastas em `pages/`.** Tela nova exige sinalização. → `CLAUDE.md` §3 › Telas
 - **Nenhum dado real, segredo ou credencial no código.** Senha só com hash, segredo só por variável de ambiente, e **nenhum dado real da Nextar** — sem nome de cliente, sem chave real de tarefa do Jira, sem conteúdo de bug real. Seed, massa e exemplo usam dado fictício. → `CLAUDE.md` §4 › Segurança — não negociável
 - Nada da lista de não-escopo do v1 sem sinalizar antes. → `CLAUDE.md` §2

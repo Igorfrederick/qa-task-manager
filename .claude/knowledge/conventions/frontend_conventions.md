@@ -32,6 +32,8 @@ São três telas, três pastas em `pages/`. Tela nova exige sinalização antes.
 ## Chamadas à API
 
 - Exclusivamente por `services/`. `fetch` ou cliente HTTP dentro de componente é quebra de camada
+- Caminho relativo, `/api/...`: o proxy do Vite repassa ao backend, que não tem CORS — decisão de 07/10/2026
+- O token é lido e escrito só por `utils/tokenStorage.js`, e só o token vai para o navegador; usuário e perfil vêm da API — decisão de 07/10/2026
 - Toda chamada trata **carregamento** e **erro**, não só o caminho feliz
 - O erro exibido ao usuário vem do `message` da API; o `code` é o que a lógica consome
 - `401` em qualquer chamada encerra a sessão e leva ao `/login`
@@ -41,6 +43,14 @@ São três telas, três pastas em `pages/`. Tela nova exige sinalização antes.
 - `/tasks`, `/tasks/new` e `/tasks/:id` exigem sessão; sem ela, redirecionam para `/login`
 - A proteção é um componente de rota único, não uma verificação repetida em cada página
 - `404` da API na tela de edição exibe "tarefa não encontrada" — é o que o `qa` vê ao abrir a tarefa de outra pessoa
+
+## Estilo
+
+- CSS Modules: o estilo de componente e de tela vive num `.module.css` ao lado do `.jsx`
+- `src/index.css` guarda só os tokens (variáveis CSS de cor, espaçamento, raio e tipografia) e o reset; estilo de componente não entra nele
+- Cor, espaçamento e medida repetida vêm dos tokens, não de valor solto entre módulos
+
+Motivo e alternativas descartadas em `docs/decisions.md` (07/10/2026).
 
 ## Responsividade
 

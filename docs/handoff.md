@@ -4,7 +4,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 **Como usar:** abra o Claude Code na raiz do repositório e comece com algo assim:
 
-> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 3 pela fatia 3.1, base e login. Feche antes as duas decisões em aberto do frontend (`CLAUDE.md` §10) e apresente o plano de commits da fatia antes de escrever.
+> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 3 pela fatia 3.2, tarefas. Confira antes se o PR da 3.1 foi mergeado, e apresente o plano de commits da fatia antes de escrever.
 
 ---
 
@@ -13,8 +13,8 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | Passo | Entrega | Situação |
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
-| **2** | **Backend completo, contrato estável** | **Em fechamento** — 2.1 (PR #1) e 2.2 (PR #2) mergeadas; 2.3 concluída em 07/10/2026 (PR #3): duas passadas do `code-reviewer`, a segunda sem bloqueios, achados tratados; aguarda merge |
-| 3 | Frontend — três telas | Próximo |
+| 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
+| **3** | **Frontend — três telas** | **Em andamento** — 3.1 concluída em 07/10/2026 na branch `feat/frontend-login`: passada do `code-reviewer` com 1 HIGH, 3 MEDIUM e 3 LOW, tratados; segunda rodada, restrita às correções, sem bloqueios, com dois LOW e um caso de abas também tratados; aguarda PR e merge. 3.2 é a próxima |
 | 4 | E2E | Não iniciado |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
 
@@ -39,6 +39,18 @@ Backend, com testes:
 - `npm run seed` — recria a base com um `lead` e dois `qa` (`lead@`, `qa@` e `qa2@exemplo.test`) e 8 tarefas, pelos mesmos services da API; senhas de `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD`, iguais às do `e2e/.env`; recusa `NODE_ENV=production`
 
 Sem cadastro público, o primeiro `lead` vem do seed. Os testes do backend não dependem dele: criam usuários pelo service — nos testes de API, por `tests/helpers/users.js`, que devolve o usuário e o token.
+
+Frontend, fatia 3.1:
+
+- Vite + React, React Router, React Hook Form com Zod por `@hookform/resolvers`, CSS Modules com tokens em `src/index.css`
+- Tela `/login` com erro por campo e, na falha da API, o `message` do contrato em `login-error-message`
+- `services/api.js` é a única porta para a API: chama `/api` relativo, pelo proxy do Vite, e devolve o erro do contrato como `ApiError` (`status`, `code`, `message`, `details`)
+- Token no `localStorage`, só ele, por `utils/tokenStorage.js`; a sessão é restaurada por `GET /auth/me` quando a página recarrega
+- `ProtectedRoute` único para as telas com sessão; sem sessão, `/login`, guardando o destino; `401` encerra a sessão, menos no login e na resposta atrasada de um token já trocado; chamada sem token, de uma aba aberta depois que outra saiu, também encerra. A restauração que falha por outro motivo, como servidor fora, não apaga o token
+- O `/login` espera a restauração da sessão antes de mostrar o formulário; "Sair" não guarda destino, porque o `BrowserRouter` roda com `useTransitions={false}`
+- `AppLayout` com o nome do usuário e o botão "Sair"; `/tasks` ainda é só o título, à espera da 3.2
+- Componentes reutilizáveis: `Button` (`primary`, `secondary`) e `TextField` (rótulo, erro e `data-cy` do erro)
+- Verificado em navegador, em 1280 e em 375 px de largura: validação, credencial inválida, login, recarga, sair, token adulterado e ausência de rolagem horizontal; depois da revisão, também sair sem destino guardado, login com restauração lenta, `401` de token trocado e saída em outra aba
 
 ---
 
@@ -66,6 +78,15 @@ Para o Passo 3: o contrato declara o que a lista consome — ordem fixa, da mais
 |---|---|
 | 3.1 Base e login | App Vite, rotas, contexto de auth, cliente HTTP, tela de login, rota protegida |
 | 3.2 Tarefas | Lista com filtros e ações por linha, formulário de criar e editar |
+
+A fatia 3.1 fechou as decisões do frontend — token no `localStorage`, CSS Modules, proxy do Vite em vez de CORS e `@hookform/resolvers` —, entradas de 07/10 em `docs/decisions.md`; o `CLAUDE.md` §10 fica sem decisões em aberto.
+
+Para a 3.2:
+
+- `Button` e `TextField` nasceram no segundo uso; o formulário de tarefa traz o terceiro. A descrição pede um `textarea`: extrair o invólucro comum — rótulo, erro e `aria` — em vez de tornar `TextField` polimórfico
+- A mensagem de erro da API aparece hoje só no login, em marcação própria; com a lista e o formulário, chega ao terceiro uso, e aí vira componente
+- Sugestões da revisão da 3.1 ainda não aplicadas: com backend fora, a restauração não abre sessão e o `/login` não diz por quê; e, pelo proxy, backend fora responde `502` sem corpo, que hoje aparece como `UNEXPECTED_RESPONSE` em vez de `NETWORK_ERROR`
+- Fora do v1, registrado: se outra aba entra como outro usuário, a aba já aberta segue mostrando o usuário antigo até recarregar; ouvir o evento `storage` no `AuthProvider` resolveria
 
 ### Passo 4 — E2E
 
@@ -103,9 +124,7 @@ README final com a tabela critério → lugar no repositório, passada única do
 
 | # | Pendência | Por que importa |
 |---|---|---|
-| 1 | **Alinhamento com o Murilo** sobre o domínio do projeto | A entrada de 01/10 sobre o domínio, em `docs/decisions.md`, espera a data e a resposta |
-| 2 | **Decisões em aberto do frontend** — armazenamento do token e abordagem de estilo | `CLAUDE.md` §10; decidir no início do Passo 3 |
-| 3 | **Caminho do `docker compose` não verificado** — a máquina de desenvolvimento não tem Docker; o MongoDB 7 roda de um zip, fora do repositório, em `%USERPROFILE%\mongodb`, e sobe com `start-mongod.cmd` | O README manda o avaliador pelo compose: antes da entrega, alguém com Docker roda `docker compose up -d` e a suíte uma vez |
+| 1 | **Caminho do `docker compose` não verificado** — a máquina de desenvolvimento ainda não tem Docker nem WSL; o MongoDB 7 roda de um zip, fora do repositório, em `%USERPROFILE%\mongodb`, e sobe com `start-mongod.cmd`. Decidido em 07/10: verificar nesta máquina, instalando o Docker | O README manda o avaliador pelo compose: antes da entrega, `docker compose up -d` e a suíte rodam uma vez num clone limpo |
 
 ---
 

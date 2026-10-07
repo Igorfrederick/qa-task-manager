@@ -2,7 +2,7 @@
 
 Gerenciador de tarefas de um time de QA. Cada pessoa mantém as próprias tarefas; o líder enxerga as de todo o time e cria as contas.
 
-> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend e E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
+> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend com login integrado e rotas protegidas; telas de tarefa e E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
 
 ---
 
@@ -32,6 +32,11 @@ docs/        Log de decisões técnicas e documento de retomada
 | [docs/decisions.md](docs/decisions.md) | Log de decisões técnicas, com motivo e alternativa descartada |
 | [docs/handoff.md](docs/handoff.md) | Estado do projeto e ordem de execução |
 
+## Requisitos
+
+- Node.js 20.19+ ou 22.12+ — mínimo do Vite 8, no frontend; o backend aceita qualquer 20+
+- MongoDB 7, pelo `docker compose` da seção seguinte ou instalado localmente
+
 ## Banco de dados
 
 A aplicação e a suíte de teste do backend exercitam um MongoDB real. O caminho principal é o `docker-compose.yml` da raiz:
@@ -47,7 +52,7 @@ Sem banco em pé, `npm test` no `backend/` falha em poucos segundos com uma mens
 
 ## Configuração
 
-Cada frente tem seu próprio `.env.example`. Copie e preencha com valores locais:
+Cada frente tem seu próprio `.env.example`. Copie e preencha com valores locais — o do frontend é opcional, e só muda o endereço do backend:
 
 ```bash
 cp backend/.env.example backend/.env
@@ -83,8 +88,20 @@ npm run dev     # sobe a API em http://localhost:3000
 
 Não há cadastro público: o seed é a origem do primeiro `lead`, e as demais contas o líder cria por `POST /api/auth/register`.
 
+## Frontend
+
+Com a API em pé (seção anterior):
+
+```bash
+cd frontend
+npm install
+npm run dev     # sobe a interface em http://localhost:5173
+```
+
+Entre com uma das contas do seed. O frontend chama `/api` no próprio endereço, e o servidor do Vite repassa ao backend em `API_PROXY_TARGET` (padrão `http://localhost:3000`) — por isso o backend não precisa de CORS. A porta 5173 é fixa: ocupada, o Vite falha em vez de subir em outra, porque a suíte E2E aponta para ela.
+
 ## Contexto
 
 Este repositório é o entregável das etapas 1, 2 e 3 de um PDI de QA — frontend, backend e E2E. As etapas 4 e 5 vivem fora daqui.
 
-Instruções de frontend e E2E serão adicionadas conforme cada frente for implementada.
+Instruções de E2E serão adicionadas quando a frente for implementada.
