@@ -13,7 +13,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | Passo | Entrega | Situação |
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
-| **2** | **Backend completo, contrato estável** | **Em andamento** — 2.1 concluída em 06/10/2026, em PR; faltam 2.2 e 2.3 |
+| **2** | **Backend completo, contrato estável** | **Em andamento** — 2.1 concluída em 06/10/2026: duas passadas do `code-reviewer`, a segunda sem bloqueios e com os achados tratados; aguarda merge. Faltam 2.2 e 2.3 |
 | 3 | Frontend — três telas | Não iniciado |
 | 4 | E2E | Não iniciado |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
@@ -25,7 +25,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 Backend, com testes:
 
 - `POST /auth/login` — emite JWT só com o id, em `sub`; e-mail inexistente e senha errada respondem igual, inclusive no tempo
-- `GET /auth/me` — usuário do token; `requireAuth` responde `TOKEN_MISSING`, `TOKEN_INVALID` ou `TOKEN_EXPIRED`, e confirma no banco que o usuário existe, lendo de lá o perfil
+- `GET /auth/me` — usuário do token; `requireAuth` responde `TOKEN_MISSING`, `TOKEN_INVALID` ou `TOKEN_EXPIRED`, e confirma no banco que o usuário existe, lendo de lá o perfil; `sub` fora do formato de id também é `TOKEN_INVALID`, nunca `500`
 - `POST /auth/register` — exclusivo do `lead` (`requireRole`, `403 FORBIDDEN`); hash bcrypt e dupla barreira no `passwordHash` (`select: false` e `transform`)
 - `GET /api/health`
 - Catálogo de `code`s em `utils/errors.js`, com um teste que falha se ele divergir de `api_contract.md` §Catálogo de `code`s
