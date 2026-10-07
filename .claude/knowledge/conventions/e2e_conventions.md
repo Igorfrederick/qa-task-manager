@@ -54,7 +54,7 @@ Page Object que assere, crie massa ou chame a API é quebra de camada — mesma 
 
 - Setup via service layer (API), nunca pela interface
 - Autenticação por fixture, por perfil: `test.use({ role: 'qa' })` põe no `storageState` o token que a fixture de worker obteve pela API, com as contas do seed — decisão de 07/10/2026
-- O teste limpa o que criou
+- O teste limpa o que criou, pela fixture `taskApi`: a tarefa criada por ela, ou anotada com `taskApi.track` depois de criada pela tela, sai no teardown, pela API, com o token do perfil que a criou — sem `afterEach` em cada arquivo. Decisão de 07/10/2026
 - A suíte não cria usuário: a API não tem rota para excluí-lo, e o teste não teria como limpar o que criou. Quando um teste precisa de "outra pessoa", ela é a outra conta com credencial no `e2e/.env` — para o `qa`, o `lead`
 - As contas do seed são compartilhadas entre testes em paralelo: nenhuma asserção conta as linhas da lista inteira, cada uma olha as tarefas do próprio teste, pelo `_id`
 

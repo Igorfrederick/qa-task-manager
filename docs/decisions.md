@@ -8,6 +8,18 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] Massa de tarefa do E2E excluída no teardown da fixture, pelo perfil que a criou
+
+**Decisão:** a fixture `taskApi` dá ao teste um `TaskService` por perfil — `taskApi.qa`, `taskApi.lead` —, com o token da sessão do worker. Toda tarefa criada por ele fica anotada, com o perfil que a criou; a tarefa criada pela tela entra na lista por `taskApi.track`, com o `_id` da resposta da criação. No teardown, cada uma é excluída pela API, com o token de quem a criou, e o `404` de uma tarefa que o próprio teste já excluiu é ignorado.
+
+**Motivo:** o teardown da fixture roda também quando o teste falha, e nenhum arquivo de teste precisa de `afterEach` para limpar. A exclusão pelo perfil que criou, e não pelo `lead`, que alcança as tarefas do time inteiro, impede que a limpeza dependa da regra de escopo que um teste pode estar provando: se o escopo do `lead` quebrasse, a limpeza por ele falharia em silêncio, com o `404` ignorado. O `_id` da tarefa criada pela tela vem da resposta porque o teste precisa dele de qualquer forma, para localizar a linha.
+
+**Alternativa descartada:** `afterEach` em cada arquivo — a mesma limpeza repetida, e esquecida no arquivo seguinte. Limpar tudo pelo `lead` — a limpeza passaria a depender da regra de escopo. Varrer no fim da suíte as tarefas com uma marca no título — apagaria a massa de testes ainda rodando em paralelo. Ouvir as respostas da página para anotar sozinho o que a tela criou — esconderia do leitor do teste o que ele cria.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] Autenticação do E2E por fixture de perfil, com o token da API no `storageState`
 
 **Decisão:** `test.use({ role: 'qa' })` ou `{ role: 'lead' }` escolhe o perfil do teste. Uma fixture de worker entra pela API com as contas do seed, uma vez por worker, e a fixture `storageState` põe o token daquele perfil no `localStorage` antes de a página abrir: o teste começa autenticado, sem passar pela tela de login. A suíte não cria usuário — a massa de cada teste são as tarefas que ele cria e exclui, e as asserções se ancoram no `_id` delas.

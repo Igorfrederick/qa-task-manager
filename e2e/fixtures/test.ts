@@ -1,8 +1,11 @@
 import { test as base, expect, request } from '@playwright/test'
 
 import { LoginPage } from '../pages/LoginPage'
+import { TaskFormPage } from '../pages/TaskFormPage'
 import { TaskListPage } from '../pages/TaskListPage'
+import { ApiCallError } from '../services/ApiCallError'
 import { AuthService, type Role, type Session } from '../services/AuthService'
+import { TaskService } from '../services/TaskService'
 import { env } from '../support/env'
 
 // Mesma chave de frontend/src/utils/tokenStorage.js.
@@ -10,10 +13,21 @@ const TOKEN_STORAGE_KEY = 'task-manager.token'
 
 type Sessions = Record<Role, Session>
 
+/**
+ * Tarefas pela API, um service por perfil — `taskApi.qa`, `taskApi.lead` —,
+ * cada um com o token daquela sessão.
+ */
+type TaskApi = Record<Role, TaskService> & {
+  /** Anota para a limpeza uma tarefa que o teste criou pela tela, com o perfil do teste. */
+  track(taskId: string): void
+}
+
 type TestFixtures = {
   role: Role | null
   loginPage: LoginPage
   taskListPage: TaskListPage
+  taskFormPage: TaskFormPage
+  taskApi: TaskApi
 }
 
 type WorkerFixtures = {
@@ -69,6 +83,44 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   taskListPage: async ({ page }, use) => {
     await use(new TaskListPage(page))
+  },
+
+  taskFormPage: async ({ page }, use) => {
+    await use(new TaskFormPage(page))
+  },
+
+  // O teste limpa o que criou: cada tarefa criada pela API, ou anotada com
+  // `track` depois de criada pela tela, sai no teardown — que roda também
+  // quando o teste falha. Sai pelo perfil que a criou, e não pelo lead, que
+  // alcança todas: a limpeza não depende da regra de escopo que um teste
+  // pode estar provando.
+  taskApi: async ({ role, sessions }, use) => {
+    const apiContext = await request.newContext({ baseURL: env.apiUrl })
+    const created: { owner: Role; taskId: string }[] = []
+    const serviceFor = (owner: Role) =>
+      new TaskService(apiContext, sessions[owner].token, (task) => created.push({ owner, taskId: task._id }))
+    const services = { qa: serviceFor('qa'), lead: serviceFor('lead') }
+
+    await use({
+      ...services,
+      track(taskId) {
+        if (!role) throw new Error('taskApi.track exige um perfil: use test.use({ role }).')
+        created.push({ owner: role, taskId })
+      },
+    })
+
+    try {
+      for (const { owner, taskId } of created) {
+        try {
+          await services[owner].remove(taskId)
+        } catch (error) {
+          // A tarefa que o próprio teste excluiu já não existe.
+          if (!(error instanceof ApiCallError && error.status === 404)) throw error
+        }
+      }
+    } finally {
+      await apiContext.dispose()
+    }
   },
 })
 
