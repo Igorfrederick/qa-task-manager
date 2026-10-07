@@ -7,13 +7,19 @@ import type { Locator, Page } from '@playwright/test'
 export class TaskListPage {
   readonly page: Page
   readonly userName: Locator
+  readonly logoutButton: Locator
 
   constructor(page: Page) {
     this.page = page
     this.userName = page.getByTestId('header-user-name')
+    this.logoutButton = page.getByTestId('header-logout-button')
   }
 
   async goto(): Promise<void> {
     await this.page.goto('/tasks')
+  }
+
+  async logout(): Promise<void> {
+    await this.logoutButton.click()
   }
 }

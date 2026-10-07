@@ -8,6 +8,20 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] Autenticação do E2E por fixture de perfil, com o token da API no `storageState`
+
+**Decisão:** `test.use({ role: 'qa' })` ou `{ role: 'lead' }` escolhe o perfil do teste. Uma fixture de worker entra pela API com as contas do seed, uma vez por worker, e a fixture `storageState` põe o token daquele perfil no `localStorage` antes de a página abrir: o teste começa autenticado, sem passar pela tela de login. A suíte não cria usuário — a massa de cada teste são as tarefas que ele cria e exclui, e as asserções se ancoram no `_id` delas.
+
+**Motivo:** login pela tela em cada teste custaria segundos e acoplaria toda jornada à tela de login, que tem testes próprios. O token no `storageState` é o mesmo estado que o login deixa — a entrada de 07/10 sobre o `localStorage` já contava com isso. Sair na tela só apaga o token do navegador daquele teste: o JWT não tem estado no servidor, e o token do worker segue valendo para os outros. Contas do seed, e não um usuário por teste: a API não tem rota para excluir usuário, e cada teste deixaria um que nenhum teardown remove.
+
+**Alternativa descartada:** projeto de setup do Playwright gravando o `storageState` em arquivo por perfil — token em disco, a ignorar no git, para o que uma fixture de worker faz em memória. Usuário novo por teste, criado pelo `lead` — isolamento maior, ao preço de lixo permanente na base. Login pela tela no `beforeEach` — lento e acoplado à tela de login.
+
+**Consequência registrada:** testes em paralelo dividem as contas do seed, então a lista do `qa` mostra também as tarefas de outros testes. Nenhuma asserção conta as linhas da lista inteira; cada uma olha as tarefas do próprio teste. A linha de `e2e_conventions.md` que previa usuário criado pelo teste passa a dizer que a suíte não cria usuário. A entrada de 07/10 sobre o seed segue valendo: a massa que o teste de escopo cria pelo `lead` é uma tarefa dele, e não um usuário — o caso entre dois `qa` já está provado na API, em `backend/tests/`. O Playwright não tem `--shuffle`: a prova de independência é `--repeat-each` com `fullyParallel`, mais uma rodada com `--workers=1`.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] Massa do E2E com `@faker-js/faker`, na versão 10
 
 **Decisão:** as factories de `e2e/factories/` geram a massa com `@faker-js/faker` 10, com entropia no que precisa ser único. O `engines` da suíte acompanha o do faker: Node 20.19+, 22.13+ ou 23.5+.
