@@ -14,6 +14,12 @@
   background: var(--color-surface);
 }
 
+.loading {
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
 .title {
   font-size: var(--font-size-lg);
 }

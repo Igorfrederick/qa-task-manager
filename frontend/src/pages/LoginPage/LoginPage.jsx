@@ -10,7 +10,7 @@ import { loginSchema } from '../../schemas/loginSchema.js'
 import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
-  const { user, login } = useAuth()
+  const { user, isRestoring, login } = useAuth()
   const location = useLocation()
   const [apiError, setApiError] = useState(null)
   const {
@@ -29,6 +29,12 @@ export default function LoginPage() {
     } catch (error) {
       setApiError(error.message)
     }
+  }
+
+  // Com um token guardado em confirmação, o formulário espera: um login feito
+  // agora correria contra a resposta da restauração.
+  if (isRestoring) {
+    return <p className={styles.loading}>Carregando sessão…</p>
   }
 
   // Com sessão aberta — recém-criada pelo login ou restaurada —, a tela segue

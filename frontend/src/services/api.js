@@ -59,9 +59,12 @@ export async function request(path, { method = 'GET', body } = {}) {
   const data = await response.json().catch(() => null)
   if (response.ok && data !== null) return data
 
-  // Só chamada que levou token encerra a sessão: o 401 do login é credencial
-  // inválida, e quem trata é a tela.
-  if (response.status === 401 && token) handleUnauthorized()
+  // Só encerra a sessão o 401 de uma chamada que levou o token ainda guardado.
+  // O 401 do login é credencial inválida, e quem trata é a tela; o de um token
+  // já trocado é resposta atrasada, e não pode derrubar a sessão nova.
+  if (response.status === 401 && token && token === tokenStorage.get()) {
+    handleUnauthorized()
+  }
 
   throw new ApiError(response.status, data?.error ?? UNEXPECTED_RESPONSE)
 }
