@@ -66,6 +66,38 @@ export async function getTask(user, id) {
 }
 
 /**
+ * Edita os campos enviados de uma tarefa que o usuário alcança.
+ *
+ * Busca e escrita numa operação só, com o escopo na consulta: para o `qa`, a
+ * tarefa de outra pessoa não é encontrada e, por isso, não é alterada
+ * (regra 2). Os campos são lidos um a um, como na criação, e `userId` não está
+ * entre eles: editar não transfere a tarefa, nem quando quem edita é o `lead`.
+ *
+ * Campo não enviado chega como `undefined`, e o Mongoose descarta chave
+ * `undefined` no update: o que não foi enviado fica como está.
+ * `runValidators` aplica os enums do schema também na edição — por padrão, o
+ * Mongoose só os confere na criação.
+ *
+ * @param {{ id: string, role: string }} user usuário autenticado
+ * @param {string} id já validado no formato pelo schema de parâmetro
+ * @param {{ title?: string, description?: string, status?: string, priority?: string }} changes
+ *        já validados pelo schema Zod no middleware
+ * @returns {Promise<import('mongoose').Document>} tarefa editada, com `owner` preenchido
+ * @throws {AppError} `TASK_NOT_FOUND` quando a tarefa não existe para quem pede
+ */
+export async function updateTask(user, id, { title, description, status, priority }) {
+  const task = await Task.findOneAndUpdate(
+    { _id: id, ...ownerScope(user) },
+    { title, description, status, priority },
+    { new: true, runValidators: true },
+  ).populate('owner', OWNER_FIELDS)
+  if (!task) {
+    throw new AppError('TASK_NOT_FOUND')
+  }
+  return task
+}
+
+/**
  * Cria a tarefa em nome de quem pede.
  *
  * O dono é o usuário autenticado (regra 3). Os campos são lidos um a um, e

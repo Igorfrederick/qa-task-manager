@@ -33,6 +33,13 @@ export const createTaskSchema = z.object({
 })
 
 /**
+ * Edição parcial: os mesmos campos e as mesmas regras da criação, todos
+ * opcionais. Concluir ou reabrir envia só o `status`. Os padrões estão no
+ * model, não aqui: campo ausente na edição fica como está.
+ */
+export const updateTaskSchema = createTaskSchema.partial()
+
+/**
  * `:id` das rotas de uma tarefa. Id fora do formato se julga olhando só a
  * entrada: é invariante de entrada, `400` com `id` em `details` — nunca o
  * `500` do `CastError` que o Mongoose lançaria na consulta.

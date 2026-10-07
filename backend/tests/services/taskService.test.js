@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
 import { Task } from '../../src/models/Task.js'
 import { User } from '../../src/models/User.js'
-import { createTask, getTask, listTasks } from '../../src/services/taskService.js'
+import { createTask, getTask, listTasks, updateTask } from '../../src/services/taskService.js'
 import { registerUser } from '../../src/services/userService.js'
 import { AppError } from '../../src/utils/errors.js'
 import { ROLES } from '../../src/utils/roles.js'
@@ -101,6 +101,28 @@ describe('taskService', () => {
       const task = await getTask(authenticated(lead), foreign.id)
 
       expect(task.title).toBe('Tarefa da outra QA')
+    })
+  })
+
+  describe('updateTask', () => {
+    it('lança TASK_NOT_FOUND ao qa que edita a tarefa de outra pessoa, sem alterá-la', async () => {
+      const foreign = await Task.create({ title: 'Tarefa da outra QA', userId: otherQa.id })
+
+      const error = await updateTask(authenticated(qa), foreign.id, { title: 'Editada' }).catch(
+        (e) => e,
+      )
+
+      expect(error).toBeInstanceOf(AppError)
+      expect(error.code).toBe('TASK_NOT_FOUND')
+      expect((await Task.findById(foreign.id)).title).toBe('Tarefa da outra QA')
+    })
+
+    it('mantém o dono quando os dados trazem userId de outra pessoa', async () => {
+      const own = await Task.create({ title: 'Tarefa da QA', userId: qa.id })
+
+      await updateTask(authenticated(qa), own.id, { title: 'Editada', userId: otherQa.id })
+
+      expect((await Task.findById(own.id)).userId.toString()).toBe(qa.id)
     })
   })
 
