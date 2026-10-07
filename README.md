@@ -2,7 +2,7 @@
 
 Gerenciador de tarefas de um time de QA. Cada pessoa mantém as próprias tarefas; o líder enxerga as de todo o time e cria as contas.
 
-> **Estado:** em construção. API do backend pronta — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder e CRUD de tarefas com escopo por dono e filtros por status e prioridade. O primeiro `lead` virá do seed, ainda não implementado; frontend e E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
+> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend e E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
 
 ---
 
@@ -67,11 +67,24 @@ openssl rand -base64 32
 cd backend
 npm install
 npm test        # suíte de service e API, sem navegador; exige o banco em pé
+npm run seed    # recria a base com dado fictício: um lead, dois qa e tarefas dos três
 npm run dev     # sobe a API em http://localhost:3000
 ```
+
+### Seed
+
+`npm run seed` apaga usuários e tarefas e recria um conjunto fictício, sempre o mesmo — por isso recusa rodar com `NODE_ENV=production`. As senhas vêm de `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD` no `backend/.env`; as de `e2e/.env` têm de ser as mesmas.
+
+| Perfil | E-mail | Senha |
+|---|---|---|
+| `lead` | `lead@exemplo.test` | `SEED_LEAD_PASSWORD` |
+| `qa` | `qa@exemplo.test` | `SEED_QA_PASSWORD` |
+| `qa` | `qa2@exemplo.test` | `SEED_QA_PASSWORD` |
+
+Não há cadastro público: o seed é a origem do primeiro `lead`, e as demais contas o líder cria por `POST /api/auth/register`.
 
 ## Contexto
 
 Este repositório é o entregável das etapas 1, 2 e 3 de um PDI de QA — frontend, backend e E2E. As etapas 4 e 5 vivem fora daqui.
 
-Instruções completas de seed, frontend e E2E serão adicionadas conforme cada frente for implementada.
+Instruções de frontend e E2E serão adicionadas conforme cada frente for implementada.

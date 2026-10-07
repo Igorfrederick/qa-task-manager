@@ -170,6 +170,23 @@ describe('POST /api/auth/register', () => {
     expect(await User.countDocuments({ email: 'nao-e-email' })).toBe(0)
   })
 
+  it('recusa senha acima de 72 bytes, mesmo com menos de 72 caracteres', async () => {
+    // 37 caracteres, 73 bytes: um byte além do limite, e o bcrypt ignoraria o
+    // último. Na fronteira, para que um limite frouxo também quebre o teste.
+    const response = await postRegister({ ...validPayload, password: 'ç'.repeat(36) + 'a' })
+
+    expect(response.status).toBe(400)
+    expect(response.body.error.code).toBe('VALIDATION_ERROR')
+    expect(response.body.error.details.map((d) => d.field)).toContain('password')
+    expect(await User.countDocuments({ email: validPayload.email })).toBe(0)
+  })
+
+  it('aceita senha de exatamente 72 bytes, com acentos', async () => {
+    const response = await postRegister({ ...validPayload, password: 'ç'.repeat(36) })
+
+    expect(response.status).toBe(201)
+  })
+
   it('recusa perfil fora do catálogo com 400', async () => {
     const response = await postRegister({ ...validPayload, role: 'admin' })
 

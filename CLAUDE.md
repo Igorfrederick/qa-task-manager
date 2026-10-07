@@ -177,6 +177,7 @@ backend/
     middlewares/     auth, autorização por perfil, validação, erro
     validators/      schemas Zod de request
     utils/
+    seed/            dado fictício para desenvolvimento e E2E (npm run seed)
   tests/             testes automatizados de service e API, sem UI
 
 frontend/
