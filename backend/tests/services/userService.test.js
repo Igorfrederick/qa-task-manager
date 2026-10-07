@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
 import { User } from '../../src/models/User.js'
 import { registerUser } from '../../src/services/userService.js'
-import { EmailTakenError } from '../../src/utils/errors.js'
+import { AppError } from '../../src/utils/errors.js'
 import { ROLES } from '../../src/utils/roles.js'
 
 /**
@@ -91,7 +91,7 @@ describe('userService.registerUser', () => {
     expect(user.email).toBe('dicrano@exemplo.test')
   })
 
-  it('recusa e-mail já cadastrado com EmailTakenError, code EMAIL_TAKEN e 409', async () => {
+  it('recusa e-mail já cadastrado com AppError, code EMAIL_TAKEN e 409', async () => {
     const data = {
       name: 'Fulana de Teste',
       email: 'repetida@exemplo.test',
@@ -103,7 +103,7 @@ describe('userService.registerUser', () => {
     // rejects.toThrow não afere `code` nem `status`, que são o contrato.
     const error = await registerUser({ ...data, name: 'Outra Pessoa' }).catch((e) => e)
 
-    expect(error).toBeInstanceOf(EmailTakenError)
+    expect(error).toBeInstanceOf(AppError)
     expect(error.code).toBe('EMAIL_TAKEN')
     expect(error.status).toBe(409)
     expect(await User.countDocuments()).toBe(1)
@@ -122,7 +122,7 @@ describe('userService.registerUser', () => {
       password: 'senha-de-teste-123',
     }).catch((e) => e)
 
-    expect(error).toBeInstanceOf(EmailTakenError)
+    expect(error.code).toBe('EMAIL_TAKEN')
   })
 
   it('devolve EMAIL_TAKEN quando dois cadastros simultâneos disputam o mesmo e-mail', async () => {
@@ -143,7 +143,7 @@ describe('userService.registerUser', () => {
     const rejected = results.filter((r) => r.status === 'rejected')
 
     expect(rejected).toHaveLength(1)
-    expect(rejected[0].reason).toBeInstanceOf(EmailTakenError)
+    expect(rejected[0].reason.code).toBe('EMAIL_TAKEN')
     expect(await User.countDocuments()).toBe(1)
   })
 

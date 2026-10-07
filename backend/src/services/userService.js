@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 
 import { env } from '../config/env.js'
 import { User } from '../models/User.js'
-import { EmailTakenError } from '../utils/errors.js'
+import { AppError } from '../utils/errors.js'
 
 /**
  * Regra de negócio de usuário.
@@ -30,14 +30,14 @@ import { EmailTakenError } from '../utils/errors.js'
  * @param {{ name: string, email: string, password: string, role?: string }} data
  *        já validados pelo schema Zod no middleware
  * @returns {Promise<import('mongoose').Document>} documento sem `passwordHash`
- * @throws {EmailTakenError} quando o e-mail já está cadastrado
+ * @throws {AppError} `EMAIL_TAKEN` quando o e-mail já está cadastrado
  */
 export async function registerUser({ name, email, password, role }) {
   const normalizedEmail = email.trim().toLowerCase()
 
   const alreadyExists = await User.exists({ email: normalizedEmail })
   if (alreadyExists) {
-    throw new EmailTakenError(normalizedEmail)
+    throw new AppError('EMAIL_TAKEN')
   }
 
   const passwordHash = await bcrypt.hash(password, env.bcryptSaltRounds)
@@ -51,7 +51,7 @@ export async function registerUser({ name, email, password, role }) {
     // outra requisição com o mesmo e-mail. Quem garante é o índice único do
     // schema, e sem isto a corrida viraria 500 em vez do 409 do contrato.
     if (error?.code === 11000) {
-      throw new EmailTakenError(normalizedEmail)
+      throw new AppError('EMAIL_TAKEN')
     }
     throw error
   }
