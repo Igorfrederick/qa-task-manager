@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import { authRouter } from './auth.js'
+import { taskRouter } from './tasks.js'
 
 /**
  * Raiz do roteamento sob `/api`. Cada frente do contrato entra aqui como um
@@ -13,3 +14,4 @@ apiRouter.get('/health', (_req, res) => {
 })
 
 apiRouter.use('/auth', authRouter)
+apiRouter.use('/tasks', taskRouter)
