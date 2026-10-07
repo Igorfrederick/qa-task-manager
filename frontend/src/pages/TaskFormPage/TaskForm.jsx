@@ -103,7 +103,7 @@ export default function TaskForm({ id }) {
   if (loadState === 'error') {
     return (
       <section className={styles.page}>
-        <ErrorMessage data-cy="task-form-error-message">{apiError}</ErrorMessage>
+        <ErrorMessage data-cy="task-form-load-error-message">{apiError}</ErrorMessage>
         <div>
           <Button variant="secondary" onClick={backToList} data-cy="task-form-back-button">
             Voltar para a lista

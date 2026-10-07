@@ -16,7 +16,11 @@ export default function TaskListItem({ task, showOwner, isBusy, onToggleStatus, 
         <h2 className={styles.title} data-cy={`task-list-title-${id}`}>
           {task.title}
         </h2>
-        {task.description && <p className={styles.description}>{task.description}</p>}
+        {task.description && (
+          <p className={styles.description} data-cy={`task-list-description-${id}`}>
+            {task.description}
+          </p>
+        )}
         <div className={styles.meta}>
           <span className={`${styles.badge} ${styles[`status-${task.status}`]}`} data-cy={`task-list-status-${id}`}>
             {labelOf(STATUS_OPTIONS, task.status)}

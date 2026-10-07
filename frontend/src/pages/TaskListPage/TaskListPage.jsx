@@ -93,7 +93,7 @@ export default function TaskListPage() {
       )
     }
     return (
-      <ul className={styles.list} aria-busy={isLoading}>
+      <ul className={styles.list} aria-busy={isLoading} data-cy="task-list">
         {tasks.map((task) => (
           <TaskListItem
             key={task._id}
@@ -136,7 +136,7 @@ export default function TaskListPage() {
       </div>
 
       {actionError && !error && (
-        <ErrorMessage data-cy="task-list-error-message">{actionError}</ErrorMessage>
+        <ErrorMessage data-cy="task-list-action-error-message">{actionError}</ErrorMessage>
       )}
       {renderTasks()}
     </section>
