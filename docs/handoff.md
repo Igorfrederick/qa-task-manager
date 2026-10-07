@@ -22,10 +22,10 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 ### O que já funciona
 
-Backend, com testes — 49 na suíte:
+Backend, com testes:
 
 - `POST /auth/login` — emite JWT com o id em `sub` e o perfil; e-mail inexistente e senha errada respondem igual, inclusive no tempo
-- `GET /auth/me` — usuário do token; `requireAuth` responde `TOKEN_MISSING`, `TOKEN_INVALID` ou `TOKEN_EXPIRED`
+- `GET /auth/me` — usuário do token; `requireAuth` responde `TOKEN_MISSING`, `TOKEN_INVALID` ou `TOKEN_EXPIRED`, e confirma no banco que o usuário existe, lendo de lá o perfil
 - `POST /auth/register` — exclusivo do `lead` (`requireRole`, `403 FORBIDDEN`); hash bcrypt e dupla barreira no `passwordHash` (`select: false` e `transform`)
 - `GET /api/health`
 - Catálogo de `code`s em `utils/errors.js`, com um teste que falha se ele divergir de `api_contract.md` §Catálogo de `code`s
@@ -97,6 +97,7 @@ README final com a tabela critério → lugar no repositório, passada única do
 | 1 | **Alinhamento com o Murilo** sobre o domínio do projeto | A entrada de 01/10 sobre o domínio, em `docs/decisions.md`, espera a data e a resposta |
 | 2 | **Decisões em aberto do frontend** — armazenamento do token e abordagem de estilo | `CLAUDE.md` §10; decidir no início do Passo 3 |
 | 3 | **Caminho do `docker compose` não verificado** — a máquina de desenvolvimento não tem Docker; o MongoDB 7 roda de um zip, fora do repositório, em `%USERPROFILE%\mongodb`, e sobe com `start-mongod.cmd` | O README manda o avaliador pelo compose: antes da entrega, alguém com Docker roda `docker compose up -d` e a suíte uma vez |
+| 4 | **Limite da senha em caracteres, não em bytes** — `validators/auth.js` usa `max(72)`, mas o bcrypt trunca em 72 bytes: senha longa com acentos pode ser cortada em silêncio | Sugestão do `code-reviewer` na 2.1, anterior a ela; ajuste pequeno, cabe numa fatia seguinte |
 
 ---
 
