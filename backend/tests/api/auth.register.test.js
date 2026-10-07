@@ -171,8 +171,9 @@ describe('POST /api/auth/register', () => {
   })
 
   it('recusa senha acima de 72 bytes, mesmo com menos de 72 caracteres', async () => {
-    // 40 caracteres, 80 bytes: o bcrypt ignoraria tudo depois do 36º.
-    const response = await postRegister({ ...validPayload, password: 'ç'.repeat(40) })
+    // 37 caracteres, 73 bytes: um byte além do limite, e o bcrypt ignoraria o
+    // último. Na fronteira, para que um limite frouxo também quebre o teste.
+    const response = await postRegister({ ...validPayload, password: 'ç'.repeat(36) + 'a' })
 
     expect(response.status).toBe(400)
     expect(response.body.error.code).toBe('VALIDATION_ERROR')
