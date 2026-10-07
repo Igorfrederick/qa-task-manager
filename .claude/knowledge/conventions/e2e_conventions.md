@@ -20,6 +20,7 @@ support/
 - Locators, sempre por `data-cy`
 - Ações de baixo nível: `fillCredentials()`, `completeTask()`, `clickSave()`
 - Navegação para a própria tela
+- Aceitar o diálogo nativo de confirmação dentro da ação que o abre: `deleteTask()` registra a aceitação antes do clique. Sem ouvinte, o Playwright descarta o diálogo e nada é excluído — decisão de 07/10/2026
 
 ## O que não fica no Page Object
 

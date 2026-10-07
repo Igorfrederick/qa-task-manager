@@ -36,6 +36,7 @@ São três telas, três pastas em `pages/`. Tela nova exige sinalização antes.
 - O token é lido e escrito só por `utils/tokenStorage.js`, e só o token vai para o navegador; usuário e perfil vêm da API — decisão de 07/10/2026
 - Toda chamada trata **carregamento** e **erro**, não só o caminho feliz
 - O erro exibido ao usuário vem do `message` da API; o `code` é o que a lógica consome
+- Exclusão pede confirmação pelo diálogo nativo (`window.confirm`) antes da chamada — decisão de 07/10/2026
 - `401` em qualquer chamada encerra a sessão e leva ao `/login`
 
 ## Rotas protegidas

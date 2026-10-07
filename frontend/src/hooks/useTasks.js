@@ -1,12 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import * as taskService from '../services/taskService.js'
 
-/** Tarefas da listagem para os filtros dados, com carregamento e erro. */
+/**
+ * Tarefas da listagem para os filtros dados, com carregamento e erro.
+ * `reload` busca de novo com os mesmos filtros: depois de uma ação, a tarefa
+ * alterada pode ter saído do filtro, e quem sabe a lista certa é a API.
+ */
 export function useTasks({ status, priority }) {
   const [tasks, setTasks] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [reloadCount, setReloadCount] = useState(0)
 
   useEffect(() => {
     // Trocar de filtro antes da resposta chegar descarta a resposta antiga:
@@ -30,7 +35,9 @@ export function useTasks({ status, priority }) {
     return () => {
       isCurrent = false
     }
-  }, [status, priority])
+  }, [status, priority, reloadCount])
 
-  return { tasks, isLoading, error }
+  const reload = useCallback(() => setReloadCount((count) => count + 1), [])
+
+  return { tasks, isLoading, error, reload }
 }

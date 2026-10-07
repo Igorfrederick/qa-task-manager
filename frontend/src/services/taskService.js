@@ -14,3 +14,13 @@ export async function listTasks({ status, priority } = {}) {
   const { tasks } = await request(query ? `/tasks?${query}` : '/tasks')
   return tasks
 }
+
+/** Edição parcial: concluir ou reabrir envia só `{ status }`. Responde a tarefa. */
+export async function updateTask(id, changes) {
+  const { task } = await request(`/tasks/${id}`, { method: 'PATCH', body: changes })
+  return task
+}
+
+export function deleteTask(id) {
+  return request(`/tasks/${id}`, { method: 'DELETE' })
+}

@@ -47,6 +47,7 @@ Cada linha diz **o que** garantir e **onde** está a regra por extenso. Leia a f
 - **Setup via API, auth por fixture**, nunca pela interface — **e o teste limpa o que criou**. Usuário de teste é criado pelo `lead` via API, porque não há cadastro público. A suíte exige MongoDB em pé (`docker compose up -d` na raiz), e a falha por banco ausente precisa apontar a causa. → `e2e_conventions.md` §Setup e teardown
 - **Independência real:** a suíte passa embaralhada e em paralelo. → `e2e_conventions.md` §Independência
 - **Seletores exclusivamente `data-cy`.** → `e2e_conventions.md` §Seletores
+- **Exclusão pela tela passa pelo diálogo nativo:** a ação do Page Object aceita o diálogo antes do clique. → `e2e_conventions.md` §O que fica no Page Object
 - **Jornadas principais e regras cobertas na interface** — criar, editar, concluir, excluir, filtrar, escopo por dono e validação do formulário. A prova de cada regra na API é do `backend/tests/`; a da interface é sua. → `checklist_e2e.md` §Cobertura das regras de negócio
 - **Login e autenticação cobertos na interface:** login válido, login inválido e rota protegida sem sessão. `401` e `403` de API ficam em `backend/tests/`. → `checklist_e2e.md` §Cobertura das regras de negócio › Além das regras
 - **Nenhum dado real, segredo ou credencial no código.** Senha só com hash, segredo só por variável de ambiente, e **nenhum dado real da Nextar** — sem nome de cliente, sem chave real de tarefa do Jira, sem conteúdo de bug real. Seed, massa e exemplo usam dado fictício. → `CLAUDE.md` §4 › Segurança — não negociável

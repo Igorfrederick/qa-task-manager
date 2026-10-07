@@ -50,6 +50,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 - [ ] Nenhum `waitForTimeout`
 - [ ] Sem `if/else` no caminho principal do teste
 - [ ] Sem dependência de dado pré-existente no ambiente
+- [ ] Exclusão pela tela aceita o diálogo de confirmação dentro da ação do Page Object, registrado antes do clique
 
 ## Cobertura das regras de negócio
 
