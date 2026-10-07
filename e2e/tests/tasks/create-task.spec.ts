@@ -31,11 +31,14 @@ test.describe('criar tarefa pela tela', () => {
     await taskFormPage.fill(data)
     await taskFormPage.save()
 
-    // O id vem da resposta da criação: é ele que localiza a linha na lista.
+    // O id vem da resposta da criação: é ele que localiza a linha na lista. A
+    // tarefa é anotada para a limpeza antes da conferência do 201, para não
+    // sobrar na base se a API criar com outro status de sucesso.
     const response = await creation
-    expect(response.status()).toBe(201)
+    expect(response.ok()).toBe(true)
     const { task } = await response.json()
     taskApi.track(task._id)
+    expect(response.status()).toBe(201)
     await expect(page).toHaveURL('/tasks')
     await expect(taskListPage.taskTitle(task._id)).toHaveText(data.title)
     await expect(taskListPage.taskDescription(task._id)).toHaveText(data.description)

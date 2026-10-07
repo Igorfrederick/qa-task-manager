@@ -109,17 +109,20 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       },
     })
 
-    try {
-      for (const { owner, taskId } of created) {
-        try {
-          await services[owner].remove(taskId)
-        } catch (error) {
-          // A tarefa que o próprio teste excluiu já não existe.
-          if (!(error instanceof ApiCallError && error.status === 404)) throw error
-        }
+    // Uma exclusão que falha não interrompe as outras: as falhas se acumulam e
+    // saem juntas no fim.
+    const failures: unknown[] = []
+    for (const { owner, taskId } of created) {
+      try {
+        await services[owner].remove(taskId)
+      } catch (error) {
+        // A tarefa que o próprio teste excluiu já não existe.
+        if (!(error instanceof ApiCallError && error.code === 'TASK_NOT_FOUND')) failures.push(error)
       }
-    } finally {
-      await apiContext.dispose()
+    }
+    await apiContext.dispose()
+    if (failures.length > 0) {
+      throw new AggregateError(failures, `A limpeza falhou para ${failures.length} tarefa(s) criada(s) pelo teste.`)
     }
   },
 })

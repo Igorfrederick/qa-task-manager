@@ -1,8 +1,8 @@
 /**
- * Resposta fora do esperado numa chamada da service layer. Leva o status e,
- * quando a resposta segue o contrato, o `code` do erro, para quem chama
- * distinguir a causa — credencial recusada não é API fora do ar, e tarefa
- * inexistente se confere pelo `code`, não pela mensagem.
+ * Resposta fora do esperado numa chamada da service layer. Leva o status, para
+ * quem chama distinguir a causa — credencial recusada não é API fora do ar —,
+ * e o `code` do contrato quando o service o lê da resposta, como faz o
+ * `TaskService`: tarefa inexistente se confere pelo `code`, não pela mensagem.
  */
 export class ApiCallError extends Error {
   readonly status: number
