@@ -72,6 +72,10 @@ describe('GET /api/auth/me', () => {
       () => jwt.sign({ role: ROLES.LEAD }, 'outro-segredo', { algorithm: 'HS256', subject: user.id }),
     ],
     [
+      'com sub que não é um id',
+      () => jwt.sign({}, env.jwtSecret, { algorithm: 'HS256', subject: 'nao-e-um-id' }),
+    ],
+    [
       'assinado com outro algoritmo',
       () => jwt.sign({ role: ROLES.QA }, env.jwtSecret, { algorithm: 'HS512', subject: user.id }),
     ],

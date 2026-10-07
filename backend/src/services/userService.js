@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt'
+import mongoose from 'mongoose'
 
 import { env } from '../config/env.js'
 import { User } from '../models/User.js'
@@ -69,6 +70,12 @@ export async function registerUser({ name, email, password, role }) {
  * @throws {AppError} `TOKEN_INVALID` quando o usuário do token não existe mais
  */
 export async function getAuthenticatedUser(id) {
+  // `sub` fora do formato de id não identifica ninguém. Sem esta guarda, o
+  // `findById` lançaria `CastError`, e toda rota protegida responderia `500`.
+  if (!mongoose.isObjectIdOrHexString(id)) {
+    throw new AppError('TOKEN_INVALID')
+  }
+
   const user = await User.findById(id)
   if (!user) {
     throw new AppError('TOKEN_INVALID')
