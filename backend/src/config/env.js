@@ -36,4 +36,8 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '8h',
   bcryptSaltRounds: toInteger(process.env.BCRYPT_SALT_ROUNDS, 10),
+  // Senhas dos usuários do seed. Fora das obrigatórias: a API sobe sem elas,
+  // e só o `npm run seed` as exige — ele recusa rodar sem as duas.
+  seedLeadPassword: process.env.SEED_LEAD_PASSWORD,
+  seedQaPassword: process.env.SEED_QA_PASSWORD,
 }
