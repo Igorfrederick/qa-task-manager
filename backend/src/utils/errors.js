@@ -15,6 +15,9 @@
  */
 export const ERRORS = Object.freeze({
   VALIDATION_ERROR: { status: 400, message: 'Dados inválidos na requisição' },
+  // Um só `code` para e-mail inexistente e senha errada: o contrato exige que
+  // os dois respondam igual, para não revelar quais e-mails têm conta.
+  INVALID_CREDENTIALS: { status: 401, message: 'E-mail ou senha inválidos' },
   NOT_FOUND: { status: 404, message: 'Rota não encontrada' },
   // `409` porque é invariante de domínio: só se julga consultando o banco. O
   // formato do e-mail é invariante de entrada e morre no schema com `400`.

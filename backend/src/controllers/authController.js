@@ -1,3 +1,4 @@
+import { authenticate } from '../services/authService.js'
 import { registerUser } from '../services/userService.js'
 
 /**
@@ -14,6 +15,14 @@ export function register(req, res, next) {
       // `res.json` chama `toJSON`, e o transform do schema remove
       // `passwordHash`. A remoção não depende de o controller lembrar dela.
       res.status(201).json({ user })
+    })
+    .catch(next)
+}
+
+export function login(req, res, next) {
+  authenticate(req.body)
+    .then(({ token, user }) => {
+      res.status(200).json({ token, user })
     })
     .catch(next)
 }
