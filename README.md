@@ -2,7 +2,7 @@
 
 Gerenciador de tarefas de um time de QA. Cada pessoa mantém as próprias tarefas; o líder enxerga as de todo o time e cria as contas.
 
-> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend com login integrado e rotas protegidas; telas de tarefa e E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
+> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend pronto — login integrado, rotas protegidas, lista com filtros e ações por linha, e formulário de criar e editar; E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
 
 ---
 
@@ -98,7 +98,7 @@ npm install
 npm run dev     # sobe a interface em http://localhost:5173
 ```
 
-Entre com uma das contas do seed. O frontend chama `/api` no próprio endereço, e o servidor do Vite repassa ao backend em `API_PROXY_TARGET` (padrão `http://localhost:3000`) — por isso o backend não precisa de CORS. A porta 5173 é fixa: ocupada, o Vite falha em vez de subir em outra, porque a suíte E2E aponta para ela.
+Entre com uma das contas do seed: o `qa` vê e gerencia as próprias tarefas; o `lead`, as do time inteiro, com o dono de cada uma. O frontend chama `/api` no próprio endereço, e o servidor do Vite repassa ao backend em `API_PROXY_TARGET` (padrão `http://localhost:3000`) — por isso o backend não precisa de CORS. A porta 5173 é fixa: ocupada, o Vite falha em vez de subir em outra, porque a suíte E2E aponta para ela.
 
 ## Contexto
 
