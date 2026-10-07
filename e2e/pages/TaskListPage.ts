@@ -47,4 +47,8 @@ export class TaskListPage {
   async openNewTask(): Promise<void> {
     await this.newTaskButton.click()
   }
+
+  async editTask(taskId: string): Promise<void> {
+    await this.page.getByTestId(`task-list-edit-button-${taskId}`).click()
+  }
 }
