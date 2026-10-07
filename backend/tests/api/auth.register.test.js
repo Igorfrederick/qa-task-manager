@@ -6,9 +6,8 @@ import { createApp } from '../../src/app.js'
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
 import { env } from '../../src/config/env.js'
 import { User } from '../../src/models/User.js'
-import { registerUser } from '../../src/services/userService.js'
 import { ROLES } from '../../src/utils/roles.js'
-import { signToken } from '../../src/utils/token.js'
+import { createUserWithToken } from '../helpers/users.js'
 
 /**
  * Teste da rota, com supertest e sem porta aberta.
@@ -37,20 +36,18 @@ describe('POST /api/auth/register', () => {
   // Criação de conta é exclusiva do líder: cada teste nasce com um `lead` e
   // um `qa`, criados pelo service, e com o token de cada um.
   beforeEach(async () => {
-    const lead = await registerUser({
+    const lead = await createUserWithToken({
       name: 'Líder de Teste',
       email: 'lead@exemplo.test',
-      password: 'senha-de-teste-123',
       role: ROLES.LEAD,
     })
-    const qa = await registerUser({
+    const qa = await createUserWithToken({
       name: 'QA de Teste',
       email: 'qa@exemplo.test',
-      password: 'senha-de-teste-123',
       role: ROLES.QA,
     })
-    leadToken = signToken(lead)
-    qaToken = signToken(qa)
+    leadToken = lead.token
+    qaToken = qa.token
   })
 
   afterEach(async () => {

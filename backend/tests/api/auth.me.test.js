@@ -6,9 +6,8 @@ import { createApp } from '../../src/app.js'
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
 import { env } from '../../src/config/env.js'
 import { User } from '../../src/models/User.js'
-import { registerUser } from '../../src/services/userService.js'
 import { ROLES } from '../../src/utils/roles.js'
-import { signToken } from '../../src/utils/token.js'
+import { createUserWithToken } from '../helpers/users.js'
 
 /**
  * `GET /auth/me` e, por ela, o middleware de autenticação.
@@ -19,18 +18,20 @@ import { signToken } from '../../src/utils/token.js'
 describe('GET /api/auth/me', () => {
   const app = createApp()
   let user
+  let token
 
   beforeAll(async () => {
     await connectDatabase()
   })
 
   beforeEach(async () => {
-    user = await registerUser({
+    const created = await createUserWithToken({
       name: 'Fulana de Teste',
       email: 'fulana@exemplo.test',
-      password: 'senha-de-teste-123',
       role: ROLES.QA,
     })
+    user = created.user
+    token = created.token
   })
 
   afterEach(async () => {
@@ -47,7 +48,7 @@ describe('GET /api/auth/me', () => {
   }
 
   it('responde 200 com o usuário do token, sem passwordHash', async () => {
-    const response = await getMe(`Bearer ${signToken(user)}`)
+    const response = await getMe(`Bearer ${token}`)
 
     expect(response.status).toBe(200)
     expect(response.body.user).toMatchObject({ _id: user.id, email: user.email, role: ROLES.QA })
@@ -108,7 +109,6 @@ describe('GET /api/auth/me', () => {
   })
 
   it('responde 401 TOKEN_INVALID para token de usuário que não existe mais', async () => {
-    const token = signToken(user)
     await User.deleteOne({ _id: user.id })
 
     const response = await getMe(`Bearer ${token}`)
