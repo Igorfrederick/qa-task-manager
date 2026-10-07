@@ -13,7 +13,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | Passo | Entrega | Situação |
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
-| **2** | **Backend completo, contrato estável** | **Em fechamento** — 2.1 (PR #1) e 2.2 (PR #2) mergeadas; 2.3 concluída em 07/10/2026, em PR, aguardando a passada do `code-reviewer` |
+| **2** | **Backend completo, contrato estável** | **Em fechamento** — 2.1 (PR #1) e 2.2 (PR #2) mergeadas; 2.3 concluída em 07/10/2026 (PR #3): duas passadas do `code-reviewer`, a segunda sem bloqueios, achados tratados; aguarda merge |
 | 3 | Frontend — três telas | Próximo |
 | 4 | E2E | Não iniciado |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
