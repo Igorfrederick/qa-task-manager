@@ -34,5 +34,5 @@ export async function authenticate({ email, password }) {
     throw new AppError('INVALID_CREDENTIALS')
   }
 
-  return { token: signToken({ id: user.id, role: user.role }), user }
+  return { token: signToken({ id: user.id }), user }
 }
