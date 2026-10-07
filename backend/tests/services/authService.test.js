@@ -34,7 +34,7 @@ describe('authService.authenticate', () => {
     await disconnectDatabase()
   })
 
-  it('emite token assinado com o id em sub, o perfil e expiração', async () => {
+  it('emite token assinado com o id em sub e expiração', async () => {
     const { token } = await authenticate(credentials)
 
     // Validado com o segredo e o algoritmo do projeto: um token que passa aqui
@@ -42,10 +42,10 @@ describe('authService.authenticate', () => {
     const payload = jwt.verify(token, env.jwtSecret, { algorithms: ['HS256'] })
 
     expect(payload.sub).toBe(registered.id)
-    expect(payload.role).toBe(ROLES.QA)
     expect(payload.exp).toBeGreaterThan(payload.iat)
-    // O mínimo para autorizar, e nada mais: nem e-mail, nem nome, nem hash.
-    expect(Object.keys(payload).sort()).toEqual(['exp', 'iat', 'role', 'sub'])
+    // Só o id: nem perfil — lido do banco a cada requisição —, nem e-mail,
+    // nem nome, nem hash.
+    expect(Object.keys(payload).sort()).toEqual(['exp', 'iat', 'sub'])
   })
 
   it('devolve o usuário sem passwordHash na serialização', async () => {

@@ -16,7 +16,11 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 **Alternativa descartada:** middleware sem estado, só com o token — uma consulta a menos, ao preço de o token de usuário removido autorizar qualquer rota por até `JWT_EXPIRES_IN`, e de `TOKEN_INVALID` significar coisas diferentes conforme a rota.
 
+**Consequência registrada:** o token passa a levar só o id, em `sub`. Com o perfil lido do banco, um perfil copiado no token não seria lido por ninguém — e convidaria alguém a usá-lo.
+
 **Origem:** achado HIGH do `code-reviewer` no PR da fatia 2.1.
+
+**Decidido por:** Igor Frederick, em 06/10/2026.
 
 ---
 

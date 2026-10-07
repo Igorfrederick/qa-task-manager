@@ -24,7 +24,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 Backend, com testes:
 
-- `POST /auth/login` — emite JWT com o id em `sub` e o perfil; e-mail inexistente e senha errada respondem igual, inclusive no tempo
+- `POST /auth/login` — emite JWT só com o id, em `sub`; e-mail inexistente e senha errada respondem igual, inclusive no tempo
 - `GET /auth/me` — usuário do token; `requireAuth` responde `TOKEN_MISSING`, `TOKEN_INVALID` ou `TOKEN_EXPIRED`, e confirma no banco que o usuário existe, lendo de lá o perfil
 - `POST /auth/register` — exclusivo do `lead` (`requireRole`, `403 FORBIDDEN`); hash bcrypt e dupla barreira no `passwordHash` (`select: false` e `transform`)
 - `GET /api/health`

@@ -1,8 +1,10 @@
+import jwt from 'jsonwebtoken'
 import request from 'supertest'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createApp } from '../../src/app.js'
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
+import { env } from '../../src/config/env.js'
 import { User } from '../../src/models/User.js'
 import { registerUser } from '../../src/services/userService.js'
 import { ROLES } from '../../src/utils/roles.js'
@@ -123,10 +125,15 @@ describe('POST /api/auth/register', () => {
   })
 
   it('autoriza pelo perfil do banco, não pelo perfil escrito no token', async () => {
-    // Token bem assinado para o qa, mas com role lead — o caso de um perfil
-    // alterado depois do login. Vale o perfil atual do usuário.
+    // Token bem assinado para o qa, mas declarando role lead. O token do
+    // projeto não carrega perfil; este é montado à mão para provar que, se
+    // carregasse, não seria ele a decidir. Vale o perfil atual do usuário.
     const qa = await User.findOne({ email: 'qa@exemplo.test' })
-    const staleToken = signToken({ id: qa.id, role: ROLES.LEAD })
+    const staleToken = jwt.sign({ role: ROLES.LEAD }, env.jwtSecret, {
+      algorithm: 'HS256',
+      expiresIn: '1h',
+      subject: qa.id,
+    })
 
     const response = await postRegister(validPayload, staleToken)
 
