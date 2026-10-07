@@ -48,7 +48,8 @@ A ferramenta é **Vitest com supertest** — decisão de 01/10/2026 em `docs/dec
 - JWT com geração e validação explícitas, expiração definida
 - Segredo exclusivamente em variável de ambiente; nunca literal no código
 - Validação do token em middleware, não repetida em controller
-- O payload do token carrega o mínimo para autorizar: identificador e perfil
+- O payload do token carrega só o id do usuário, em `sub`; o perfil é lido do banco, não do token
+- O middleware confirma no banco que o usuário do token existe e lê dele o perfil: token de usuário removido não autoriza nenhuma rota, e perfil alterado vale na hora — decisão de 06/10/2026 em `docs/decisions.md`
 
 ## Senhas
 
@@ -71,7 +72,7 @@ A ferramenta é **Vitest com supertest** — decisão de 01/10/2026 em `docs/dec
 
 O escopo por dono é regra de negócio (regras 2 e 3 do `api_contract.md`) e vive no service:
 
-- O controller extrai o usuário autenticado do token e o passa ao service — o service recebe `{ id, role }`, não `req`
+- O controller lê o usuário autenticado de `req.user`, montado pelo middleware, e o passa ao service — o service recebe `{ id, role }`, não `req`
 - O filtro por dono entra **na própria consulta** (`{ _id, userId }` para o `qa`), não numa comparação feita depois de buscar a tarefa: comparação posterior é um passo que dá para esquecer em uma das rotas
 - Tarefa alheia e tarefa inexistente percorrem o mesmo caminho e lançam o mesmo erro (`404`)
 - Na criação, `userId` vem do usuário autenticado; o schema Zod não declara `userId`, e o campo é descartado se vier no payload
@@ -90,7 +91,8 @@ O que cabe ao backend garantir:
 
 - Middleware de erro centralizado; `try/catch` repetido em cada controller é achado
 - `code` nascido de um catálogo único, nunca montado ad hoc no controller
-- Regra de negócio nova exige `code` novo no catálogo
+- O catálogo, em `utils/errors.js`, associa cada `code` ao seu status e à sua mensagem. O erro é lançado pelo `code`: status e mensagem vêm do catálogo, nunca de quem lança — decisão de 01/10/2026 em `docs/decisions.md`
+- Regra de negócio nova exige `code` novo no catálogo, e o `code` novo entra em `api_contract.md` §Catálogo de `code`s antes ou junto do código que o lança
 - O status devolvido corresponde à camada que detectou a falha: validação de payload no middleware, violação de domínio no service
 
 ## Modelagem

@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt'
+import mongoose from 'mongoose'
 
 import { env } from '../config/env.js'
 import { User } from '../models/User.js'
-import { EmailTakenError } from '../utils/errors.js'
+import { AppError } from '../utils/errors.js'
 
 /**
  * Regra de negócio de usuário.
@@ -30,14 +31,14 @@ import { EmailTakenError } from '../utils/errors.js'
  * @param {{ name: string, email: string, password: string, role?: string }} data
  *        já validados pelo schema Zod no middleware
  * @returns {Promise<import('mongoose').Document>} documento sem `passwordHash`
- * @throws {EmailTakenError} quando o e-mail já está cadastrado
+ * @throws {AppError} `EMAIL_TAKEN` quando o e-mail já está cadastrado
  */
 export async function registerUser({ name, email, password, role }) {
   const normalizedEmail = email.trim().toLowerCase()
 
   const alreadyExists = await User.exists({ email: normalizedEmail })
   if (alreadyExists) {
-    throw new EmailTakenError(normalizedEmail)
+    throw new AppError('EMAIL_TAKEN')
   }
 
   const passwordHash = await bcrypt.hash(password, env.bcryptSaltRounds)
@@ -51,8 +52,33 @@ export async function registerUser({ name, email, password, role }) {
     // outra requisição com o mesmo e-mail. Quem garante é o índice único do
     // schema, e sem isto a corrida viraria 500 em vez do 409 do contrato.
     if (error?.code === 11000) {
-      throw new EmailTakenError(normalizedEmail)
+      throw new AppError('EMAIL_TAKEN')
     }
     throw error
   }
+}
+
+/**
+ * Usuário autenticado, a partir do id que veio no token.
+ *
+ * Usuário que não existe mais é `TOKEN_INVALID`, e não `404`: para quem chama,
+ * a credencial não identifica ninguém. O `401` leva o frontend a encerrar a
+ * sessão; um `404` o deixaria preso numa tela de erro.
+ *
+ * @param {string} id
+ * @returns {Promise<import('mongoose').Document>}
+ * @throws {AppError} `TOKEN_INVALID` quando o usuário do token não existe mais
+ */
+export async function getAuthenticatedUser(id) {
+  // `sub` fora do formato de id não identifica ninguém. Sem esta guarda, o
+  // `findById` lançaria `CastError`, e toda rota protegida responderia `500`.
+  if (!mongoose.isObjectIdOrHexString(id)) {
+    throw new AppError('TOKEN_INVALID')
+  }
+
+  const user = await User.findById(id)
+  if (!user) {
+    throw new AppError('TOKEN_INVALID')
+  }
+  return user
 }

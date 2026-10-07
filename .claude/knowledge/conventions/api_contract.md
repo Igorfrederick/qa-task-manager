@@ -127,7 +127,26 @@ Corpo do erro de validação:
 
 `TASK_NOT_FOUND` vale também para `_id` que não existe — é o mesmo caminho no código e no teste. `_id` em formato inválido é outro caso: julga-se olhando só a entrada, então é invariante de entrada — `400` com `VALIDATION_ERROR` e `id` em `details`, nunca o `500` de um `CastError` vazando do Mongoose.
 
-A tabela cataloga as invariantes de domínio numeradas e não é a lista completa dos `code`s da API — `NOT_FOUND` (rota inexistente), `INTERNAL_ERROR` e a família de autenticação também são `code`s. A lista completa é o catálogo, que nasce no commit de login.
+A tabela cataloga as invariantes de domínio numeradas e não é a lista completa dos `code`s da API — `NOT_FOUND` (rota inexistente), `INTERNAL_ERROR` e a família de autenticação também são `code`s. A lista completa está em §Catálogo de `code`s.
+
+## Catálogo de `code`s
+
+Todos os `code`s da API. Cada `code` tem um único status. No backend, o catálogo vive em `backend/src/utils/errors.js` e associa cada `code` ao seu status e à sua mensagem — decisões de 01/10/2026 em `docs/decisions.md`.
+
+| `code` | Status | Quando |
+|---|---|---|
+| `VALIDATION_ERROR` | `400` | Corpo, filtro ou parâmetro de rota fora do schema; JSON malformado |
+| `INVALID_CREDENTIALS` | `401` | Login com e-mail inexistente ou com senha errada — mesma resposta para os dois |
+| `TOKEN_MISSING` | `401` | Requisição sem `Authorization: Bearer <token>` |
+| `TOKEN_INVALID` | `401` | Assinatura, formato ou algoritmo inválido, ou token de usuário que não existe mais |
+| `TOKEN_EXPIRED` | `401` | `exp` vencido |
+| `FORBIDDEN` | `403` | Perfil autenticado sem permissão para a rota |
+| `NOT_FOUND` | `404` | Rota inexistente |
+| `TASK_NOT_FOUND` | `404` | Tarefa inexistente ou, para o `qa`, de outra pessoa (regra 2) |
+| `EMAIL_TAKEN` | `409` | E-mail já cadastrado (regra 4) |
+| `INTERNAL_ERROR` | `500` | Erro não previsto; a mensagem original não vai ao cliente |
+
+Esta tabela é o contrato e o catálogo do backend a implementa: `code` novo entra aqui antes ou junto do código que o lança, nunca depois.
 
 ## Perfis
 

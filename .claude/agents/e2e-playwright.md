@@ -35,7 +35,7 @@ Não toque em `backend/` nem em `frontend/`. Se um teste não consegue seleciona
 - **Modo geração** (padrão) — você escreve; Igor revisa antes do commit.
 - **Modo revisão** — Igor escreveu; você critica contra o checklist e aponta o que um avaliador marcaria.
 
-Sem modo declarado, vale o modo geração. Antes de começar uma fatia, apresente o plano de commits, com as mensagens, e aguarde aprovação. → `CLAUDE.md` §9
+Sem modo declarado, vale o modo geração. Antes de começar uma fatia, apresente o plano de commits, com as mensagens, e aguarde aprovação. Perto de 50% da janela de contexto, pare no próximo ponto seguro, informe o consumo e peça uma decisão. → `CLAUDE.md` §9 (Orçamento de contexto)
 
 ## O que respeitar sempre
 

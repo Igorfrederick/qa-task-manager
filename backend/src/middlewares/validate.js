@@ -1,5 +1,7 @@
 import { ZodError } from 'zod'
 
+import { AppError } from '../utils/errors.js'
+
 /**
  * Validação de entrada por schema Zod.
  *
@@ -18,28 +20,15 @@ export function validateBody(schema) {
       req.body = schema.parse(req.body)
       next()
     } catch (error) {
-      next(error instanceof ZodError ? new ValidationError(error) : error)
+      next(error instanceof ZodError ? new AppError('VALIDATION_ERROR', toDetails(error)) : error)
     }
   }
 }
 
-/**
- * Falha de validação de payload. `400`, com `details` preenchido.
- *
- * Declarada aqui, e não em `utils/errors.js`, porque é o erro deste middleware
- * e só ele a constrói — não é violação de regra de domínio. Quando o catálogo
- * de `code`s nascer, no commit de login, `VALIDATION_ERROR` migra para lá
- * junto com `EMAIL_TAKEN`.
- */
-export class ValidationError extends Error {
-  constructor(zodError) {
-    super('Dados inválidos na requisição')
-    this.name = 'ValidationError'
-    this.code = 'VALIDATION_ERROR'
-    this.status = 400
-    this.details = zodError.issues.map((issue) => ({
-      field: issue.path.join('.'),
-      issue: issue.message,
-    }))
-  }
+/** Uma entrada de `details` por falha, no formato de `api_contract.md`. */
+function toDetails(zodError) {
+  return zodError.issues.map((issue) => ({
+    field: issue.path.join('.'),
+    issue: issue.message,
+  }))
 }

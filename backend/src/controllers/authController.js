@@ -1,4 +1,5 @@
-import { registerUser } from '../services/userService.js'
+import { authenticate } from '../services/authService.js'
+import { getAuthenticatedUser, registerUser } from '../services/userService.js'
 
 /**
  * Entrada e saída HTTP das rotas de autenticação. Nenhuma regra de negócio.
@@ -14,6 +15,28 @@ export function register(req, res, next) {
       // `res.json` chama `toJSON`, e o transform do schema remove
       // `passwordHash`. A remoção não depende de o controller lembrar dela.
       res.status(201).json({ user })
+    })
+    .catch(next)
+}
+
+export function login(req, res, next) {
+  authenticate(req.body)
+    .then(({ token, user }) => {
+      res.status(200).json({ token, user })
+    })
+    .catch(next)
+}
+
+/**
+ * `req.user` vem do middleware de autenticação e traz só `{ id, role }`; o
+ * service busca o usuário completo para a resposta. É uma segunda leitura do
+ * mesmo usuário, deliberada: `req.user` guarda só o que autoriza, como pede a
+ * convenção, e não o documento do model.
+ */
+export function me(req, res, next) {
+  getAuthenticatedUser(req.user.id)
+    .then((user) => {
+      res.status(200).json({ user })
     })
     .catch(next)
 }

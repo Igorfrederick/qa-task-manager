@@ -26,3 +26,18 @@ export const registerSchema = z.object({
     .max(72, 'A senha pode ter no máximo 72 caracteres'),
   role: z.enum(ROLE_VALUES, { errorMap: () => ({ message: 'Perfil inválido' }) }).optional(),
 })
+
+/**
+ * Login: só a forma — e-mail válido e senha presente. A política de senha
+ * (tamanho mínimo e máximo) é do cadastro; o login apenas confere a
+ * credencial, e senha fora da política é credencial inválida, não payload
+ * inválido.
+ */
+export const loginSchema = z.object({
+  email: z
+    .string({ required_error: 'Informe o e-mail' })
+    .trim()
+    .toLowerCase()
+    .email('E-mail em formato inválido'),
+  password: z.string({ required_error: 'Informe a senha' }).min(1, 'Informe a senha'),
+})

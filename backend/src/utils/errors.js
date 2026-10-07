@@ -1,40 +1,61 @@
 /**
- * Erro de domínio.
+ * Catálogo de `code`s da API e o erro que o usa.
  *
- * O service não conhece `req` nem `res`: quando a regra é violada, ele lança
- * isto. Quem traduz para HTTP é o middleware de erro, em um lugar só.
+ * Fonte única dos `code`s no backend: cada um associado ao seu status HTTP e à
+ * sua mensagem. O contrato é `api_contract.md` §Catálogo de `code`s; este
+ * objeto o implementa. Decisão de 01/10/2026 em `docs/decisions.md`.
  *
- * O erro carrega `code` e `status` porque quem detecta a violação é quem sabe
- * a natureza dela. O middleware não precisa adivinhar nem manter um mapa.
+ * O `code` carrega o status porque a relação é uma função: cada `code` tem
+ * exatamente um status, e vários `code`s podem dividir o mesmo. Um mapa
+ * `code → status` à parte seria uma segunda estrutura com as mesmas chaves,
+ * livre para dessincronizar.
  *
- * Ainda NÃO existe catálogo de `code`s: ele nasce na fatia de login, quando a
- * família `401` der a informação para decidir a forma — `CLAUDE.md` §10. Até
- * lá os `code`s vivem declarados aqui, ao lado do erro que os usa.
+ * `code` é contrato e não muda. `message` é apresentação, em português, e pode
+ * mudar sem quebrar consumidor — os testes asserem o `code`.
  */
-export class DomainError extends Error {
-  /**
-   * @param {string} code    contrato, SCREAMING_SNAKE_CASE
-   * @param {string} message apresentação, em português
-   * @param {number} status  status HTTP da violação
-   */
-  constructor(code, message, status) {
-    super(message)
-    this.name = 'DomainError'
-    this.code = code
-    this.status = status
-  }
-}
+export const ERRORS = Object.freeze({
+  VALIDATION_ERROR: { status: 400, message: 'Dados inválidos na requisição' },
+  // Um só `code` para e-mail inexistente e senha errada: o contrato exige que
+  // os dois respondam igual, para não revelar quais e-mails têm conta.
+  INVALID_CREDENTIALS: { status: 401, message: 'E-mail ou senha inválidos' },
+  // Três `code`s de token, e não um: cada causa de `401` tem asserção própria
+  // no teste. Para o frontend, os três encerram a sessão do mesmo jeito.
+  TOKEN_MISSING: { status: 401, message: 'Autenticação necessária' },
+  TOKEN_INVALID: { status: 401, message: 'Sessão inválida; entre novamente' },
+  TOKEN_EXPIRED: { status: 401, message: 'Sessão expirada; entre novamente' },
+  FORBIDDEN: { status: 403, message: 'Seu perfil não tem permissão para esta ação' },
+  NOT_FOUND: { status: 404, message: 'Rota não encontrada' },
+  // `409` porque é invariante de domínio: só se julga consultando o banco. O
+  // formato do e-mail é invariante de entrada e morre no schema com `400`.
+  EMAIL_TAKEN: { status: 409, message: 'Já existe usuário cadastrado com este e-mail' },
+  INTERNAL_ERROR: { status: 500, message: 'Erro interno no servidor' },
+})
 
 /**
- * Violação de unicidade de `User.email`.
+ * Erro lançado deliberadamente por uma camada da API — validação ou regra de
+ * domínio.
  *
- * `409` porque é invariante de domínio: só se julga consultando o estado do
- * sistema. O formato do e-mail é invariante de entrada e morre no schema Zod
- * com `400`, antes de chegar aqui.
+ * Construído pelo `code`: status e mensagem vêm do catálogo, e quem lança não
+ * tem como divergir dele. O service não conhece `req` nem `res`; quando a
+ * regra é violada, lança isto, e quem traduz para HTTP é o middleware de erro.
  */
-export class EmailTakenError extends DomainError {
-  constructor(email) {
-    super('EMAIL_TAKEN', `Já existe usuário cadastrado com o e-mail ${email}`, 409)
-    this.name = 'EmailTakenError'
+export class AppError extends Error {
+  /**
+   * @param {keyof typeof ERRORS} code
+   * @param {{ field: string, issue: string }[]} [details] falhas de validação
+   */
+  constructor(code, details = []) {
+    // `code` fora do catálogo é erro de programação. Falha aqui, com o nome
+    // errado na mensagem, em vez de responder com status e mensagem `undefined`.
+    // `hasOwn`, e não `ERRORS[code]`: `'toString'` existe em todo objeto.
+    if (!Object.hasOwn(ERRORS, code)) {
+      throw new Error(`code fora do catálogo de erros: ${code}`)
+    }
+
+    super(ERRORS[code].message)
+    this.name = 'AppError'
+    this.code = code
+    this.status = ERRORS[code].status
+    this.details = details
   }
 }
