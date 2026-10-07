@@ -2,7 +2,7 @@
 
 Gerenciador de tarefas de um time de QA. Cada pessoa mantém as próprias tarefas; o líder enxerga as de todo o time e cria as contas.
 
-> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend pronto — login integrado, rotas protegidas, lista com filtros e ações por linha, e formulário de criar e editar; E2E em andamento — ver [docs/handoff.md](docs/handoff.md).
+> **Estado:** em construção. Backend pronto — login com JWT, perfis `qa` e `lead`, criação de conta restrita ao líder, CRUD de tarefas com escopo por dono e filtros por status e prioridade, e seed com dado fictício. Frontend pronto — login integrado, rotas protegidas, lista com filtros e ações por linha, e formulário de criar e editar; E2E com autenticação pronta — login, sessão por perfil e rotas protegidas, no desktop e no celular; jornadas de tarefa em andamento — ver [docs/handoff.md](docs/handoff.md).
 
 ---
 
@@ -34,7 +34,7 @@ docs/        Log de decisões técnicas e documento de retomada
 
 ## Requisitos
 
-- Node.js 20.19+ ou 22.12+ — mínimo do Vite 8, no frontend; o backend aceita qualquer 20+
+- Node.js 20.19+, 22.13+ ou 23.5+ — o mínimo do E2E, pelo faker. O frontend aceita também a 22.12, pelo Vite 8, e o backend, qualquer 20+
 - MongoDB 7, pelo `docker compose` da seção seguinte ou instalado localmente
 
 ## Banco de dados
@@ -100,8 +100,30 @@ npm run dev     # sobe a interface em http://localhost:5173
 
 Entre com uma das contas do seed: o `qa` vê e gerencia as próprias tarefas; o `lead`, as do time inteiro, com o dono de cada uma. O frontend chama `/api` no próprio endereço, e o servidor do Vite repassa ao backend em `API_PROXY_TARGET` (padrão `http://localhost:3000`) — por isso o backend não precisa de CORS. A porta 5173 é fixa: ocupada, o Vite falha em vez de subir em outra, porque a suíte E2E aponta para ela.
 
+## E2E
+
+Com o banco em pé, o `backend/.env` preenchido e o seed rodado — com `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD` iguais a `E2E_LEAD_PASSWORD` e `E2E_QA_PASSWORD` no `e2e/.env`:
+
+```bash
+cd e2e
+npm install
+npx playwright install chromium
+npm test            # sobe API e frontend se não estiverem no ar, e roda cada teste no desktop e no celular
+npm run report      # relatório HTML da última execução
+npm run typecheck   # TypeScript estrito, sem emitir
+```
+
+A suíte não roda o seed — ele apaga a base. Antes do primeiro teste, ela confere que as contas do seed entram na API e, se não entram, diz o comando que resolve. Os testes começam autenticados por fixture de perfil (`test.use({ role: 'qa' })`), com o token obtido pela API; só os testes de login passam pela tela de login.
+
+| Pasta | Conteúdo |
+|---|---|
+| `tests/` | Testes por jornada: `auth/` (login, sessão, rotas protegidas) |
+| `pages/` | Page Objects, um por tela, com locators por `data-cy` e ações, sem asserção |
+| `fixtures/` | Test base: perfil, Page Objects e service layer injetados |
+| `services/` | Chamadas à API para setup e conferência |
+| `factories/` | Massa com faker |
+| `support/` | Variáveis de ambiente e conferência inicial |
+
 ## Contexto
 
 Este repositório é o entregável das etapas 1, 2 e 3 de um PDI de QA — frontend, backend e E2E. As etapas 4 e 5 vivem fora daqui.
-
-Instruções de E2E serão adicionadas quando a frente for implementada.
