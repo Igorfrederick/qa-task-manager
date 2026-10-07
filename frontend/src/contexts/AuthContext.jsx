@@ -25,16 +25,17 @@ export function AuthProvider({ children }) {
   }, [logout])
 
   // Página recarregada: o token guardado precisa de um usuário. Sem a
-  // confirmação da API — token vencido, usuário removido ou servidor fora —,
-  // não há sessão.
+  // confirmação da API, não há sessão. Token recusado volta 401, e quem apaga
+  // o token é o handler acima, que confere se ele ainda é o guardado; outra
+  // falha, como servidor fora, deixa o token para a próxima carga.
   useEffect(() => {
     if (!tokenStorage.get()) return
     authService
       .getMe()
       .then(setUser)
-      .catch(logout)
+      .catch(() => {})
       .finally(() => setIsRestoring(false))
-  }, [logout])
+  }, [])
 
   async function login(credentials) {
     const session = await authService.login(credentials)
