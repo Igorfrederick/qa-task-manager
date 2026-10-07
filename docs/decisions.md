@@ -8,6 +8,18 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [06/10/2026] O middleware de autenticação confirma o usuário no banco
+
+**Decisão:** `requireAuth` valida o token e, em seguida, busca o usuário pelo `sub`: se ele não existe mais, responde `401 TOKEN_INVALID`; se existe, `req.user` recebe o id e o perfil lidos do banco, não do token.
+
+**Motivo:** com o middleware só no token, o mesmo token respondia `401` em `/auth/me` e `201` em `POST /auth/register` — um `lead` removido seguia criando contas até o token expirar. O seed recria usuários, e tokens emitidos antes dele cairiam no mesmo caso. Ler o perfil do banco faz uma mudança de perfil valer na hora, sem esperar o próximo login. O custo é uma consulta por `_id`, indexado, a cada requisição autenticada.
+
+**Alternativa descartada:** middleware sem estado, só com o token — uma consulta a menos, ao preço de o token de usuário removido autorizar qualquer rota por até `JWT_EXPIRES_IN`, e de `TOKEN_INVALID` significar coisas diferentes conforme a rota.
+
+**Origem:** achado HIGH do `code-reviewer` no PR da fatia 2.1.
+
+---
+
 ## [06/10/2026] Parada para decisão perto de 50% da janela de contexto
 
 **Decisão:** perto de 50% da janela de contexto, o agente para no próximo ponto seguro — entre commits, nunca no meio de um —, informa o consumo estimado e pede ao usuário que escolha: seguir na sessão, compactar, ou encerrar e retomar numa sessão nova a partir de `docs/handoff.md`, que o agente atualiza antes de encerrar. A regra entra no `CLAUDE.md` §9, ao lado do orçamento de revisão.
@@ -33,6 +45,7 @@ Guardar a mensagem no catálogo dá a ela o teste de unidade que a entrada *Erro
 **Consequência registrada:** mensagem fixa por `code`. `EMAIL_TAKEN` e `NOT_FOUND` deixam de interpolar o e-mail e a rota, e o JSON malformado passa a responder com a mensagem de `VALIDATION_ERROR`. Mensagem é apresentação pelo contrato; `code` e status não mudam.
 
 **Alternativa descartada:** `code` sem status, com um mapa `code → status` no middleware de erro — duas estruturas com as mesmas chaves, que podem dessincronizar, sem ganho: nenhum `code` precisa de status diferente conforme o contexto. Uma classe por `code` (`EmailTakenError`, `InvalidCredentialsError`…) — repete o catálogo em forma de hierarquia, e cada `code` novo custaria uma classe.
+
 **Decidido por:** Igor Frederick, em 01/10/2026.
 
 ---

@@ -110,6 +110,30 @@ describe('POST /api/auth/register', () => {
     expect(await User.countDocuments({ email: validPayload.email })).toBe(0)
   })
 
+  it('responde 401 TOKEN_INVALID ao token de um lead que não existe mais', async () => {
+    // O token é válido — assinatura e exp —, mas o usuário dele foi removido:
+    // nenhuma rota pode aceitá-lo, e esta é a que mais importa.
+    await User.deleteOne({ email: 'lead@exemplo.test' })
+
+    const response = await postRegister(validPayload)
+
+    expect(response.status).toBe(401)
+    expect(response.body.error.code).toBe('TOKEN_INVALID')
+    expect(await User.countDocuments({ email: validPayload.email })).toBe(0)
+  })
+
+  it('autoriza pelo perfil do banco, não pelo perfil escrito no token', async () => {
+    // Token bem assinado para o qa, mas com role lead — o caso de um perfil
+    // alterado depois do login. Vale o perfil atual do usuário.
+    const qa = await User.findOne({ email: 'qa@exemplo.test' })
+    const staleToken = signToken({ id: qa.id, role: ROLES.LEAD })
+
+    const response = await postRegister(validPayload, staleToken)
+
+    expect(response.status).toBe(403)
+    expect(response.body.error.code).toBe('FORBIDDEN')
+  })
+
   it('responde 403 ao qa antes de validar o payload', async () => {
     // Autorização antes da validação: quem não pode criar conta não recebe o
     // 400 com os campos do schema.

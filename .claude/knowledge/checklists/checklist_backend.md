@@ -25,6 +25,7 @@ Aplicar a qualquer diff que toque `backend/**`. Base: `conventions/backend_conve
 - [ ] Expiração do token definida
 - [ ] Segredo do JWT em variável de ambiente
 - [ ] Validação do token em middleware, não repetida em controller
+- [ ] Token de usuário removido responde `TOKEN_INVALID` em toda rota protegida, não só em `/auth/me`; a autorização usa o perfil do banco
 - [ ] Toda rota marcada `[lead]` no contrato tem o middleware de perfil
 - [ ] Perfis como constante única, sem string mágica espalhada
 - [ ] Login com e-mail inexistente e com senha errada responde igual — mesmo status, mesmo `code`

@@ -27,7 +27,10 @@ export function login(req, res, next) {
     .catch(next)
 }
 
-/** `req.user` vem do middleware de autenticação; o service recebe só o id. */
+/**
+ * `req.user` vem do middleware de autenticação e traz só `{ id, role }`; o
+ * service busca o usuário completo para a resposta.
+ */
 export function me(req, res, next) {
   getAuthenticatedUser(req.user.id)
     .then((user) => {

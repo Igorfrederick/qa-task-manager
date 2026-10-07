@@ -49,6 +49,7 @@ A ferramenta é **Vitest com supertest** — decisão de 01/10/2026 em `docs/dec
 - Segredo exclusivamente em variável de ambiente; nunca literal no código
 - Validação do token em middleware, não repetida em controller
 - O payload do token carrega o mínimo para autorizar: identificador e perfil
+- O middleware confirma no banco que o usuário do token existe e lê dele o perfil: token de usuário removido não autoriza nenhuma rota, e perfil alterado vale na hora — decisão de 06/10/2026 em `docs/decisions.md`
 
 ## Senhas
 
