@@ -27,6 +27,8 @@ import {
 function toResponse(_doc, ret) {
   delete ret.userId
   delete ret.id
+  // Chave de versão do Mongoose: campo interno, fora do contrato.
+  delete ret.__v
   return ret
 }
 

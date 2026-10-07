@@ -79,14 +79,23 @@ describe('POST /api/tasks', () => {
     })
   })
 
-  it('identifica o dono em owner, só com _id e name, e não devolve userId', async () => {
+  it('responde na forma do contrato, com o dono em owner só com _id e name', async () => {
     const response = await postTask({ title: 'Revisar plano de testes da release' })
 
+    // Lista do que pode sair, e não do que não pode: um campo interno novo que
+    // vaze — `userId`, `id`, `__v` — quebra o teste sem que alguém se lembre dele.
+    expect(Object.keys(response.body.task).sort()).toEqual([
+      '_id',
+      'createdAt',
+      'description',
+      'owner',
+      'priority',
+      'status',
+      'title',
+      'updatedAt',
+    ])
     // Igualdade exata: e-mail, perfil ou hash do dono não podem vazar por aqui.
     expect(response.body.task.owner).toEqual({ _id: qa.user.id, name: 'QA de Teste' })
-    expect(response.body.task).not.toHaveProperty('userId')
-    // `_id` é o identificador do contrato; `id`, cópia dele, não sai.
-    expect(response.body.task).not.toHaveProperty('id')
   })
 
   it('grava como dono quem cria, mesmo com userId de outra pessoa no payload', async () => {
