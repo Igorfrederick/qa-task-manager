@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 
 import Button from '../../components/Button/Button.jsx'
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage.jsx'
@@ -22,6 +22,9 @@ const NOT_FOUND_CODES = ['TASK_NOT_FOUND', 'VALIDATION_ERROR']
 export default function TaskForm({ id }) {
   const isEditing = id !== undefined
   const navigate = useNavigate()
+  const location = useLocation()
+  // Volta para a lista com os filtros de onde o formulário foi aberto.
+  const listPath = `/tasks${location.state?.listSearch ?? ''}`
   const [loadState, setLoadState] = useState(isEditing ? 'loading' : 'ready')
   const [apiError, setApiError] = useState(null)
   const {
@@ -65,7 +68,7 @@ export default function TaskForm({ id }) {
       } else {
         await taskService.createTask(values)
       }
-      navigate('/tasks')
+      navigate(listPath)
     } catch (error) {
       // A API valida de novo: o campo que ela recusar mostra o erro nele.
       const fieldErrors = error.details?.filter(({ field }) => TASK_FORM_FIELDS.includes(field)) ?? []
@@ -79,7 +82,7 @@ export default function TaskForm({ id }) {
     }
   }
 
-  const backToList = () => navigate('/tasks')
+  const backToList = () => navigate(listPath)
 
   if (loadState === 'loading') {
     return <LoadingMessage>Carregando tarefa…</LoadingMessage>

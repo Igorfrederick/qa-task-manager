@@ -54,6 +54,16 @@ export default function TaskListPage() {
     }
   }
 
+  // O formulário recebe os filtros atuais, para voltar à lista com eles.
+  function openForm(path) {
+    const query = searchParams.toString()
+    navigate(path, { state: { listSearch: query ? `?${query}` : '' } })
+  }
+
+  function handleEdit(task) {
+    openForm(`/tasks/${task._id}`)
+  }
+
   function handleToggleStatus(task) {
     const status = task.status === 'done' ? 'open' : 'done'
     runAction(task._id, () => taskService.updateTask(task._id, { status }))
@@ -91,7 +101,7 @@ export default function TaskListPage() {
             showOwner={user.role === 'lead'}
             isBusy={isLoading || busyTaskId === task._id}
             onToggleStatus={handleToggleStatus}
-            onEdit={(task) => navigate(`/tasks/${task._id}`)}
+            onEdit={handleEdit}
             onDelete={handleDelete}
           />
         ))}
@@ -103,7 +113,7 @@ export default function TaskListPage() {
     <section className={styles.page}>
       <div className={styles.header}>
         <h1>Tarefas</h1>
-        <Button onClick={() => navigate('/tasks/new')} data-cy="task-list-new-button">
+        <Button onClick={() => openForm('/tasks/new')} data-cy="task-list-new-button">
           Nova tarefa
         </Button>
       </div>
