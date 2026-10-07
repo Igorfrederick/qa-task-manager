@@ -79,6 +79,10 @@ describe('authService.authenticate', () => {
     await authenticate({ ...credentials, email: 'ninguem@exemplo.test' }).catch(() => {})
 
     expect(compare).toHaveBeenCalledTimes(1)
+    // E contra um hash com o custo de verdade: comparar com um hash barato
+    // devolveria a diferença de tempo que a regra existe para esconder.
+    const [, hash] = compare.mock.calls[0]
+    expect(bcrypt.getRounds(hash)).toBe(env.bcryptSaltRounds)
   })
 
   it('recusa e-mail inexistente com o mesmo erro da senha errada', async () => {
