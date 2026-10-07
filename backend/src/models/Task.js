@@ -15,15 +15,18 @@ import {
  *
  * Na resposta, o dono aparece como `owner: { _id, name }`, e `userId` não
  * sai: o contrato expõe o dono uma vez só. `owner` é um virtual que o service
- * preenche com `populate` antes de devolver a tarefa.
+ * preenche com `populate` antes de devolver a tarefa. Incluir os virtuais na
+ * serialização traria junto o `id`, cópia de `_id`; o transform o retira da
+ * resposta, e o getter `task.id` continua existindo no documento.
  *
  * Os padrões de `description`, `status` e `priority` ficam aqui, e não no
  * schema de entrada: valem para qualquer caminho de criação — a rota, o
  * service chamado direto, o seed —, e não só para o que passa pelo Zod.
  */
 
-function removeUserId(_doc, ret) {
+function toResponse(_doc, ret) {
   delete ret.userId
+  delete ret.id
   return ret
 }
 
@@ -59,9 +62,7 @@ const taskSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    // Sem o virtual `id`, que duplicaria `_id` na resposta.
-    id: false,
-    toJSON: { virtuals: true, transform: removeUserId },
+    toJSON: { virtuals: true, transform: toResponse },
   },
 )
 

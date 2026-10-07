@@ -85,6 +85,8 @@ describe('POST /api/tasks', () => {
     // Igualdade exata: e-mail, perfil ou hash do dono não podem vazar por aqui.
     expect(response.body.task.owner).toEqual({ _id: qa.user.id, name: 'QA de Teste' })
     expect(response.body.task).not.toHaveProperty('userId')
+    // `_id` é o identificador do contrato; `id`, cópia dele, não sai.
+    expect(response.body.task).not.toHaveProperty('id')
   })
 
   it('grava como dono quem cria, mesmo com userId de outra pessoa no payload', async () => {
