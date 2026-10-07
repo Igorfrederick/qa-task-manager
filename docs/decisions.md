@@ -8,6 +8,18 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [06/10/2026] Parada para decisão perto de 50% da janela de contexto
+
+**Decisão:** perto de 50% da janela de contexto, o agente para no próximo ponto seguro — entre commits, nunca no meio de um —, informa o consumo estimado e pede ao usuário que escolha: seguir na sessão, compactar, ou encerrar e retomar numa sessão nova a partir de `docs/handoff.md`, que o agente atualiza antes de encerrar. A regra entra no `CLAUDE.md` §9, ao lado do orçamento de revisão.
+
+**Motivo:** acima de 50% da janela, cresce o risco de o agente perder ou inventar detalhe do que já foi decidido — e este projeto depende de decisões registradas, de contrato fechado e de código que Igor consegue explicar. Uma parada explícita transforma esse risco numa decisão do usuário, tomada num ponto em que o trabalho está commitado e o estado cabe no handoff.
+
+**Alternativa descartada:** deixar a compactação automática decidir — ela acontece no limite da janela, sem escolha do ponto de corte, e o resumo pode perder decisões ainda não registradas. Limite em número absoluto de tokens — depende do tamanho da janela de cada modelo; o percentual vale para qualquer um.
+
+**Decidido por:** Igor Frederick, em 06/10/2026.
+
+---
+
 ## [01/10/2026] O `code` carrega o status, num catálogo único
 
 **Decisão:** o catálogo de `code`s cobre todos os erros da API — validação, autenticação, rota inexistente, erro interno e regras de negócio — e é um único objeto em `backend/src/utils/errors.js`, que associa cada `code` ao seu status HTTP e à sua mensagem: `code → { status, message }`. Há uma única classe de erro, construída pelo `code` — status e mensagem vêm do catálogo, nunca de quem lança. O catálogo nasce num commit `refactor:` que leva para ele os `code`s que já existem (`VALIDATION_ERROR`, `EMAIL_TAKEN`, `NOT_FOUND`, `INTERNAL_ERROR`), imediatamente antes do commit de login, que acrescenta o primeiro `code` da família `401`.

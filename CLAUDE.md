@@ -259,6 +259,8 @@ Sem modo declarado, vale o modo geração.
 
 **Orçamento de revisão.** Uma passada do `code-reviewer` por PR; nova rodada só se houver achado CRITICAL ou HIGH. O `revisor-pdi` roda uma vez, antes da entrega.
 
+**Orçamento de contexto.** Perto de 50% da janela de contexto, o agente para no próximo ponto seguro — entre commits, nunca no meio de um —, informa o consumo estimado e pede uma decisão: seguir na sessão, compactar com `/compact`, ou encerrar e retomar numa sessão nova. Antes de encerrar, atualiza `docs/handoff.md` com o estado do trabalho: branch, último commit, o que está em andamento e o próximo passo. Acima de 50%, cresce o risco de o agente perder ou inventar detalhe do que já foi decidido. O consumo exato aparece no comando `/context` do Claude Code; agente executado como subagente informa o consumo no próprio retorno, e quem o chamou leva a decisão ao usuário.
+
 Regras permanentes para qualquer agente neste repositório:
 
 1. Não implementar nada da lista de não-escopo (seção 2) sem sinalizar antes.

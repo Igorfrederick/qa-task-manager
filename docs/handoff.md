@@ -111,4 +111,4 @@ Para subir a API em desenvolvimento: `cp .env.example .env` em `backend/`, gerar
 
 ## 6. Protocolo
 
-Modo geração por padrão; plano de commits aprovado por fatia; uma passada do `code-reviewer` por PR, com nova rodada só para CRITICAL ou HIGH; `revisor-pdi` uma vez, no Passo 5. Detalhe no `CLAUDE.md` §9.
+Modo geração por padrão; plano de commits aprovado por fatia; uma passada do `code-reviewer` por PR, com nova rodada só para CRITICAL ou HIGH; `revisor-pdi` uma vez, no Passo 5; perto de 50% da janela de contexto, parada no próximo ponto seguro para decisão do usuário. Detalhe no `CLAUDE.md` §9.
