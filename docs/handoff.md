@@ -52,11 +52,11 @@ Uma branch por fatia, PR para a `main`, uma passada do `code-reviewer` por PR. A
 |---|---|---|
 | 2.1 Autenticação | Login, token e perfis funcionando | `POST /auth/login`, middleware de token (`401`), middleware de perfil (`403`), `GET /auth/me`, `POST /auth/register` passa a `[lead]`, catálogo de `code`s |
 | 2.2 Tarefas | CRUD com escopo por dono | Model `Task`, validators de corpo, query e parâmetro, service com o filtro por dono na consulta, rotas, testes das regras 1 a 3 |
-| 2.3 Seed | Dado fictício para desenvolvimento e E2E | Um `lead` e dois `qa` com as credenciais do `e2e/.env.example`, tarefas dos três |
+| 2.3 Seed | Dado fictício para desenvolvimento e E2E | Um `lead` e dois `qa`, tarefas dos três; credenciais do `lead` e do primeiro `qa` no `e2e/.env.example` |
 
 A fatia 2.1 fechou as duas decisões em aberto do backend: o `code` carrega o status num catálogo único, e a família `401`/`403` tem cinco `code`s — entradas de 01/10 em `docs/decisions.md`.
 
-A fatia 2.3 decidiu, com o Igor, em 07/10: o segundo `qa` do seed não tem credencial no `e2e/.env` — o E2E de escopo cria a própria massa, como manda `e2e_conventions.md`; o seed recria a base a cada execução, em vez de preservar dados.
+A fatia 2.3 decidiu que o seed recria a base a cada execução, que as senhas dele ficam fora das variáveis obrigatórias e que o segundo `qa` não tem credencial no `e2e/.env` — entrada de 07/10 em `docs/decisions.md`.
 
 Para o Passo 3: o contrato declara o que a lista consome — ordem fixa, da mais recente para a mais antiga; filtro "Todos" **omite** o parâmetro, porque filtro vazio responde `400`; o dono sai em `owner: { _id, name }`. Para exercitar o login, use as credenciais do seed, no README.
 
@@ -91,7 +91,7 @@ README final com a tabela critério → lugar no repositório, passada única do
 | Sex 09/10 | Passo 5 — entrega |
 | 10 – 12/10 | Folga |
 
-**Real:** o Passo 2 fechou em 07/10, um dia depois do previsto.
+**Real:** o Passo 2 fechou em 07/10, dois dias depois do previsto; os Passos 3 a 5 ficam entre 07 e 09/10.
 
 **Se atrasar, corte nesta ordem:** filtros da lista; coluna de dono na lista do líder (a API mantém o campo); rodadas extras de revisão.
 

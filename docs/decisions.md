@@ -8,6 +8,20 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] O seed recria a base, e as senhas dele ficam fora das variáveis obrigatórias
+
+**Decisão:** `npm run seed` apaga usuários e tarefas e recria o mesmo conjunto fictício — um `lead`, dois `qa` e oito tarefas —, pelos services da API, e recusa rodar com `NODE_ENV=production`. As senhas vêm de `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD`, opcionais em `config/env.js` e exigidas por `seed/run.js` antes de conectar. Os dois `qa` dividem a senha, e só o primeiro tem credencial no `e2e/.env.example`.
+
+**Motivo:** estado conhecido depois de cada execução — o E2E e quem sobe o projeto partem sempre da mesma base, sem sobra de rodada anterior. As tarefas saem junto com os usuários porque tarefa sem dono sairia com `owner: null`. Pelos services, o seed herda o hash, os padrões e os limites do model. O segundo `qa` não tem credencial porque o teste de escopo cria a própria massa pelo `lead`, como manda `e2e_conventions.md`.
+
+**Substitui:** em parte, a entrada de 01/10 *Variáveis de ambiente validadas na importação do módulo*. A validação na importação continua valendo para o que todo ponto de entrada precisa; a variável que só um ponto de entrada usa é conferida por ele, antes de qualquer efeito. Consequência registrada: `npm run seed` exige `JWT_SECRET`, que não usa, porque importa `config/env.js`.
+
+**Alternativa descartada:** seed idempotente, que cria só o que falta e preserva o resto — o estado depois dele dependeria do que havia antes. Senhas do seed entre as obrigatórias — a API e a suíte exigiriam um valor que não usam. Um `config/seedEnv.js` que valida as senhas na importação — segue a entrada de 01/10 ao pé da letra, ao custo de um módulo para duas variáveis.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [06/10/2026] O middleware de autenticação confirma o usuário no banco
 
 **Decisão:** `requireAuth` valida o token e, em seguida, busca o usuário pelo `sub`: se ele não existe mais, responde `401 TOKEN_INVALID`; se existe, `req.user` recebe o id e o perfil lidos do banco, não do token.
