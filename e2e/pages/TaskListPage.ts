@@ -24,6 +24,10 @@ export class TaskListPage {
     await this.page.goto('/tasks')
   }
 
+  taskRow(taskId: string): Locator {
+    return this.page.getByTestId(`task-list-row-${taskId}`)
+  }
+
   taskTitle(taskId: string): Locator {
     return this.page.getByTestId(`task-list-title-${taskId}`)
   }
@@ -50,5 +54,21 @@ export class TaskListPage {
 
   async editTask(taskId: string): Promise<void> {
     await this.page.getByTestId(`task-list-edit-button-${taskId}`).click()
+  }
+
+  async completeTask(taskId: string): Promise<void> {
+    await this.page.getByTestId(`task-list-complete-button-${taskId}`).click()
+  }
+
+  async reopenTask(taskId: string): Promise<void> {
+    await this.page.getByTestId(`task-list-reopen-button-${taskId}`).click()
+  }
+
+  // A exclusão pede confirmação pelo diálogo nativo. Sem ouvinte registrado
+  // antes do clique, o Playwright descarta o diálogo, o confirm devolve false
+  // e nada é excluído — decisão de 07/10/2026.
+  async deleteTask(taskId: string): Promise<void> {
+    this.page.once('dialog', (dialog) => dialog.accept())
+    await this.page.getByTestId(`task-list-delete-button-${taskId}`).click()
   }
 }
