@@ -59,10 +59,11 @@ export async function request(path, { method = 'GET', body } = {}) {
   const data = await response.json().catch(() => null)
   if (response.ok && data !== null) return data
 
-  // Só encerra a sessão o 401 de uma chamada que levou o token ainda guardado.
-  // O 401 do login é credencial inválida, e quem trata é a tela; o de um token
-  // já trocado é resposta atrasada, e não pode derrubar a sessão nova.
-  if (response.status === 401 && token && token === tokenStorage.get()) {
+  // 401 encerra a sessão, com duas exceções. No login, é credencial inválida,
+  // e quem trata é a tela. Com um token já trocado, é resposta atrasada, e não
+  // pode derrubar a sessão nova. Chamada sem token entra na regra: é o caso de
+  // outra aba que já saiu e apagou o token.
+  if (response.status === 401 && path !== '/auth/login' && token === tokenStorage.get()) {
     handleUnauthorized()
   }
 
