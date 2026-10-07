@@ -98,6 +98,24 @@ export async function updateTask(user, id, { title, description, status, priorit
 }
 
 /**
+ * Exclui uma tarefa que o usuário alcança.
+ *
+ * Mesmo escopo da leitura e da edição, na própria consulta: para o `qa`, a
+ * tarefa de outra pessoa não é encontrada e, por isso, não é excluída
+ * (regra 2).
+ *
+ * @param {{ id: string, role: string }} user usuário autenticado
+ * @param {string} id já validado no formato pelo schema de parâmetro
+ * @throws {AppError} `TASK_NOT_FOUND` quando a tarefa não existe para quem pede
+ */
+export async function deleteTask(user, id) {
+  const { deletedCount } = await Task.deleteOne({ _id: id, ...ownerScope(user) })
+  if (deletedCount === 0) {
+    throw new AppError('TASK_NOT_FOUND')
+  }
+}
+
+/**
  * Cria a tarefa em nome de quem pede.
  *
  * O dono é o usuário autenticado (regra 3). Os campos são lidos um a um, e

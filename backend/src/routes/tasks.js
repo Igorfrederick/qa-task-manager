@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import { create, list, show, update } from '../controllers/taskController.js'
+import { create, list, remove, show, update } from '../controllers/taskController.js'
 import { requireAuth } from '../middlewares/auth.js'
 import { validateBody, validateParams, validateQuery } from '../middlewares/validate.js'
 import {
@@ -31,3 +31,4 @@ taskRouter.patch(
   validateBody(updateTaskSchema),
   update,
 )
+taskRouter.delete('/:id', validateParams(taskIdParamsSchema), remove)

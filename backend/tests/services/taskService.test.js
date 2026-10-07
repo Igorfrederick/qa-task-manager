@@ -3,7 +3,13 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
 import { Task } from '../../src/models/Task.js'
 import { User } from '../../src/models/User.js'
-import { createTask, getTask, listTasks, updateTask } from '../../src/services/taskService.js'
+import {
+  createTask,
+  deleteTask,
+  getTask,
+  listTasks,
+  updateTask,
+} from '../../src/services/taskService.js'
 import { registerUser } from '../../src/services/userService.js'
 import { AppError } from '../../src/utils/errors.js'
 import { ROLES } from '../../src/utils/roles.js'
@@ -123,6 +129,26 @@ describe('taskService', () => {
       await updateTask(authenticated(qa), own.id, { title: 'Editada', userId: otherQa.id })
 
       expect((await Task.findById(own.id)).userId.toString()).toBe(qa.id)
+    })
+  })
+
+  describe('deleteTask', () => {
+    it('lança TASK_NOT_FOUND ao qa que exclui a tarefa de outra pessoa, sem excluí-la', async () => {
+      const foreign = await Task.create({ title: 'Tarefa da outra QA', userId: otherQa.id })
+
+      const error = await deleteTask(authenticated(qa), foreign.id).catch((e) => e)
+
+      expect(error).toBeInstanceOf(AppError)
+      expect(error.code).toBe('TASK_NOT_FOUND')
+      expect(await Task.exists({ _id: foreign.id })).toBeTruthy()
+    })
+
+    it('exclui a tarefa de outra pessoa quando o usuário é lead', async () => {
+      const foreign = await Task.create({ title: 'Tarefa da outra QA', userId: otherQa.id })
+
+      await deleteTask(authenticated(lead), foreign.id)
+
+      expect(await Task.exists({ _id: foreign.id })).toBeNull()
     })
   })
 

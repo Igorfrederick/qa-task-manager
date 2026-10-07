@@ -1,4 +1,4 @@
-import { createTask, getTask, listTasks, updateTask } from '../services/taskService.js'
+import { createTask, deleteTask, getTask, listTasks, updateTask } from '../services/taskService.js'
 
 /**
  * Entrada e saída HTTP das rotas de tarefa. Nenhuma regra de negócio: repassa
@@ -28,6 +28,15 @@ export function update(req, res, next) {
   updateTask(req.user, req.params.id, req.body)
     .then((task) => {
       res.status(200).json({ task })
+    })
+    .catch(next)
+}
+
+/** `remove`, e não `delete`: `delete` é palavra reservada do JavaScript. */
+export function remove(req, res, next) {
+  deleteTask(req.user, req.params.id)
+    .then(() => {
+      res.status(204).end()
     })
     .catch(next)
 }
