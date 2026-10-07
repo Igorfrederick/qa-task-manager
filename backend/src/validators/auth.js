@@ -3,6 +3,14 @@ import { z } from 'zod'
 import { ROLE_VALUES } from '../utils/roles.js'
 
 /**
+ * O bcrypt considera só os primeiros 72 bytes da senha: o que passar disso é
+ * ignorado em silêncio, e duas senhas que só diferem depois do limite valem a
+ * mesma. O limite é em bytes, e não em caracteres — em UTF-8, cada letra
+ * acentuada ocupa dois.
+ */
+const BCRYPT_MAX_BYTES = 72
+
+/**
  * Schemas de entrada das rotas de autenticação.
  *
  * Só invariante de entrada — o que se julga olhando apenas o payload. Falha
@@ -23,7 +31,10 @@ export const registerSchema = z.object({
   password: z
     .string({ required_error: 'Informe a senha' })
     .min(8, 'A senha precisa de ao menos 8 caracteres')
-    .max(72, 'A senha pode ter no máximo 72 caracteres'),
+    .refine(
+      (password) => Buffer.byteLength(password, 'utf8') <= BCRYPT_MAX_BYTES,
+      `A senha pode ter no máximo ${BCRYPT_MAX_BYTES} bytes — letras acentuadas contam dois`,
+    ),
   role: z.enum(ROLE_VALUES, { errorMap: () => ({ message: 'Perfil inválido' }) }).optional(),
 })
 
