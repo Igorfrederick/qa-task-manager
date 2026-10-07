@@ -14,12 +14,6 @@
   background: var(--color-surface);
 }
 
-.loading {
-  padding: var(--space-8) var(--space-4);
-  color: var(--color-text-muted);
-  text-align: center;
-}
-
 .title {
   font-size: var(--font-size-lg);
 }
@@ -27,15 +21,6 @@
 .subtitle {
   margin-top: var(--space-1);
   color: var(--color-text-muted);
-}
-
-.apiError {
-  margin-top: var(--space-4);
-  padding: var(--space-3);
-  border-radius: var(--radius);
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
 }
 
 .form {
