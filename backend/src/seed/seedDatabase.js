@@ -4,6 +4,7 @@ import { createTask } from '../services/taskService.js'
 import { registerUser } from '../services/userService.js'
 import { ROLES } from '../utils/roles.js'
 import { TASK_PRIORITY, TASK_STATUS } from '../utils/taskEnums.js'
+import { registerSchema } from '../validators/auth.js'
 
 /**
  * Dado fictício para desenvolvimento e para o E2E: um `lead`, dois `qa` e
@@ -14,7 +15,9 @@ import { TASK_PRIORITY, TASK_STATUS } from '../utils/taskEnums.js'
  * resposta com `owner: null`.
  *
  * Usuários e tarefas nascem pelos services, os mesmos caminhos da API: hash da
- * senha, padrões e limites do model valem aqui como valem na rota.
+ * senha, padrões e limites do model valem aqui como valem na rota. A política
+ * de senha mora um degrau acima, no schema da rota de cadastro, e por isso é
+ * conferida aqui à parte, antes de apagar qualquer coisa.
  *
  * Não abre conexão nem conhece `process`: quem chama é `run.js`, e a suíte
  * chama direto, como faz com os services.
@@ -80,6 +83,9 @@ const SEED = [
   },
 ]
 
+/** A mesma política de senha da rota de cadastro: de 8 caracteres a 72 bytes. */
+const passwordPolicy = registerSchema.shape.password
+
 /**
  * Apaga usuários e tarefas e recria o conjunto fictício.
  *
@@ -90,8 +96,22 @@ const SEED = [
  *        `lead` e senha comum aos dois `qa`
  * @returns {Promise<{ users: string[], tasks: number }>} e-mails criados e
  *          quantidade de tarefas, para o resumo de quem chamou
+ * @throws {Error} quando uma senha está fora da política da API; a base fica
+ *         como estava
  */
 export async function seedDatabase({ leadPassword, qaPassword }) {
+  // Antes de apagar: senha que a API recusaria não chega ao bcrypt pelo seed.
+  // A mensagem leva o motivo, nunca o valor.
+  for (const [role, password] of [
+    [ROLES.LEAD, leadPassword],
+    [ROLES.QA, qaPassword],
+  ]) {
+    const { success, error } = passwordPolicy.safeParse(password)
+    if (!success) {
+      throw new Error(`Senha do ${role} fora da política da API: ${error.issues[0].message}`)
+    }
+  }
+
   await Task.deleteMany({})
   await User.deleteMany({})
 

@@ -19,8 +19,11 @@ async function run() {
     )
   }
 
-  await connectDatabase()
+  const connection = await connectDatabase()
   try {
+    // O seed apaga o que houver neste banco: quem roda vê qual é. Nome e host,
+    // nunca a URI, que pode carregar credencial.
+    console.log(`Base alvo do seed: ${connection.name} em ${connection.host}`)
     const { users, tasks } = await seedDatabase({
       leadPassword: env.seedLeadPassword,
       qaPassword: env.seedQaPassword,

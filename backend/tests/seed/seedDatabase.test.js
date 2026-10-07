@@ -95,4 +95,21 @@ describe('seedDatabase', () => {
     expect(await User.exists({ email: 'avulsa@exemplo.test' })).toBeNull()
     expect(await Task.exists({ title: 'Tarefa avulsa' })).toBeNull()
   })
+
+  it.each([
+    ['curta demais', 'curta'],
+    ['acima de 72 bytes', 'ç'.repeat(40)],
+  ])('recusa senha %s, como a API, sem apagar a base', async (_case, password) => {
+    const stranger = await registerUser({
+      name: 'Pessoa Avulsa',
+      email: 'avulsa@exemplo.test',
+      password: 'senha-de-teste-123',
+      role: ROLES.QA,
+    })
+
+    await expect(seedDatabase({ ...passwords, qaPassword: password })).rejects.toThrow('Senha do qa')
+
+    expect(await User.exists({ _id: stranger._id })).not.toBeNull()
+    expect(await User.exists({ email: 'lead@exemplo.test' })).toBeNull()
+  })
 })
