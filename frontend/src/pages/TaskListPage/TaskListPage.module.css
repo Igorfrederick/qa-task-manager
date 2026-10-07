@@ -1,0 +1,125 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  max-width: 480px;
+}
+
+.empty {
+  padding: var(--space-8) var(--space-4);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Desktop: conteúdo à esquerda, ações à direita. Mobile: ações abaixo. */
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.content {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--font-size-md);
+  overflow-wrap: anywhere;
+}
+
+.done .title {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.description {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+/* Uma regra por valor do domínio: a classe é montada a partir dele. */
+.badge {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius);
+}
+
+.status-open,
+.priority-low {
+  background: var(--color-neutral-bg);
+}
+
+.status-done {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.priority-high {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.priority-medium {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.owner {
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+}

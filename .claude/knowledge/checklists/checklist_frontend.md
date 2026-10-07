@@ -33,6 +33,7 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 - [ ] Estado de erro tratado em toda chamada à API
 - [ ] Mensagem ao usuário vem do `message`; a lógica consome o `code`
 - [ ] `401` encerra a sessão e leva ao `/login`
+- [ ] Exclusão pede confirmação antes da chamada
 
 ## Rotas protegidas
 

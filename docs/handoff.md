@@ -4,7 +4,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 **Como usar:** abra o Claude Code na raiz do repositório e comece com algo assim:
 
-> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 3 pela fatia 3.2, tarefas. Confira antes se o PR da 3.1 foi mergeado, e apresente o plano de commits da fatia antes de escrever.
+> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 4 pela fatia 4.1, base do E2E e autenticação. Confira antes se o PR da 3.2 foi mergeado, e apresente o plano de commits da fatia antes de escrever.
 
 ---
 
@@ -14,8 +14,8 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 |---|---|---|
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
 | 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
-| **3** | **Frontend — três telas** | **Em andamento** — 3.1 concluída em 07/10/2026 na branch `feat/frontend-login`: passada do `code-reviewer` com 1 HIGH, 3 MEDIUM e 3 LOW, tratados; segunda rodada, restrita às correções, sem bloqueios, com dois LOW e um caso de abas também tratados; aguarda PR e merge. 3.2 é a próxima |
-| 4 | E2E | Não iniciado |
+| **3** | **Frontend — três telas** | **Em fechamento** — 3.1 mergeada (PR #4), com duas passadas do `code-reviewer`; 3.2 concluída em 07/10/2026 na branch `feat/frontend-tarefas`: passada única do `code-reviewer` sem bloqueios, com 3 MEDIUM, 3 LOW e duas sugestões tratados; aguarda PR e merge |
+| 4 | E2E | Próximo |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado |
 
 **Prazo: 09/10/2026** — 12/10 é feriado. Avaliador: Murilo Morato, tech lead.
@@ -48,9 +48,17 @@ Frontend, fatia 3.1:
 - Token no `localStorage`, só ele, por `utils/tokenStorage.js`; a sessão é restaurada por `GET /auth/me` quando a página recarrega
 - `ProtectedRoute` único para as telas com sessão; sem sessão, `/login`, guardando o destino; `401` encerra a sessão, menos no login e na resposta atrasada de um token já trocado; chamada sem token, de uma aba aberta depois que outra saiu, também encerra. A restauração que falha por outro motivo, como servidor fora, não apaga o token
 - O `/login` espera a restauração da sessão antes de mostrar o formulário; "Sair" não guarda destino, porque o `BrowserRouter` roda com `useTransitions={false}`
-- `AppLayout` com o nome do usuário e o botão "Sair"; `/tasks` ainda é só o título, à espera da 3.2
-- Componentes reutilizáveis: `Button` (`primary`, `secondary`) e `TextField` (rótulo, erro e `data-cy` do erro)
+- `AppLayout` com o nome do usuário e o botão "Sair"
 - Verificado em navegador, em 1280 e em 375 px de largura: validação, credencial inválida, login, recarga, sair, token adulterado e ausência de rolagem horizontal; depois da revisão, também sair sem destino guardado, login com restauração lenta, `401` de token trocado e saída em outra aba
+
+Frontend, fatia 3.2:
+
+- Componentes compartilhados: `Button` (`primary`, `secondary`, `danger`), `FormField` — rótulo, erro, `aria` e estilo do controle, que chega por função —, `TextField` e `SelectField` sobre ele, `ErrorMessage` e `LoadingMessage`
+- `/tasks`: lista na ordem da API, com filtros de status e prioridade na URL — "Todos" omite o parâmetro, valor inválido digitado vale como todos —, estados de carregamento, erro e vazio, e o dono de cada tarefa para o `lead`; linhas no desktop, cartões no celular
+- Ações por linha: concluir ou reabrir, editar e excluir, com confirmação por `window.confirm`; cada ação trava as linhas até a lista voltar da API, e a lista recarrega mantendo-se na tela, com `aria-busy` enquanto recarrega; trocar de filtro limpa o erro da ação
+- O formulário volta à lista com os filtros de onde foi aberto, e recomeça a cada tarefa: `TaskFormPage` monta `TaskForm` com a `key` do id, porque o React Router reaproveita o componente entre `/tasks/new` e `/tasks/:id`
+- `/tasks/new` e `/tasks/:id`: mesmo formulário, schema com os limites e mensagens da API, erro de validação da API levado ao campo; `404` e id fora do formato mostram "tarefa não encontrada", sem revelar se a tarefa é de outra pessoa
+- Verificado em navegador, contra a API, nos dois perfis e em 1280 e 375 px: lista igual à da API em cada filtro, dono para o `lead`, concluir, reabrir, excluir com e sem confirmação, ação sobre tarefa excluída por fora, criar com dono do token, editar, cancelar, validação por campo, `qa` abrindo tarefa do `lead` e `lead` editando tarefa do `qa` — 60 verificações, contando a regressão da 3.1; depois da revisão, mais 6: formulário que recomeça pelo histórico, filtros preservados na volta do formulário, seletores de erro distintos e botões que não reabilitam antes da recarga
 
 ---
 
@@ -81,11 +89,16 @@ Para o Passo 3: o contrato declara o que a lista consome — ordem fixa, da mais
 
 A fatia 3.1 fechou as decisões do frontend — token no `localStorage`, CSS Modules, proxy do Vite em vez de CORS e `@hookform/resolvers` —, entradas de 07/10 em `docs/decisions.md`; o `CLAUDE.md` §10 fica sem decisões em aberto.
 
-Para a 3.2:
+A fatia 3.2 decidiu que a exclusão pede confirmação pelo diálogo nativo do navegador — entrada de 07/10 em `docs/decisions.md`, propagada às convenções e aos checklists de frontend e de E2E e aos dois agentes.
 
-- `Button` e `TextField` nasceram no segundo uso; o formulário de tarefa traz o terceiro. A descrição pede um `textarea`: extrair o invólucro comum — rótulo, erro e `aria` — em vez de tornar `TextField` polimórfico
-- A mensagem de erro da API aparece hoje só no login, em marcação própria; com a lista e o formulário, chega ao terceiro uso, e aí vira componente
+Para o Passo 4:
+
+- Seletores da 3.2: `task-list-new-button`, `task-filter-status-select`, `task-filter-priority-select`, `task-list`, `task-list-empty`, `task-list-error-message` (falha ao carregar), `task-list-action-error-message` (falha de uma ação); por tarefa, `task-list-row-`, `-title-`, `-description-`, `-status-`, `-priority-`, `-owner-`, `-complete-button-`, `-reopen-button-`, `-edit-button-` e `-delete-button-`, seguidos do `_id`; no formulário, `task-form-title-input`, `-description-input`, `-priority-select`, os `-error` de cada campo, `-save-button`, `-cancel-button`, `-error-message` (falha ao salvar), `-load-error-message` (falha ao carregar), `-not-found` e `-back-button`
+- `deleteTask()` do Page Object aceita o diálogo antes do clique; sem isso, o Playwright o descarta e nada é excluído
+- Depois de uma ação ou de uma troca de filtro, as linhas antigas ficam na tela até a resposta, com `aria-busy="true"` em `task-list`. Asserção de valor final — texto, contagem — já espera sozinha; asserção de presença precisa antes esperar `task-list` com `aria-busy="false"`, ou `task-list-empty`, para não passar sobre a lista antiga
+- Os filtros estão na URL: um teste pode abrir `/tasks?status=done` direto
 - Sugestões da revisão da 3.1 ainda não aplicadas: com backend fora, a restauração não abre sessão e o `/login` não diz por quê; e, pelo proxy, backend fora responde `502` sem corpo, que hoje aparece como `UNEXPECTED_RESPONSE` em vez de `NETWORK_ERROR`
+- Sugestões da revisão da 3.2 não aplicadas: `TaskListItem` com módulo CSS próprio, em vez de dividir o da página; e entradas no log para a recarga depois de cada ação e para os filtros na URL — o motivo de cada uma está no corpo dos commits
 - Fora do v1, registrado: se outra aba entra como outro usuário, a aba já aberta segue mostrando o usuário antigo até recarregar; ouvir o evento `storage` no `AuthProvider` resolveria
 
 ### Passo 4 — E2E

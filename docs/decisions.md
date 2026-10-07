@@ -8,6 +8,18 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] Exclusão confirmada pelo diálogo nativo do navegador
+
+**Decisão:** excluir uma tarefa pela lista pede confirmação por `window.confirm`, antes da chamada à API. No E2E, a ação de excluir do Page Object registra a aceitação do diálogo antes do clique.
+
+**Motivo:** a exclusão não tem volta, e a confirmação evita a perda por toque acidental — no celular, os botões da linha ficam próximos. O diálogo nativo não pede componente, estado nem estilo, e já vem acessível. O Playwright trata diálogo por evento; sem ouvinte, ele o descarta, o `confirm` devolve `false` e nada é excluído — por isso a aceitação mora na ação do Page Object, e não repetida em cada teste.
+
+**Alternativa descartada:** modal próprio — componente novo, controle de foco, tecla Esc e `data-cy` próprios, para o mesmo resultado. Excluir sem confirmação — um toque errado apaga a tarefa. Desfazer depois de excluir — exigiria exclusão lógica na API, fora do contrato.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] O frontend chama a API pelo proxy do Vite, e o backend fica sem CORS
 
 **Decisão:** o frontend chama `/api` no próprio endereço, e o servidor de desenvolvimento do Vite repassa a chamada ao backend, no endereço de `API_PROXY_TARGET` — opcional, com padrão `http://localhost:3000`. O backend não ganha configuração de CORS, e `VITE_API_URL` sai do `frontend/.env.example`.

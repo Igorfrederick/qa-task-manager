@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router'
 
 import { useAuth } from '../../hooks/useAuth.js'
-import styles from './ProtectedRoute.module.css'
+import LoadingMessage from '../LoadingMessage/LoadingMessage.jsx'
 
 /**
  * Porta única das rotas que exigem sessão. Sem sessão, leva ao /login e
@@ -12,7 +12,7 @@ export default function ProtectedRoute() {
   const location = useLocation()
 
   if (isRestoring) {
-    return <p className={styles.loading}>Carregando sessão…</p>
+    return <LoadingMessage>Carregando sessão…</LoadingMessage>
   }
 
   if (!user) {

@@ -8,7 +8,7 @@
   font-weight: 600;
 }
 
-.input {
+.control {
   width: 100%;
   min-height: var(--control-min-height);
   padding: var(--space-2) var(--space-3);
@@ -18,8 +18,13 @@
   color: var(--color-text);
 }
 
-.input[aria-invalid='true'] {
+.control[aria-invalid='true'] {
   border-color: var(--color-danger);
+}
+
+textarea.control {
+  min-height: calc(var(--control-min-height) * 3);
+  resize: vertical;
 }
 
 .error {

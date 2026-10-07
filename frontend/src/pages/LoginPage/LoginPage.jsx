@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form'
 import { Navigate, useLocation } from 'react-router'
 
 import Button from '../../components/Button/Button.jsx'
+import ErrorMessage from '../../components/ErrorMessage/ErrorMessage.jsx'
+import LoadingMessage from '../../components/LoadingMessage/LoadingMessage.jsx'
 import TextField from '../../components/TextField/TextField.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
 import { loginSchema } from '../../schemas/loginSchema.js'
@@ -34,7 +36,7 @@ export default function LoginPage() {
   // Com um token guardado em confirmação, o formulário espera: um login feito
   // agora correria contra a resposta da restauração.
   if (isRestoring) {
-    return <p className={styles.loading}>Carregando sessão…</p>
+    return <LoadingMessage>Carregando sessão…</LoadingMessage>
   }
 
   // Com sessão aberta — recém-criada pelo login ou restaurada —, a tela segue
@@ -49,14 +51,9 @@ export default function LoginPage() {
         <h1 className={styles.title}>Task Manager</h1>
         <p className={styles.subtitle}>Entre com sua conta</p>
 
-        {apiError && (
-          <p role="alert" className={styles.apiError} data-cy="login-error-message">
-            {apiError}
-          </p>
-        )}
-
         {/* noValidate: quem valida é o schema, não o navegador */}
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+          {apiError && <ErrorMessage data-cy="login-error-message">{apiError}</ErrorMessage>}
           <TextField
             label="E-mail"
             type="email"
