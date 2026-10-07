@@ -1,5 +1,6 @@
+import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { connectDatabase, disconnectDatabase } from '../../src/config/database.js'
 import { env } from '../../src/config/env.js'
@@ -25,6 +26,7 @@ describe('authService.authenticate', () => {
   })
 
   afterEach(async () => {
+    vi.restoreAllMocks()
     await User.deleteMany({})
   })
 
@@ -42,6 +44,8 @@ describe('authService.authenticate', () => {
     expect(payload.sub).toBe(registered.id)
     expect(payload.role).toBe(ROLES.QA)
     expect(payload.exp).toBeGreaterThan(payload.iat)
+    // O mínimo para autorizar, e nada mais: nem e-mail, nem nome, nem hash.
+    expect(Object.keys(payload).sort()).toEqual(['exp', 'iat', 'role', 'sub'])
   })
 
   it('devolve o usuário sem passwordHash na serialização', async () => {
@@ -65,6 +69,16 @@ describe('authService.authenticate', () => {
     expect(error).toBeInstanceOf(AppError)
     expect(error.code).toBe('INVALID_CREDENTIALS')
     expect(error.status).toBe(401)
+  })
+
+  it('roda o bcrypt mesmo quando o e-mail não existe, para o tempo não revelar a conta', async () => {
+    // O bcrypt é a parte lenta do login. Se ele fosse pulado sem usuário, o
+    // e-mail inexistente responderia mais rápido que a senha errada.
+    const compare = vi.spyOn(bcrypt, 'compare')
+
+    await authenticate({ ...credentials, email: 'ninguem@exemplo.test' }).catch(() => {})
+
+    expect(compare).toHaveBeenCalledTimes(1)
   })
 
   it('recusa e-mail inexistente com o mesmo erro da senha errada', async () => {
