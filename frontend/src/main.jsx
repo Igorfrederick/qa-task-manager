@@ -8,7 +8,12 @@ import './index.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    {/*
+      Sem transição, a troca de rota tem a mesma prioridade que a troca de
+      sessão. Com ela, sair renderizava primeiro a sessão vazia na rota antiga,
+      e o ProtectedRoute guardava essa rota como destino do próximo login.
+    */}
+    <BrowserRouter useTransitions={false}>
       <AuthProvider>
         <App />
       </AuthProvider>
