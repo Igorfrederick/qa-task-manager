@@ -32,6 +32,11 @@ docs/        Log de decisões técnicas e documento de retomada
 | [docs/decisions.md](docs/decisions.md) | Log de decisões técnicas, com motivo e alternativa descartada |
 | [docs/handoff.md](docs/handoff.md) | Estado do projeto e ordem de execução |
 
+## Requisitos
+
+- Node.js 20.19+ ou 22.12+ — mínimo do Vite 8, no frontend; o backend aceita qualquer 20+
+- MongoDB 7, pelo `docker compose` da seção seguinte ou instalado localmente
+
 ## Banco de dados
 
 A aplicação e a suíte de teste do backend exercitam um MongoDB real. O caminho principal é o `docker-compose.yml` da raiz:
