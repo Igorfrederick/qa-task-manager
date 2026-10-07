@@ -13,7 +13,8 @@ import { loginSchema, registerSchema } from '../validators/auth.js'
  * Criar conta é exclusivo do líder: não há cadastro público. A ordem dos
  * middlewares é deliberada — autenticação, depois perfil, depois validação —,
  * para que quem não pode criar conta receba `401` ou `403` sem que o payload
- * seja sequer avaliado.
+ * passe pelo schema. O parse do JSON vem antes de tudo, no `express.json()`
+ * de `app.js`: corpo malformado responde `400` antes de qualquer rota.
  */
 export const authRouter = Router()
 

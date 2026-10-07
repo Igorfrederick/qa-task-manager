@@ -21,14 +21,17 @@ export async function requireAuth(req, _res, next) {
     return next(new AppError('TOKEN_MISSING'))
   }
 
-  let user
   try {
     const { id } = verifyToken(token)
-    user = await getAuthenticatedUser(id)
+    const user = await getAuthenticatedUser(id)
+    req.user = { id: user.id, role: user.role }
   } catch (error) {
+    // Função `async` no Express 4: o que lança aqui só chega ao middleware de
+    // erro por este `next(error)`. Fora do `try`, viraria rejeição sem dono —
+    // a requisição ficaria sem resposta. Por isso tudo que pode lançar fica
+    // dentro dele.
     return next(error)
   }
 
-  req.user = { id: user.id, role: user.role }
   next()
 }

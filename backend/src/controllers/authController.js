@@ -29,7 +29,9 @@ export function login(req, res, next) {
 
 /**
  * `req.user` vem do middleware de autenticação e traz só `{ id, role }`; o
- * service busca o usuário completo para a resposta.
+ * service busca o usuário completo para a resposta. É uma segunda leitura do
+ * mesmo usuário, deliberada: `req.user` guarda só o que autoriza, como pede a
+ * convenção, e não o documento do model.
  */
 export function me(req, res, next) {
   getAuthenticatedUser(req.user.id)
