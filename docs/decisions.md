@@ -8,6 +8,32 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] O frontend chama a API pelo proxy do Vite, e o backend fica sem CORS
+
+**Decisão:** o frontend chama `/api` no próprio endereço, e o servidor de desenvolvimento do Vite repassa a chamada ao backend, no endereço de `API_PROXY_TARGET` — opcional, com padrão `http://localhost:3000`. O backend não ganha configuração de CORS, e `VITE_API_URL` sai do `frontend/.env.example`.
+
+**Motivo:** em desenvolvimento, o frontend (porta 5173) e a API (porta 3000) são origens diferentes, e o navegador bloqueia a chamada entre elas sem CORS no backend. Com o proxy, o navegador fala com uma origem só: nenhuma biblioteca nova, nenhuma mudança no backend — fechado no Passo 2, com contrato estável —, nenhuma variável de origem para manter em sincronia entre as frentes. O E2E não muda: a tela segue em `BASE_URL`, e a service layer chama a API direto, fora do navegador, onde CORS não se aplica.
+
+**Alternativa descartada:** pacote `cors` no backend, com a origem do frontend numa variável de ambiente — biblioteca nova, alteração numa frente fechada e uma variável a mais para o avaliador acertar. URL absoluta da API no frontend — exige o mesmo CORS.
+
+**Consequência registrada:** o repasse existe no `vite` e no `vite preview`. Um build servido por outro servidor precisaria do mesmo repasse, ou de CORS — fora do v1, que não tem deploy.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
+## [07/10/2026] Token no `localStorage`, e só o token
+
+**Decisão:** o JWT fica no `localStorage`, lido e escrito só por `utils/tokenStorage.js`. Só o token é guardado: o usuário e o perfil vêm da API — da resposta do login e, quando a página recarrega, de `GET /auth/me`.
+
+**Motivo:** a sessão precisa sobreviver à recarga e a uma aba nova, e a fixture de autenticação do E2E usa o `storageState` do Playwright, que guarda `localStorage` mas não `sessionStorage`. O risco do `localStorage` é ser lido por script injetado (XSS); aqui ele é contido pelo escape do React, pela ausência de `dangerouslySetInnerHTML` e de HTML vindo da API, e pela expiração do token em `JWT_EXPIRES_IN`. O perfil não vai para o navegador porque seria uma cópia que envelhece — o backend já o lê do banco a cada requisição (entrada de 06/10).
+
+**Alternativa descartada:** cookie `httpOnly` — fora do alcance de script, mas muda o contrato, que autentica por `Authorization: Bearer`, e traz a proteção contra CSRF para dentro do escopo. `sessionStorage` — some com a aba e fica fora do `storageState`, o que obrigaria o E2E a entrar pela tela em todo teste. Só em memória — a sessão cai a cada recarga.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] `@hookform/resolvers` liga o React Hook Form ao schema Zod
 
 **Decisão:** os formulários do frontend validam pelo schema Zod de `schemas/`, entregue ao React Hook Form por `zodResolver`, do pacote `@hookform/resolvers`. O Zod do frontend fica no mesmo major do backend, a versão 3.

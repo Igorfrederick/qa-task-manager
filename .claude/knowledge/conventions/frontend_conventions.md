@@ -32,6 +32,8 @@ São três telas, três pastas em `pages/`. Tela nova exige sinalização antes.
 ## Chamadas à API
 
 - Exclusivamente por `services/`. `fetch` ou cliente HTTP dentro de componente é quebra de camada
+- Caminho relativo, `/api/...`: o proxy do Vite repassa ao backend, que não tem CORS — decisão de 07/10/2026
+- O token é lido e escrito só por `utils/tokenStorage.js`, e só o token vai para o navegador; usuário e perfil vêm da API — decisão de 07/10/2026
 - Toda chamada trata **carregamento** e **erro**, não só o caminho feliz
 - O erro exibido ao usuário vem do `message` da API; o `code` é o que a lógica consome
 - `401` em qualquer chamada encerra a sessão e leva ao `/login`

@@ -11,6 +11,8 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 ## Camadas (CRITICAL)
 
 - [ ] Nenhuma chamada HTTP fora de `services/`
+- [ ] Chamada à API por caminho relativo `/api/...`, sem URL absoluta
+- [ ] Token lido e escrito só por `utils/tokenStorage.js`, e só ele no navegador
 - [ ] Nenhuma regra de negócio dentro de componente reutilizável
 
 ## Seletores
@@ -62,4 +64,4 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 - [ ] Sem prop drilling profundo onde caberia contexto
 - [ ] Sem `useEffect` para valor derivável no render
 - [ ] Nenhuma abstração criada antes do terceiro uso
-- [ ] Token em `localStorage` — se houver, tem entrada em `docs/decisions.md`
+- [ ] Nada guardado no navegador além do token, nem fora de `utils/tokenStorage.js`, sem entrada em `docs/decisions.md`
