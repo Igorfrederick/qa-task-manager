@@ -13,6 +13,11 @@
   --color-on-primary: #ffffff;
   --color-danger: #b42318;
   --color-danger-bg: #fdecea;
+  --color-success: #1a7f37;
+  --color-success-bg: #dafbe1;
+  --color-warning: #7d4e00;
+  --color-warning-bg: #fff3c4;
+  --color-neutral-bg: #eef1f4;
   --color-focus: #2f81f7;
 
   --space-1: 4px;
