@@ -4,7 +4,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 **Como usar:** abra o Claude Code na raiz do repositório e comece com algo assim:
 
-> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Vamos seguir o Passo 5, entrega. Confira antes se o PR da 4.2 foi mergeado, e apresente o plano de commits antes de escrever.
+> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. O projeto está pronto para a entrega de 09/10. Confira se o PR do Passo 5, branch `chore/entrega`, foi mergeado, e veja o que resta em §4 Pendências.
 
 ---
 
@@ -15,8 +15,8 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | 1 | Fundação — base do backend, convenções, agentes, decisões | Concluído em 01/10/2026 |
 | 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
 | 3 | Frontend — três telas | Concluído em 07/10/2026 — 3.1 (PR #4) e 3.2 (PR #5) mergeadas |
-| **4** | **E2E** | **Em revisão** — 4.1 (PR #6) mergeada; 4.2 concluída em 07/10/2026 na branch `feat/e2e-tarefas`: passada única do `code-reviewer` sem bloqueios, com 1 MEDIUM, 1 LOW e 3 sugestões tratados; aguarda PR e merge |
-| 5 | Entrega — README final, `revisor-pdi`, limpeza | Não iniciado — é o próximo |
+| 4 | E2E | Concluído em 07/10/2026 — 4.1 (PR #6) e 4.2 (PR #7) mergeadas |
+| **5** | **Entrega — README final, `revisor-pdi`, limpeza** | **Concluído em 07/10/2026** na branch `chore/entrega`: passada única do `revisor-pdi` sem CRITICAL nem HIGH, com os achados tratados ou registrados, e o projeto verificado num clone limpo seguindo só o README; aguarda PR e merge |
 
 **Prazo: 09/10/2026** — 12/10 é feriado. Avaliador: Murilo Morato, tech lead.
 
@@ -86,6 +86,15 @@ E2E, fatia 4.2:
 - Estabilidade: 290 de 290 com `--repeat-each=5` em paralelo, e 58 de 58 com `--workers=1`; depois das 348 execuções, a base voltou às 8 tarefas do seed. Depois das correções da revisão, 58 de 58 de novo, com a base nas mesmas 8
 - Revisão: a prioridade do teste de criação deixou de ser sorteada — o padrão do formulário, `medium`, saía em um terço das execuções e não provava o select (MEDIUM); a limpeza passou a tentar cada tarefa e a ignorar só `TASK_NOT_FOUND`, e a criada pela tela é anotada antes da conferência do `201` (LOW)
 
+Entrega, Passo 5:
+
+- README final: o que a aplicação faz e o que fica fora do escopo por decisão; cada critério das três frentes apontando para o arquivo que o evidencia — o `403` por perfil, para `backend/tests/api/`; e o caminho do clone à suíte verde, com `npm ci`
+- `checklist_pdi.md` volta a ser modelo: sem marcadores de passo e sem itens `[x]`; o scorecard fica no relatório do `revisor-pdi`
+- Dependências do backend sem vulnerabilidade conhecida: `bcrypt` 6 e `vitest` 4.1.11, com o lockfile gerado pelo npm 11 e aceito pelo `npm ci` do npm 10; o backend passa a Node 20, 22 ou 24+ — entrada de 07/10 em `docs/decisions.md`
+- Frontend compara status, prioridade e perfil pelas constantes de `utils/taskOptions.js` e `utils/roles.js`
+- `revisor-pdi`: nenhum CRITICAL nem HIGH; 3 MEDIUM e 10 LOW, quase todos de propagação e documentação. Tratados: a exceção das contas do seed na convenção de independência; a seção de variáveis de ambiente na convenção, no checklist e no agente de backend; o checklist do PDI como modelo; o README sobre perfis e o `--with-deps` no Linux; três entradas no log — filtros na URL, recarga depois de cada ação e o `dotenv` do backend —, propagadas ao frontend; constantes no frontend; o critério de `feat:` para jornada E2E; itens de checklist que só repetiam a convenção; a transcrição literal do critério de JWT. Não aplicados, por decisão: ver §4
+- Verificado num clone limpo, seguindo só o README, com Docker Desktop 29.8.2 e Compose 5.5.1: `docker compose up -d`, `.env` copiados, `npm ci` sem vulnerabilidade nas três frentes, backend 133 de 133, seed, typecheck do E2E e suíte E2E 58 de 58
+
 ---
 
 ## 2. Plano por fatias
@@ -124,7 +133,7 @@ Para o Passo 4:
 - Depois de uma ação ou de uma troca de filtro, as linhas antigas ficam na tela até a resposta, com `aria-busy="true"` em `task-list`. Asserção de valor final — texto, contagem — já espera sozinha; asserção de presença precisa antes esperar `task-list` com `aria-busy="false"`, ou `task-list-empty`, para não passar sobre a lista antiga
 - Os filtros estão na URL: um teste pode abrir `/tasks?status=done` direto
 - Sugestões da revisão da 3.1 ainda não aplicadas: com backend fora, a restauração não abre sessão e o `/login` não diz por quê; e, pelo proxy, backend fora responde `502` sem corpo, que hoje aparece como `UNEXPECTED_RESPONSE` em vez de `NETWORK_ERROR`
-- Sugestões da revisão da 3.2 não aplicadas: `TaskListItem` com módulo CSS próprio, em vez de dividir o da página; e entradas no log para a recarga depois de cada ação e para os filtros na URL — o motivo de cada uma está no corpo dos commits
+- Sugestões da revisão da 3.2: `TaskListItem` com módulo CSS próprio, em vez de dividir o da página, não aplicada; as entradas no log para a recarga depois de cada ação e para os filtros na URL entraram no Passo 5
 - Fora do v1, registrado: se outra aba entra como outro usuário, a aba já aberta segue mostrando o usuário antigo até recarregar; ouvir o evento `storage` no `AuthProvider` resolveria
 
 ### Passo 4 — E2E
@@ -140,13 +149,11 @@ A fatia 4.2 decidiu a limpeza da massa pela fixture `taskApi`, com o token do pe
 
 ### Passo 5 — Entrega
 
-README final com a tabela critério → lugar no repositório e passada única do `revisor-pdi`. Não restam `.gitkeep` no repositório.
+README final com a tabela critério → lugar no repositório, passada única do `revisor-pdi` e verificação num clone limpo. Não restam `.gitkeep` no repositório.
 
-Para o Passo 5:
+O Passo 5 decidiu atualizar as dependências do backend e registrou três decisões que só estavam no corpo dos commits — entradas de 07/10 em `docs/decisions.md`, propagadas às convenções, aos checklists e aos agentes.
 
-- O `checklist_pdi.md` pede, na suíte de autenticação, "acesso negado por perfil". A interface não tem tela exclusiva do `lead` — o cadastro não tem tela, fora do v1 —, e o `403` está provado na API, em `backend/tests/`. A tabela critério → lugar do README deve apontar para lá
-- A suíte E2E roda contra o seed: antes da execução de entrega, `npm run seed` e depois `npm test` em `e2e/`, sem rodar o seed no meio — ele invalida os tokens dos workers
-- Sugestão da revisão da 4.1 ainda não aplicada: conferir no `globalSetup` que o `API_PROXY_TARGET` do frontend aponta para a mesma API de `API_URL`
+"Acesso negado por perfil", que o `checklist_pdi.md` pede na suíte de autenticação, está provado na API, em `backend/tests/api/auth.register.test.js`: a interface não tem tela exclusiva do `lead`, porque o cadastro não tem tela, fora do v1. O README aponta para lá.
 
 ---
 
@@ -161,7 +168,7 @@ Para o Passo 5:
 | Sex 09/10 | Passo 5 — entrega |
 | 10 – 12/10 | Folga |
 
-**Real:** o Passo 2 fechou em 07/10, dois dias depois do previsto; o Passo 3 também fechou em 07/10, e o Passo 4 fecha no mesmo dia, com o merge da 4.2; o Passo 5 fica entre 08 e 09/10.
+**Real:** o Passo 2 fechou em 07/10, dois dias depois do previsto, e os Passos 3, 4 e 5 fecharam no mesmo dia — a entrega fica pronta dois dias antes do prazo, faltando só o merge do Passo 5.
 
 **Se atrasar, corte nesta ordem:** filtros da lista; coluna de dono na lista do líder (a API mantém o campo); rodadas extras de revisão.
 
@@ -173,11 +180,24 @@ Para o Passo 5:
 
 | # | Pendência | Por que importa |
 |---|---|---|
-| 1 | **Caminho do `docker compose` não verificado** — a máquina de desenvolvimento ainda não tem Docker nem WSL; o MongoDB 7 roda de um zip, fora do repositório, em `%USERPROFILE%\mongodb`, e sobe com `start-mongod.cmd`. Decidido em 07/10: verificar nesta máquina, instalando o Docker | O README manda o avaliador pelo compose: antes da entrega, `docker compose up -d` e a suíte rodam uma vez num clone limpo |
+| 1 | **PR do Passo 5** — abrir e mergear a `chore/entrega` | A `main` é o que o avaliador lê no GitHub |
+
+O caminho do `docker compose`, pendente até o Passo 4, foi verificado em 07/10: a máquina de desenvolvimento ganhou WSL 2 e Docker Desktop, e um clone limpo subiu e passou em tudo seguindo só o README. O MongoDB do zip, em `%USERPROFILE%\mongodb`, deixa de ser necessário; ele e o compose usam a mesma porta, 27017, e não rodam juntos.
+
+**Não aplicado, por decisão de 07/10** — registrado para quem retomar depois da entrega:
+
+- Com a API fora, a restauração da sessão falha em silêncio e o `/login` não diz por quê; pelo proxy, a API fora responde `502` sem corpo, que aparece como `UNEXPECTED_RESPONSE` em vez de `NETWORK_ERROR` — revisão da 3.1 e achado L5 do `revisor-pdi`
+- Comentário `eslint-disable` em `backend/src/middlewares/error.js`, para um linter que o projeto não roda — achado L6 do `revisor-pdi`
+- Teste E2E de token adulterado no `storageState` levando ao `/login` — hoje verificado só à mão, na 3.1
+- `TaskListItem` com módulo CSS próprio — revisão da 3.2
+- Conferir no `globalSetup` que o `API_PROXY_TARGET` do frontend aponta para a mesma API de `API_URL` — revisão da 4.1
+- Outra aba que entra como outro usuário: a aba já aberta segue com o usuário antigo até recarregar — fora do v1
 
 ---
 
 ## 5. Primeiros comandos
+
+O caminho completo, do clone à suíte E2E verde, está no README, em "Do clone à suíte verde". O mínimo para o backend:
 
 ```bash
 git clone https://github.com/Igorfrederick/qa-task-manager.git
@@ -189,7 +209,7 @@ npm ci
 npm test
 ```
 
-Para subir a API em desenvolvimento: `cp .env.example .env` em `backend/`, gerar um `JWT_SECRET` próprio (`openssl rand -base64 32`), rodar `npm run seed` e `npm run dev`.
+Para subir a API em desenvolvimento: `cp .env.example .env` em `backend/`, gerar um `JWT_SECRET` próprio (`openssl rand -base64 32`), escolher as senhas do seed, rodar `npm run seed` e `npm run dev`. Atualizar dependência do backend pede o npm 11 (`npx npm@11 install`), pelo motivo registrado na entrada de 07/10 sobre `bcrypt` e Vitest.
 
 ---
 

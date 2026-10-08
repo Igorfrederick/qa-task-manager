@@ -11,7 +11,7 @@ import SelectField from '../../components/SelectField/SelectField.jsx'
 import TextField from '../../components/TextField/TextField.jsx'
 import { TASK_FORM_FIELDS, taskSchema } from '../../schemas/taskSchema.js'
 import * as taskService from '../../services/taskService.js'
-import { PRIORITY_OPTIONS } from '../../utils/taskOptions.js'
+import { PRIORITY_OPTIONS, TASK_PRIORITY } from '../../utils/taskOptions.js'
 import styles from './TaskFormPage.module.css'
 
 // 404 é tarefa inexistente ou, para o qa, de outra pessoa (regra 2); 400 é id
@@ -35,7 +35,7 @@ export default function TaskForm({ id }) {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(taskSchema),
-    defaultValues: { title: '', description: '', priority: 'medium' },
+    defaultValues: { title: '', description: '', priority: TASK_PRIORITY.MEDIUM },
   })
 
   useEffect(() => {

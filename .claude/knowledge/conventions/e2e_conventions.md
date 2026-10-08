@@ -65,7 +65,7 @@ Page Object que assere, crie massa ou chame a API é quebra de camada — mesma 
 
 ## Independência
 
-Nenhum teste depende de outro, da ordem de execução, ou de estado deixado por um anterior. Dado compartilhado entre dois testes é bug de arquitetura de teste, não conveniência.
+Nenhum teste depende de outro, da ordem de execução, ou de estado deixado por um anterior. Dado compartilhado entre dois testes é bug de arquitetura de teste, não conveniência — com uma exceção: as contas do seed, que todos usam e nenhum teste altera, porque cada um só cria e exclui as próprias tarefas. Decisão de 07/10/2026
 
 Consequência prática: a suíte passa em paralelo e em qualquer ordem. Se não passa, há acoplamento escondido. O Playwright não tem `--shuffle`; a prova é `--repeat-each` com `fullyParallel`, que mistura a ordem entre os workers, mais uma rodada com `--workers=1`.
 

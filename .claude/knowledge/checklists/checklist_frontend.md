@@ -34,6 +34,8 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 - [ ] Mensagem ao usuário vem do `message`; a lógica consome o `code`
 - [ ] `401` encerra a sessão e leva ao `/login`
 - [ ] Exclusão pede confirmação antes da chamada
+- [ ] Ação da lista recarrega a lista pela API, sem atualizar a linha no cliente, com `aria-busy` e ações travadas até a resposta
+- [ ] Filtros lidos e escritos na URL; "Todos" sem parâmetro, nunca `?status=` vazio
 
 ## Rotas protegidas
 
@@ -49,7 +51,7 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 
 ## Responsividade
 
-- [ ] **Responsividade:** a interface é utilizável em mobile e desktop, sem quebra de layout nem conteúdo inacessível — critério de avaliação do PDI
+- [ ] Cada tela utilizável em 375 px e em 1280 px de largura, e a suíte E2E roda também no projeto `mobile`
 - [ ] Lista de tarefas sem rolagem horizontal em mobile para chegar a uma ação
 - [ ] Layout reflui de verdade; sem `overflow` escondendo conteúdo
 
@@ -61,8 +63,9 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 
 ## Qualidade
 
-- [ ] Nenhum componente fazendo trabalho demais para ser testado isoladamente
+- [ ] Nenhum componente acima de cerca de 300 linhas
 - [ ] Sem prop drilling profundo onde caberia contexto
 - [ ] Sem `useEffect` para valor derivável no render
 - [ ] Nenhuma abstração criada antes do terceiro uso
+- [ ] Status, prioridade e perfil comparados pelas constantes de `utils/taskOptions.js` e `utils/roles.js`, nunca por string solta
 - [ ] Nada guardado no navegador além do token, nem fora de `utils/tokenStorage.js`, sem entrada em `docs/decisions.md`

@@ -6,6 +6,8 @@ Fonte única. O histórico é parte do que será avaliado: um avaliador lê o `g
 
 Conventional Commits: `feat:`, `fix:`, `test:`, `docs:`, `refactor:`, `chore:`
 
+Na frente E2E, a suíte é o entregável: jornada nova é `feat:`, e `test:` reforça um teste que já existe.
+
 ## Critério de corte
 
 **Unidade funcional coerente e vertical.** O teste é direto: se o commit precisa do próximo para o projeto não quebrar, foi cortado cedo demais.

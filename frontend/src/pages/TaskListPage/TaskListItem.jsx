@@ -1,5 +1,5 @@
 import Button from '../../components/Button/Button.jsx'
-import { labelOf, PRIORITY_OPTIONS, STATUS_OPTIONS } from '../../utils/taskOptions.js'
+import { labelOf, PRIORITY_OPTIONS, STATUS_OPTIONS, TASK_STATUS } from '../../utils/taskOptions.js'
 import styles from './TaskListPage.module.css'
 
 /**
@@ -8,7 +8,7 @@ import styles from './TaskListPage.module.css'
  */
 export default function TaskListItem({ task, showOwner, isBusy, onToggleStatus, onEdit, onDelete }) {
   const id = task._id
-  const isDone = task.status === 'done'
+  const isDone = task.status === TASK_STATUS.DONE
 
   return (
     <li className={isDone ? `${styles.item} ${styles.done}` : styles.item} data-cy={`task-list-row-${id}`}>

@@ -47,6 +47,11 @@ Cada linha diz **o que** garantir e **onde** está a regra por extenso. Leia a f
 - **Status por camada.** Invariante de entrada valida por schema e retorna `400`; invariante de domínio valida no service — `409` quando o estado impede a operação, `404` quando a tarefa não existe para quem pede. → `api_contract.md` §Regras de negócio e seus erros
 - **Nenhum dado real, segredo ou credencial no código.** Senha só com hash, segredo só por variável de ambiente, e **nenhum dado real da Nextar** — sem nome de cliente, sem chave real de tarefa do Jira, sem conteúdo de bug real. Seed, massa e exemplo usam dado fictício. → `CLAUDE.md` §4 › Segurança — não negociável
 - **Senha com bcrypt, `passwordHash` nunca em resposta nem em log.** → `backend_conventions.md` §Senhas
+- **JWT só com o id, em `sub`; o middleware confirma o usuário no banco** e lê dele o perfil. → `backend_conventions.md` §Autenticação
+- **Validação de corpo, query e parâmetro por schema, em middleware**, antes do controller. → `backend_conventions.md` §Validação de entrada
+- **Variáveis de ambiente validadas em `config/env.js`, na importação**, sem padrão para segredo; a do seed é conferida pelo seed. → `backend_conventions.md` §Variáveis de ambiente
+- **Conexão isolada em `config/`**, URI por variável de ambiente, falha tratada. → `backend_conventions.md` §Conexão com o banco
+- **Modelagem coerente com as regras** — e-mail único, índice no dono, enums da constante única. → `backend_conventions.md` §Modelagem
 - Nada da lista de não-escopo do v1 sem sinalizar antes. → `CLAUDE.md` §2
 - Nenhuma biblioteca nova sem justificar e registrar em `docs/decisions.md`.
 - Nenhuma abstração antes do terceiro uso.

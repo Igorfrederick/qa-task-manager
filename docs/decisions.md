@@ -8,6 +8,64 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] `dotenv` no backend, `process.loadEnvFile` no E2E
+
+**Decisão:** o backend segue lendo o `.env` pelo `dotenv`, e a suíte E2E pelo `process.loadEnvFile`, do próprio Node.
+
+**Motivo:** o `dotenv` veio na base do backend, no Passo 1, e o `engines` do backend aceita Node 20 desde a 20.0 — o `process.loadEnvFile` só existe a partir da 20.12. A suíte E2E nasceu exigindo 20.19+, pelo faker, e não precisou da biblioteca: a entrada de 07/10 sobre a configuração da suíte descarta o `dotenv` por isso, e não por um critério que o backend violaria.
+
+**Alternativa descartada:** `process.loadEnvFile` também no backend — subiria o mínimo de Node e reabriria `config/env.js` sem ganho para quem usa. `dotenv` também no E2E — biblioteca a mais para o que o Node já faz na versão que a suíte exige.
+
+**Origem:** achado do `revisor-pdi` na leitura de entrega — as duas frentes pareciam seguir critérios opostos sem explicação.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
+## [07/10/2026] Depois de cada ação, a lista volta da API
+
+**Decisão:** concluir, reabrir e excluir chamam a API e, dê certo ou errado, recarregam a lista com os mesmos filtros. Enquanto a lista não volta, a anterior fica na tela, com `aria-busy="true"` e as ações travadas.
+
+**Motivo:** quem sabe se a tarefa ainda cabe no filtro, ou se outra pessoa já a excluiu, é a API: atualizar a linha no cliente deixaria uma tarefa concluída na lista de abertas. Manter a lista anterior evita que a página pule a cada clique, e travar as ações impede agir sobre dado velho.
+
+**Alternativa descartada:** atualização otimista da linha — refaria no cliente a regra do filtro e teria de desfazer a mudança no erro. Esvaziar a lista enquanto recarrega — a página pula a cada ação.
+
+**Consequência registrada:** no E2E, a asserção de ausência só vale depois de uma presença que prove a lista nova — regra em `e2e_conventions.md` §Asserções.
+
+**Origem:** tomada na fatia 3.2, com o motivo no corpo do commit `40a729f`; registrada aqui na entrega, como sugeriu o `code-reviewer` da 3.2.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
+## [07/10/2026] Filtros da lista na URL, e "Todos" omite o parâmetro
+
+**Decisão:** os filtros de status e prioridade vivem na query string — `/tasks?status=done&priority=high` —, lidos pelo `useSearchParams`. "Todos" tira o parâmetro da URL, e valor fora do domínio, digitado à mão, vale como todos. O formulário recebe os filtros e volta à lista com eles.
+
+**Motivo:** o filtro sobrevive à recarga, à volta do formulário e ao login com destino guardado, e o endereço filtrado pode ser aberto direto — inclusive pelo E2E. "Todos" omite o parâmetro porque o contrato responde `400` a filtro vazio (`?status=`).
+
+**Alternativa descartada:** estado local no componente — some na recarga e na volta do formulário. Contexto global — guardaria o filtro sem o endereço, com mais código para menos resultado.
+
+**Origem:** tomada na fatia 3.2, com o motivo no corpo do commit `ca47e93`; registrada aqui na entrega, como sugeriu o `code-reviewer` da 3.2.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
+## [07/10/2026] Dependências do backend sem vulnerabilidade conhecida: bcrypt 6 e Vitest 4
+
+**Decisão:** o backend passa do `bcrypt` 5 para o 6 e do `vitest` 2 para o 4.1.11. O `engines` do backend acompanha o do Vitest 4: Node 20, 22 ou 24+.
+
+**Motivo:** a verificação de entrega num clone limpo mostrou que o primeiro `npm ci` do backend avisava de 10 vulnerabilidades, 3 delas críticas — o primeiro texto que o avaliador lê no terminal. Três vinham da produção: o `bcrypt` 5 baixa o binário pelo `@mapbox/node-pre-gyp`, que depende de um `tar` vulnerável. O `bcrypt` 6 traz os binários prontos no pacote, sem esse caminho, com a mesma API e hashes compatíveis — nenhuma linha de código mudou. As outras sete eram de desenvolvimento, na cadeia do Vitest 2 (`tinypool`, `@vitest/mocker`, `vite`, `esbuild`); a 4.1.11 é a primeira versão fora de todos os alertas. Depois da troca, o `npm audit` não acusa nada, o backend passa nos 133 testes e a suíte E2E nas 58 execuções, num clone limpo com `docker compose`.
+
+**Alternativa descartada:** Vitest 5 — também fora dos alertas, mas exige Node 22.12+, e o backend deixaria de rodar na 20. Manter as versões e registrar o risco — o avaliador veria "3 critical" na instalação, num projeto que trata segurança como não negociável. `npm audit fix --force` — escolheria as versões sozinho, e o Vitest 5 entre elas.
+
+**Consequência registrada:** o npm 10 falha ao resolver as dependências *peer* do Vitest 4 (`Cannot read properties of null (reading 'edgesOut')`), e por isso o lockfile foi gerado com o npm 11 (`npx npm@11 install`). O `npm ci` do npm 10, que é o que o README manda rodar, aceita esse lockfile — conferido. Uma próxima atualização de dependência do backend passa pelo mesmo caminho.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] Massa de tarefa do E2E excluída no teardown da fixture, pelo perfil que a criou
 
 **Decisão:** a fixture `taskApi` dá ao teste um `TaskService` por perfil — `taskApi.qa`, `taskApi.lead` —, com o token da sessão do worker. Toda tarefa criada por ele fica anotada, com o perfil que a criou; a tarefa criada pela tela entra na lista por `taskApi.track`, com o `_id` da resposta da criação. No teardown, cada uma é excluída pela API, com o token de quem a criou, e o `404 TASK_NOT_FOUND` de uma tarefa que o próprio teste já excluiu é ignorado — qualquer outra falha, inclusive outro `404`, aparece, sem interromper a exclusão das demais.

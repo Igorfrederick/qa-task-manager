@@ -37,6 +37,8 @@ São três telas, três pastas em `pages/`. Tela nova exige sinalização antes.
 - Toda chamada trata **carregamento** e **erro**, não só o caminho feliz
 - O erro exibido ao usuário vem do `message` da API; o `code` é o que a lógica consome
 - Exclusão pede confirmação pelo diálogo nativo (`window.confirm`) antes da chamada — decisão de 07/10/2026
+- Depois de cada ação da lista, certa ou errada, a lista volta da API com os mesmos filtros; até a resposta, a anterior fica na tela com `aria-busy="true"` e as ações travadas — decisão de 07/10/2026
+- Filtros da lista na URL, pelo `useSearchParams`; "Todos" omite o parâmetro, porque o contrato responde `400` a filtro vazio — decisão de 07/10/2026
 - `401` em qualquer chamada encerra a sessão e leva ao `/login`
 
 ## Rotas protegidas
@@ -95,3 +97,4 @@ Identificadores, componentes e campos em inglês; texto de interface em portugu�
 | Abstração antes do terceiro uso | Generaliza sobre dois exemplos e acerta o formato errado |
 | Token em `localStorage` sem justificativa | Decisão de segurança que exige entrada em `docs/decisions.md` |
 | Elemento interativo sem `data-cy` | Componente incompleto; quebra a suíte E2E |
+| Valor de domínio escrito à mão — `'done'`, `'lead'` | `utils/taskOptions.js` e `utils/roles.js` são a fonte única; a string solta diverge do contrato sem aviso |

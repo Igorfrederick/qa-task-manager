@@ -64,12 +64,18 @@ Aplicar a qualquer diff que toque `backend/**`. Base: `conventions/backend_conve
 ## Testes
 
 - [ ] **Toda regra de negócio tem teste automatizado em `backend/tests/`, sem depender de UI**
-- [ ] **Regra de negócio sem teste no mesmo commit é achado**
 - [ ] Toda rota protegida tem teste de `401` sem token; toda rota `[lead]` tem teste de `403` com `qa`
 - [ ] Cada causa de `401` tem teste próprio, asserindo o `code` que só ela produz — `TOKEN_MISSING`, `TOKEN_INVALID`, `TOKEN_EXPIRED`
 - [ ] O service é exercitável sem HTTP e sem subir a aplicação
 - [ ] Dependência externa (conexão, relógio, identificador) entra por parâmetro ou `config/`, não instanciada dentro da regra
 - [ ] Caminho de erro coberto, não só o caminho feliz
+
+## Variáveis de ambiente
+
+- [ ] `process.env` lido só em `config/env.js`, que valida as obrigatórias na importação e lança com a lista do que falta
+- [ ] Nenhum valor padrão para segredo
+- [ ] Variável de um único ponto de entrada — senhas do seed — conferida por ele antes de qualquer efeito, fora das obrigatórias
+- [ ] Toda variável lida pelo código tem chave no `.env.example`, com valor fictício
 
 ## Conexão com o banco
 

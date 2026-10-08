@@ -35,9 +35,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 
 ## Independência
 
-- [ ] Nenhum teste depende de outro
-- [ ] Nenhum teste depende da ordem de execução
-- [ ] Nenhum dado compartilhado entre testes
+- [ ] Nenhum dado compartilhado entre testes além das contas do seed, que nenhum teste altera
 - [ ] A suíte passa com `--repeat-each` em paralelo e com `--workers=1` — o Playwright não tem `--shuffle`
 - [ ] Nenhuma asserção conta as linhas da lista inteira: as contas do seed são compartilhadas entre testes em paralelo
 
@@ -46,7 +44,7 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 - [ ] Autenticação por fixture, por perfil — `test.use({ role })`, sem login pela tela fora dos testes de login
 - [ ] Nenhum usuário criado pelo teste
 - [ ] Page objects injetados por fixture, sem herança de BasePage
-- [ ] O teste limpa o que criou, pela fixture `taskApi`: tarefa criada pela tela é anotada com `taskApi.track`, e nenhum arquivo repete a limpeza em `afterEach`
+- [ ] O teste limpa o que criou, pela fixture `taskApi`: tarefa criada pela tela é anotada com `taskApi.track`, e nenhum arquivo repete a limpeza em `afterEach`. A exclusão usa o token do perfil que criou a tarefa, e só o `TASK_NOT_FOUND` é ignorado
 
 ## Determinismo
 
