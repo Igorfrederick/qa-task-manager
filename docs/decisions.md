@@ -8,6 +8,20 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [07/10/2026] Dependências do backend sem vulnerabilidade conhecida: bcrypt 6 e Vitest 4
+
+**Decisão:** o backend passa do `bcrypt` 5 para o 6 e do `vitest` 2 para o 4.1.11. O `engines` do backend acompanha o do Vitest 4: Node 20, 22 ou 24+.
+
+**Motivo:** a verificação de entrega num clone limpo mostrou que o primeiro `npm ci` do backend avisava de 10 vulnerabilidades, 3 delas críticas — o primeiro texto que o avaliador lê no terminal. Três vinham da produção: o `bcrypt` 5 baixa o binário pelo `@mapbox/node-pre-gyp`, que depende de um `tar` vulnerável. O `bcrypt` 6 traz os binários prontos no pacote, sem esse caminho, com a mesma API e hashes compatíveis — nenhuma linha de código mudou. As outras sete eram de desenvolvimento, na cadeia do Vitest 2 (`tinypool`, `@vitest/mocker`, `vite`, `esbuild`); a 4.1.11 é a primeira versão fora de todos os alertas. Depois da troca, o `npm audit` não acusa nada, o backend passa nos 133 testes e a suíte E2E nas 58 execuções, num clone limpo com `docker compose`.
+
+**Alternativa descartada:** Vitest 5 — também fora dos alertas, mas exige Node 22.12+, e o backend deixaria de rodar na 20. Manter as versões e registrar o risco — o avaliador veria "3 critical" na instalação, num projeto que trata segurança como não negociável. `npm audit fix --force` — escolheria as versões sozinho, e o Vitest 5 entre elas.
+
+**Consequência registrada:** o npm 10 falha ao resolver as dependências *peer* do Vitest 4 (`Cannot read properties of null (reading 'edgesOut')`), e por isso o lockfile foi gerado com o npm 11 (`npx npm@11 install`). O `npm ci` do npm 10, que é o que o README manda rodar, aceita esse lockfile — conferido. Uma próxima atualização de dependência do backend passa pelo mesmo caminho.
+
+**Decidido por:** Igor Frederick, em 07/10/2026.
+
+---
+
 ## [07/10/2026] Massa de tarefa do E2E excluída no teardown da fixture, pelo perfil que a criou
 
 **Decisão:** a fixture `taskApi` dá ao teste um `TaskService` por perfil — `taskApi.qa`, `taskApi.lead` —, com o token da sessão do worker. Toda tarefa criada por ele fica anotada, com o perfil que a criou; a tarefa criada pela tela entra na lista por `taskApi.track`, com o `_id` da resposta da criação. No teardown, cada uma é excluída pela API, com o token de quem a criou, e o `404 TASK_NOT_FOUND` de uma tarefa que o próprio teste já excluiu é ignorado — qualquer outra falha, inclusive outro `404`, aparece, sem interromper a exclusão das demais.

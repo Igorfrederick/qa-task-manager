@@ -100,7 +100,7 @@ npm test                                # sobe API e frontend, e roda a suíte n
 
 ## Requisitos
 
-- Node.js 20.19+, 22.13+ ou 23.5+ — o mínimo do E2E, pelo faker. O frontend aceita também a 22.12, pelo Vite 8, e o backend, qualquer 20+
+- Node.js 20.19+, 22.13+ ou 24+ — o que as três frentes aceitam juntas: o E2E pede 20.19+, 22.13+ ou 23.5+, pelo faker, e o backend, 20, 22 ou 24+, pelo Vitest 4
 - MongoDB 7, pelo `docker compose` da seção seguinte ou instalado localmente
 
 ## Banco de dados
