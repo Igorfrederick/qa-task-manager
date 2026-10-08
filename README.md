@@ -66,7 +66,7 @@ Cada critério da rubrica das etapas 1 a 3, e onde ele aparece no repositório. 
 | Critério | Onde ver |
 |---|---|
 | Suíte cobrindo login e autenticação | `e2e/tests/auth/` — login válido nos dois perfis, credencial inválida conferida pelo `code`, validação do formulário, sessão restaurada, sair e rotas protegidas; o `401` e o `403` por perfil, na API, em `backend/tests/api/` |
-| Suíte cobrindo funcionalidades principais | `e2e/tests/tasks/` — criar, validar, editar, concluir, reabrir, excluir, filtrar e escopo por dono, nos dois perfis |
+| Suíte cobrindo funcionalidades principais | `e2e/tests/tasks/` — criar, validar, editar, concluir, reabrir, excluir e filtrar, com a sessão do `qa`; escopo por dono nos dois perfis: o `qa` não vê nem abre a tarefa do `lead`, e o `lead` vê a do `qa`, com o dono, e a conclui |
 | Testes isolados de backend | `backend/tests/` — services e API, com Vitest e supertest, sem navegador, contra um MongoDB real |
 | Organização por feature ou jornada | `e2e/tests/auth/` e `e2e/tests/tasks/`, um arquivo por jornada; um Page Object por tela em `e2e/pages/` |
 | Qualidade dos seletores | Só `data-cy`, por `getByTestId` — `testIdAttribute: 'data-cy'` em `e2e/playwright.config.ts` |
@@ -94,7 +94,7 @@ cd ../frontend
 npm ci
 cd ../e2e
 npm ci
-npx playwright install chromium
+npx playwright install chromium         # no Linux: npx playwright install --with-deps chromium
 npm test                                # sobe API e frontend, e roda a suíte no desktop e no celular
 ```
 
@@ -175,7 +175,7 @@ Com o banco em pé, o `backend/.env` preenchido e o seed rodado — com `SEED_LE
 ```bash
 cd e2e
 npm ci
-npx playwright install chromium
+npx playwright install chromium   # no Linux, --with-deps instala também as bibliotecas do sistema
 npm test            # sobe API e frontend se não estiverem no ar, e roda cada teste no desktop e no celular
 npm run report      # relatório HTML da última execução
 npm run typecheck   # TypeScript estrito, sem emitir
