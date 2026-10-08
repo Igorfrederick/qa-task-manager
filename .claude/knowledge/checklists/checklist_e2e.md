@@ -35,8 +35,6 @@ Aplicar a qualquer diff que toque `e2e/**`. Base: `conventions/e2e_conventions.m
 
 ## Independência
 
-- [ ] Nenhum teste depende de outro
-- [ ] Nenhum teste depende da ordem de execução
 - [ ] Nenhum dado compartilhado entre testes além das contas do seed, que nenhum teste altera
 - [ ] A suíte passa com `--repeat-each` em paralelo e com `--workers=1` — o Playwright não tem `--shuffle`
 - [ ] Nenhuma asserção conta as linhas da lista inteira: as contas do seed são compartilhadas entre testes em paralelo

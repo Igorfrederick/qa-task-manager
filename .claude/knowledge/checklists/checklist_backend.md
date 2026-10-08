@@ -64,7 +64,6 @@ Aplicar a qualquer diff que toque `backend/**`. Base: `conventions/backend_conve
 ## Testes
 
 - [ ] **Toda regra de negócio tem teste automatizado em `backend/tests/`, sem depender de UI**
-- [ ] **Regra de negócio sem teste no mesmo commit é achado**
 - [ ] Toda rota protegida tem teste de `401` sem token; toda rota `[lead]` tem teste de `403` com `qa`
 - [ ] Cada causa de `401` tem teste próprio, asserindo o `code` que só ela produz — `TOKEN_MISSING`, `TOKEN_INVALID`, `TOKEN_EXPIRED`
 - [ ] O service é exercitável sem HTTP e sem subir a aplicação

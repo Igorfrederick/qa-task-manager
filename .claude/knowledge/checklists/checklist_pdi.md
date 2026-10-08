@@ -14,7 +14,9 @@ Os itens abaixo derivam da tabela de critérios da seção 1 do `CLAUDE.md`, que
 | `- [x]` | Verificado e conforme |
 | `[pendente: Passo N]` | Depende de etapa futura do projeto; **não é falha** |
 
-Os passos estão em `docs/handoff.md`: 2 backend, 3 frontend, 4 E2E, 5 entrega. Quando um passo fecha, os marcadores dele saem, e o item passa a ser lido como pronto ou não — na entrega, nenhum item carrega marcador.
+Os passos estão em `docs/handoff.md`: 2 backend, 3 frontend, 4 E2E, 5 entrega. Quando um passo fecha, os marcadores dele saem — na entrega, nenhum item carrega marcador.
+
+Este arquivo é modelo: todo item fica `[ ]`, e a marcação acima vale para o scorecard que o `revisor-pdi` entrega no próprio relatório, não para este arquivo.
 
 A distinção importa: item que depende de passo futuro não é a mesma coisa que item que deveria estar pronto e não está. Um report que não separa os dois vira ruído e deixa de ser lido.
 
@@ -36,7 +38,7 @@ Critério: estrutura de pastas, componentização e reutilização, boas prátic
 
 ## Backend
 
-Critério: API REST funcional, arquitetura em camadas, JWT correto, middleware de validação e autorização, conexão com MongoDB, hash de senhas, variáveis de ambiente, modelagem de dados.
+Critério: API REST funcional, arquitetura em camadas, JWT correto (geração e validação), middleware de validação e autorização, conexão com MongoDB, hash de senhas, variáveis de ambiente, modelagem de dados.
 
 - [ ] **API REST funcional** — todas as rotas do contrato respondendo
 - [ ] Separação de camadas visível na estrutura e respeitada no código
@@ -47,8 +49,8 @@ Critério: API REST funcional, arquitetura em camadas, JWT correto, middleware d
 - [ ] **Escopo por dono** no service, com `404` para tarefa alheia
 - [ ] **Conexão com MongoDB** isolada em `config/`, URI por env, falha tratada
 - [ ] Senha com bcrypt; `passwordHash` nunca exposto; o login completa a verificação
-- [x] Segredos exclusivamente por variável de ambiente
-- [x] `.env.example` presente e completo, com valores fictícios
+- [ ] Segredos exclusivamente por variável de ambiente
+- [ ] `.env.example` presente e completo, com valores fictícios
 - [ ] Modelagem coerente com as regras — `User.email` único, índice em `Task.userId`, enums de status e prioridade
 - [ ] Formato de erro único, com `code` e status HTTP adequado
 
@@ -92,3 +94,4 @@ Verificáveis desde já, em qualquer estágio.
 - [ ] Nada da lista de não-escopo do v1 implementado
 - [ ] Alteração na rubrica do PDI, na tabela de critérios da seção 1 ou em `docs/decisions.md` propagou para `.claude/knowledge/` **e** `.claude/agents/`
 - [ ] Nenhum checklist virou paráfrase da convenção que verifica
+- [ ] A tabela de critérios da seção 1 do `CLAUDE.md` está transcrita sem divergência neste checklist, na lista do `revisor-pdi` e na tabela de critérios do README

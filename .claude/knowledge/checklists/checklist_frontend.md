@@ -49,7 +49,7 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 
 ## Responsividade
 
-- [ ] **Responsividade:** a interface é utilizável em mobile e desktop, sem quebra de layout nem conteúdo inacessível — critério de avaliação do PDI
+- [ ] Cada tela utilizável em 375 px e em 1280 px de largura, e a suíte E2E roda também no projeto `mobile`
 - [ ] Lista de tarefas sem rolagem horizontal em mobile para chegar a uma ação
 - [ ] Layout reflui de verdade; sem `overflow` escondendo conteúdo
 
@@ -61,7 +61,7 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 
 ## Qualidade
 
-- [ ] Nenhum componente fazendo trabalho demais para ser testado isoladamente
+- [ ] Nenhum componente acima de cerca de 300 linhas
 - [ ] Sem prop drilling profundo onde caberia contexto
 - [ ] Sem `useEffect` para valor derivável no render
 - [ ] Nenhuma abstração criada antes do terceiro uso
