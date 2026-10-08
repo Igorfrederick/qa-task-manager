@@ -65,4 +65,5 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 - [ ] Sem prop drilling profundo onde caberia contexto
 - [ ] Sem `useEffect` para valor derivável no render
 - [ ] Nenhuma abstração criada antes do terceiro uso
+- [ ] Status, prioridade e perfil comparados pelas constantes de `utils/taskOptions.js` e `utils/roles.js`, nunca por string solta
 - [ ] Nada guardado no navegador além do token, nem fora de `utils/tokenStorage.js`, sem entrada em `docs/decisions.md`

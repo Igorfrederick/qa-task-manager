@@ -8,7 +8,14 @@ import SelectField from '../../components/SelectField/SelectField.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useTasks } from '../../hooks/useTasks.js'
 import * as taskService from '../../services/taskService.js'
-import { PRIORITY_OPTIONS, PRIORITY_VALUES, STATUS_OPTIONS, STATUS_VALUES } from '../../utils/taskOptions.js'
+import { ROLES } from '../../utils/roles.js'
+import {
+  PRIORITY_OPTIONS,
+  PRIORITY_VALUES,
+  STATUS_OPTIONS,
+  STATUS_VALUES,
+  TASK_STATUS,
+} from '../../utils/taskOptions.js'
 import TaskListItem from './TaskListItem.jsx'
 import styles from './TaskListPage.module.css'
 
@@ -66,7 +73,7 @@ export default function TaskListPage() {
   }
 
   function handleToggleStatus(task) {
-    const nextStatus = task.status === 'done' ? 'open' : 'done'
+    const nextStatus = task.status === TASK_STATUS.DONE ? TASK_STATUS.OPEN : TASK_STATUS.DONE
     runAction(task._id, () => taskService.updateTask(task._id, { status: nextStatus }))
   }
 
@@ -99,7 +106,7 @@ export default function TaskListPage() {
           <TaskListItem
             key={task._id}
             task={task}
-            showOwner={user.role === 'lead'}
+            showOwner={user.role === ROLES.LEAD}
             isBusy={isLoading || busyTaskId === task._id}
             onToggleStatus={handleToggleStatus}
             onEdit={handleEdit}

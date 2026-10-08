@@ -95,3 +95,4 @@ Identificadores, componentes e campos em inglês; texto de interface em portugu�
 | Abstração antes do terceiro uso | Generaliza sobre dois exemplos e acerta o formato errado |
 | Token em `localStorage` sem justificativa | Decisão de segurança que exige entrada em `docs/decisions.md` |
 | Elemento interativo sem `data-cy` | Componente incompleto; quebra a suíte E2E |
+| Valor de domínio escrito à mão — `'done'`, `'lead'` | `utils/taskOptions.js` e `utils/roles.js` são a fonte única; a string solta diverge do contrato sem aviso |
