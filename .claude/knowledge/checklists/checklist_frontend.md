@@ -34,6 +34,8 @@ Aplicar a qualquer diff que toque `frontend/**`. Base: `conventions/frontend_con
 - [ ] Mensagem ao usuário vem do `message`; a lógica consome o `code`
 - [ ] `401` encerra a sessão e leva ao `/login`
 - [ ] Exclusão pede confirmação antes da chamada
+- [ ] Ação da lista recarrega a lista pela API, sem atualizar a linha no cliente, com `aria-busy` e ações travadas até a resposta
+- [ ] Filtros lidos e escritos na URL; "Todos" sem parâmetro, nunca `?status=` vazio
 
 ## Rotas protegidas
 
