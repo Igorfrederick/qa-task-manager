@@ -83,7 +83,7 @@ Verifica a presença e a qualidade dos seletores de teste.
 
 Verifica que o comportamento alterado pelo diff está coberto por teste.
 **Fonte:** `checklist_backend.md` §Testes; `checklist_e2e.md` §Independência e §Cobertura das regras de negócio; `commit_conventions.md` — regra e teste no mesmo commit.
-**Bloqueia quando:** regra de negócio criada ou alterada sem teste no mesmo PR; teste dependente de ordem ou de dado de outro teste; massa hardcoded; `waitForTimeout` sem justificativa; ausência de limpeza do que o teste criou.
+**Bloqueia quando:** regra de negócio criada ou alterada sem teste no mesmo PR; teste dependente de ordem ou de dado de outro teste; massa hardcoded; `waitForTimeout`; ausência de limpeza do que o teste criou.
 
 ### BLOCO 8 — Lógica e robustez
 

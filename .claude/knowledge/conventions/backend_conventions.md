@@ -43,6 +43,13 @@ A ferramenta é **Vitest com supertest** — decisão de 01/10/2026 em `docs/dec
 - Falha de conexão tratada de forma explícita: a aplicação não sobe silenciosamente sem banco
 - Encerramento controlado da conexão, para que a suíte de teste não fique pendurada
 
+## Variáveis de ambiente
+
+- Lidas e validadas só em `config/env.js`, na importação do módulo: variável obrigatória ausente lança com a lista do que falta e aponta o `.env.example` — todo ponto de entrada passa pela validação sem precisar chamá-la. Decisão de 01/10/2026
+- Nenhum valor padrão para segredo; porta, ambiente, expiração do token e custo do bcrypt têm padrão, porque errar neles é inconveniente, e errar em `JWT_SECRET` é falha de segurança
+- Variável que só um ponto de entrada usa — as senhas do seed — fica fora das obrigatórias e é conferida por ele, antes de qualquer efeito; o seed também recusa `NODE_ENV=production`. Decisão de 07/10/2026
+- `.env` fora do versionamento; `.env.example` com todas as chaves e valores fictícios
+
 ## Autenticação
 
 - JWT com geração e validação explícitas, expiração definida

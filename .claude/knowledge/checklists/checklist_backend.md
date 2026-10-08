@@ -71,6 +71,13 @@ Aplicar a qualquer diff que toque `backend/**`. Base: `conventions/backend_conve
 - [ ] Dependência externa (conexão, relógio, identificador) entra por parâmetro ou `config/`, não instanciada dentro da regra
 - [ ] Caminho de erro coberto, não só o caminho feliz
 
+## Variáveis de ambiente
+
+- [ ] `process.env` lido só em `config/env.js`, que valida as obrigatórias na importação e lança com a lista do que falta
+- [ ] Nenhum valor padrão para segredo
+- [ ] Variável de um único ponto de entrada — senhas do seed — conferida por ele antes de qualquer efeito, fora das obrigatórias
+- [ ] Toda variável lida pelo código tem chave no `.env.example`, com valor fictício
+
 ## Conexão com o banco
 
 - [ ] Conexão isolada em `config/`, não aberta em service, controller ou model
