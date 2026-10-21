@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Task Manager API",
-    "description": "Rotas da API do Task Manager. Preencha leadPassword e qaPassword com SEED_LEAD_PASSWORD e SEED_QA_PASSWORD do backend/.env. Cada login guarda o token em {{token}}, e as demais requisições usam o do último login: rodando a coleção inteira, vale o do lead. Create guarda o _id em {{taskId}}, que Get, Update, Complete, Reopen e Delete usam.",
+    "description": "Rotas da API do Task Manager. Preencha leadPassword e qaPassword com SEED_LEAD_PASSWORD e SEED_QA_PASSWORD do backend/.env. Cada login guarda o token em {{token}}, e as demais requisições usam o do último login: rodando a coleção inteira, vale o do lead. Create guarda o _id em {{taskId}}, que Get, Update, Complete, Reopen e Delete usam. As senhas ficam vazias de propósito: não reexporte a coleção com elas preenchidas.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -47,6 +47,17 @@
   "item": [
     {
       "name": "Health",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
       "request": {
         "auth": {
           "type": "noauth"
@@ -128,6 +139,17 @@
         },
         {
           "name": "Me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/auth/me"
@@ -135,6 +157,17 @@
         },
         {
           "name": "Register (só lead)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -157,10 +190,21 @@
       "item": [
         {
           "name": "List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/tasks?status=open&priority=high",
+              "raw": "{{baseUrl}}/tasks",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -217,6 +261,17 @@
         },
         {
           "name": "Get",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/tasks/{{taskId}}"
@@ -224,6 +279,17 @@
         },
         {
           "name": "Update",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -241,6 +307,17 @@
         },
         {
           "name": "Complete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -258,6 +335,17 @@
         },
         {
           "name": "Reopen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -275,6 +363,17 @@
         },
         {
           "name": "Delete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/tasks/{{taskId}}"
