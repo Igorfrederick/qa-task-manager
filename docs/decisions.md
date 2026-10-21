@@ -8,6 +8,18 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [21/10/2026] `package.json` na raiz, com `concurrently`, sobe API e frontend juntos
+
+**Decisão:** um `package.json` na raiz, só de scripts — `setup`, `db:up`, `db:down`, `seed` e `dev`. O `dev` roda o `npm run dev` do backend e o do frontend em paralelo pelo `concurrently` 9, com o log de cada um prefixado e `--kill-others-on-fail`. A raiz não declara `workspaces`. O seed e o banco ficam fora do `dev`.
+
+**Motivo:** subir a aplicação pedia dois terminais e a ordem certa entre eles; com um comando, quem chega ao repositório pelo README tem a aplicação no ar mais rápido. Sem `workspaces`, cada frente mantém o próprio `package.json`, lockfile e `node_modules`, e sobe sozinha como antes — a raiz só conhece o nome das pastas. O `concurrently` encerra a árvore de processos de cada frente, o que no Windows evita `node` sobrando nas portas 3000 e 5173. A versão 9, e não a 10, porque a 10 exige Node 22 e o projeto aceita 20.19+. O seed fica fora porque apaga a base; o banco, porque o MongoDB local é alternativa documentada ao Docker.
+
+**Alternativa descartada:** script Node próprio, com `child_process` — sem dependência, mas o repasse do `Ctrl+C` e o encerramento dos filhos no Windows seriam código a mais para explicar. `npm-run-all` — executa só scripts npm, e pediria um script auxiliar por frente; o pacote original está sem manutenção, e o ponto forte dele, encadear etapas em sequência, não se usa aqui, com o seed fora do fluxo. npm `workspaces` — junta as dependências num `node_modules` da raiz, e o Vite 5 que o Vitest traz ao backend poderia ser resolvido no lugar do Vite 8 do frontend. Backend e frontend como serviços do `docker-compose` — Dockerfiles e hot reload por volume, além de mudar o que o `webServer` do E2E sobe.
+
+**Decidido por:** Igor Frederick, em 21/10/2026.
+
+---
+
 ## [07/10/2026] `dotenv` no backend, `process.loadEnvFile` no E2E
 
 **Decisão:** o backend segue lendo o `.env` pelo `dotenv`, e a suíte E2E pelo `process.loadEnvFile`, do próprio Node.

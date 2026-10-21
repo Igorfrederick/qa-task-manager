@@ -4,7 +4,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 **Como usar:** abra o Claude Code na raiz do repositório e comece com algo assim:
 
-> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. O projeto está pronto para a entrega de 09/10. Confira se o PR do Passo 5, branch `chore/entrega`, foi mergeado, e veja o que resta em §4 Pendências.
+> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Confira se o PR da branch `chore/subida-um-comando` foi mergeado, e veja o que resta em §4 Pendências.
 
 ---
 
@@ -16,7 +16,8 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | 2 | Backend completo, contrato estável | Concluído em 07/10/2026 — 2.1 (PR #1), 2.2 (PR #2) e 2.3 (PR #3) mergeadas |
 | 3 | Frontend — três telas | Concluído em 07/10/2026 — 3.1 (PR #4) e 3.2 (PR #5) mergeadas |
 | 4 | E2E | Concluído em 07/10/2026 — 4.1 (PR #6) e 4.2 (PR #7) mergeadas |
-| **5** | **Entrega — README final, `revisor-pdi`, limpeza** | **Concluído em 07/10/2026** na branch `chore/entrega`: passada única do `revisor-pdi` sem CRITICAL nem HIGH, com os achados tratados ou registrados, e o projeto verificado num clone limpo seguindo só o README; aguarda PR e merge |
+| 5 | Entrega — README final, `revisor-pdi`, limpeza | Concluído em 07/10/2026 — PR #8 mergeado: passada única do `revisor-pdi` sem CRITICAL nem HIGH, com os achados tratados ou registrados, e o projeto verificado num clone limpo seguindo só o README |
+| **—** | **Subida por um comando — `package.json` na raiz, README com passo a passo, criação de conta e problemas comuns, coleção do Postman** | **Concluído em 21/10/2026** na branch `chore/subida-um-comando`; aguarda PR, `code-reviewer` e merge |
 
 **Prazo: 09/10/2026** — 12/10 é feriado. Avaliador: Murilo Morato, tech lead.
 
@@ -94,6 +95,15 @@ Entrega, Passo 5:
 - Frontend compara status, prioridade e perfil pelas constantes de `utils/taskOptions.js` e `utils/roles.js`
 - `revisor-pdi`: nenhum CRITICAL nem HIGH; 3 MEDIUM e 10 LOW, quase todos de propagação e documentação. Tratados: a exceção das contas do seed na convenção de independência; a seção de variáveis de ambiente na convenção, no checklist e no agente de backend; o checklist do PDI como modelo; o README sobre perfis e o `--with-deps` no Linux; três entradas no log — filtros na URL, recarga depois de cada ação e o `dotenv` do backend —, propagadas ao frontend; constantes no frontend; o critério de `feat:` para jornada E2E; itens de checklist que só repetiam a convenção; a transcrição literal do critério de JWT. Não aplicados, por decisão: ver §4
 - Verificado num clone limpo, seguindo só o README, com Docker Desktop 29.8.2 e Compose 5.5.1: `docker compose up -d`, `.env` copiados, `npm ci` sem vulnerabilidade nas três frentes, backend 133 de 133, seed, typecheck do E2E e suíte E2E 58 de 58
+
+Subida por um comando, 21/10:
+
+- `package.json` na raiz, só de scripts e sem `workspaces`: `setup` (o `npm ci` da raiz e das três frentes), `db:up`, `db:down`, `seed` e `dev`, que sobe API e frontend pelo `concurrently` 9 — entrada de 21/10 em `docs/decisions.md`. A versão 10 exige Node 22, e o projeto aceita 20.19+
+- README: "Do clone à aplicação no ar", em dez passos, pelos comandos da raiz; "Criar contas", com o `curl`, as regras de cada campo e as respostas de erro; "Problemas comuns"; `JWT_SECRET` gerado pelo Node
+- `docs/postman/`: coleção com todas as rotas; cada login guarda o token, e o Create guarda o `_id` da tarefa
+- Verificado: o `dev` sobe os dois, com o proxy do Vite chegando à API, e encerra sem deixar processo; com a porta 5173 ocupada, o Vite falha e o `--kill-others-on-fail` derruba a API junto. A coleção, pelo Newman, 12 requisições no status do contrato. Num clone limpo da branch, `npm run setup` sem vulnerabilidade, seed e o `curl` do README, com `201` e, repetido, `409 EMAIL_TAKEN`. Tudo contra a base descartável `task-manager-verify` e as portas 3100 e 5174
+- Não verificado: o `Ctrl+C` num terminal interativo — o encerramento foi conferido derrubando o processo do `concurrently`
+- Limite conhecido, achado do `code-reviewer`: o `--kill-others-on-fail` só derruba a API quando o Vite cai. A API roda com `node --watch`, que, quando ela cai — banco fora, `.env` incompleto, porta 3000 ocupada —, fica esperando alteração de arquivo em vez de encerrar, e a interface segue no ar. Tratado na documentação, em "Problemas comuns" do README; trocar o `dev` da raiz por `npm start` faria a API cair junto, mas tiraria o recarregamento do backend
 
 ---
 
@@ -180,7 +190,7 @@ O Passo 5 decidiu atualizar as dependências do backend e registrou três decis�
 
 | # | Pendência | Por que importa |
 |---|---|---|
-| 1 | **PR do Passo 5** — abrir e mergear a `chore/entrega` | A `main` é o que o avaliador lê no GitHub |
+| 1 | **PR da subida por um comando** — abrir a `chore/subida-um-comando`, passar o `code-reviewer` e mergear | A `main` é o que o avaliador lê no GitHub |
 
 O caminho do `docker compose`, pendente até o Passo 4, foi verificado em 07/10: a máquina de desenvolvimento ganhou WSL 2 e Docker Desktop, e um clone limpo subiu e passou em tudo seguindo só o README. O MongoDB do zip, em `%USERPROFILE%\mongodb`, deixa de ser necessário; ele e o compose usam a mesma porta, 27017, e não rodam juntos.
 
@@ -197,19 +207,20 @@ O caminho do `docker compose`, pendente até o Passo 4, foi verificado em 07/10:
 
 ## 5. Primeiros comandos
 
-O caminho completo, do clone à suíte E2E verde, está no README, em "Do clone à suíte verde". O mínimo para o backend:
+O caminho completo está no README, em "Do clone à aplicação no ar" e "Do clone à suíte verde". O mínimo, da raiz:
 
 ```bash
 git clone https://github.com/Igorfrederick/qa-task-manager.git
 cd qa-task-manager
 
-docker compose up -d
-cd backend
-npm ci
-npm test
+npm run db:up
+cp backend/.env.example backend/.env    # gere o JWT_SECRET e escolha as senhas do seed
+npm run setup
+npm run seed
+npm run dev                             # API em :3000 e interface em :5173
 ```
 
-Para subir a API em desenvolvimento: `cp .env.example .env` em `backend/`, gerar um `JWT_SECRET` próprio (`openssl rand -base64 32`), escolher as senhas do seed, rodar `npm run seed` e `npm run dev`. Atualizar dependência do backend pede o npm 11 (`npx npm@11 install`), pelo motivo registrado na entrada de 07/10 sobre `bcrypt` e Vitest.
+Atualizar dependência do backend pede o npm 11 (`npx npm@11 install`), pelo motivo registrado na entrada de 07/10 sobre `bcrypt` e Vitest.
 
 ---
 

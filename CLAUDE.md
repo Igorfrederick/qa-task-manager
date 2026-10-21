@@ -167,6 +167,9 @@ Os checklists são a **forma executável** das convenções: a lista item a item
 ## 6. Estrutura de pastas
 
 ```
+package.json         só scripts, sem workspaces: npm run dev sobe API e frontend juntos
+docker-compose.yml   MongoDB de desenvolvimento e teste
+
 backend/
   src/
     config/          conexão, variáveis de ambiente
@@ -205,6 +208,7 @@ e2e/
 docs/
   decisions.md       log de decisões técnicas
   handoff.md         estado do projeto e ordem de execução
+  postman/           coleção do Postman com as rotas da API
 ```
 
 **Regra de camada no backend:** controller não contém regra de negócio; service não conhece `req`/`res`; model não conhece service. Violação disso é o erro mais visível na avaliação de "arquitetura em camadas".

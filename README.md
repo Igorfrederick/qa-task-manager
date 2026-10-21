@@ -17,10 +17,11 @@ Entregável das etapas 1, 2 e 3 de um PDI de QA — frontend, backend e E2E; as 
 ## Estrutura
 
 ```
+package.json Só scripts: sobe API e frontend com um comando; cada frente mantém as próprias dependências
 backend/     API REST em camadas (routes → controllers → services → models), com testes em tests/
 frontend/    SPA React, uma pasta por tela em src/pages
 e2e/         Suíte Playwright com Page Object Model, um page por tela, testes por jornada
-docs/        Log de decisões técnicas e documento de retomada
+docs/        Log de decisões técnicas, documento de retomada e coleção do Postman da API
 .claude/     Agentes e base de conhecimento — convenções e checklists — usados na construção
 ```
 
@@ -74,26 +75,51 @@ Cada critério da rubrica das etapas 1 a 3, e onde ele aparece no repositório. 
 | Independência entre testes | Cada teste cria a própria massa, com entropia, e se ancora no `_id` dela; com `fullyParallel`, a suíte passa com `--repeat-each=5` e com `--workers=1` |
 | Setup e teardown apropriados | `e2e/fixtures/test.ts` — autenticação por fixture de perfil, com o token da API; massa criada pela API e excluída no teardown, mesmo quando o teste falha |
 
+## Do clone à aplicação no ar
+
+Com Node.js e Docker instalados, todos os comandos rodam na raiz do repositório. O detalhe de cada passo está nas seções seguintes.
+
+1. **Conferir os pré-requisitos** — `node -v` responde 20.19+, 22.13+ ou 24+, e `docker -v` responde. Sem Docker, veja [Banco de dados](#banco-de-dados).
+
+2. **Clonar**
+
+   ```bash
+   git clone https://github.com/Igorfrederick/qa-task-manager.git
+   cd qa-task-manager
+   ```
+
+3. **Subir o banco** — `npm run db:up`, que roda `docker compose up -d`.
+
+4. **Configurar**
+
+   ```bash
+   cp backend/.env.example backend/.env
+   cp e2e/.env.example e2e/.env
+   ```
+
+   No `backend/.env`, troque `JWT_SECRET` por um segredo gerado — `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` — e escolha `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD`, com ao menos 8 caracteres. No `e2e/.env`, repita as duas senhas em `E2E_LEAD_PASSWORD` e `E2E_QA_PASSWORD`.
+
+5. **Instalar** — `npm run setup` roda o `npm ci` da raiz e das três frentes, cada uma com o próprio lockfile.
+
+6. **Popular a base** — `npm run seed` apaga usuários e tarefas e recria o conjunto fictício: um `lead`, dois `qa` e as tarefas dos três. Mudou uma senha do seed no `backend/.env`? Rode de novo, ou as contas seguem com a senha antiga.
+
+7. **Subir a aplicação** — `npm run dev` sobe a API em `http://localhost:3000` e a interface em `http://localhost:5173`, no mesmo terminal, com o log de cada uma prefixado por `[api]` e `[web]`.
+
+8. **Entrar** — em `http://localhost:5173`, com uma das [contas do seed](#seed).
+
+9. **Criar contas** — pela API, com o token do `lead`: [Criar contas](#criar-contas).
+
+10. **Encerrar** — `Ctrl+C` encerra a API e a interface juntas; `npm run db:down` para o banco, preservando os dados.
+
+Cada frente também sobe sozinha, de dentro da própria pasta — o `package.json` da raiz só reúne os comandos, e as seções [Backend](#backend) e [Frontend](#frontend) mostram o caminho por frente.
+
 ## Do clone à suíte verde
 
-Com Node.js e Docker instalados — o detalhe de cada passo está nas seções seguintes:
+Depois dos passos 1 a 6 acima:
 
 ```bash
-git clone https://github.com/Igorfrederick/qa-task-manager.git
-cd qa-task-manager
-docker compose up -d
-
-cp backend/.env.example backend/.env    # gere o JWT_SECRET e escolha as duas senhas do seed
-cp e2e/.env.example e2e/.env            # repita as mesmas senhas do seed
-
-cd backend
-npm ci
-npm test                                # testes de service e API
-npm run seed                            # um lead, dois qa e tarefas dos três
-cd ../frontend
-npm ci
-cd ../e2e
-npm ci
+npm test --prefix backend               # testes de service e API, sem navegador
+cd e2e
 npx playwright install chromium         # no Linux: npx playwright install --with-deps chromium
 npm test                                # sobe API e frontend, e roda a suíte no desktop e no celular
 ```
@@ -108,8 +134,8 @@ npm test                                # sobe API e frontend, e roda a suíte n
 A aplicação e a suíte de teste do backend exercitam um MongoDB real. O caminho principal é o `docker-compose.yml` da raiz:
 
 ```bash
-docker compose up -d      # sobe o banco em 127.0.0.1:27017
-docker compose down       # encerra, preservando os dados
+npm run db:up      # docker compose up -d: sobe o banco em 127.0.0.1:27017
+npm run db:down    # docker compose down: encerra, preservando os dados
 ```
 
 **Alternativa sem Docker:** instale o MongoDB localmente e ajuste `MONGODB_URI` no `backend/.env` para apontar para a sua instância.
@@ -126,10 +152,10 @@ cp frontend/.env.example frontend/.env
 cp e2e/.env.example e2e/.env
 ```
 
-Nenhum valor real de segredo é versionado. `JWT_SECRET` deve ser gerado localmente:
+Nenhum valor real de segredo é versionado. `JWT_SECRET` deve ser gerado localmente — pelo Node, que funciona em qualquer sistema, ou pelo `openssl rand -base64 32`, onde houver `openssl`:
 
 ```bash
-openssl rand -base64 32
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
 As senhas do seed, `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD`, têm ao menos 8 caracteres e se repetem no `e2e/.env`, em `E2E_LEAD_PASSWORD` e `E2E_QA_PASSWORD`.
@@ -144,6 +170,8 @@ npm run seed    # recria a base com dado fictício: um lead, dois qa e tarefas d
 npm run dev     # sobe a API em http://localhost:3000
 ```
 
+Da raiz, `npm test --prefix backend` e `npm run seed` fazem o mesmo que os dois primeiros, e `npm run dev` sobe a API junto com a interface.
+
 ### Seed
 
 `npm run seed` apaga usuários e tarefas e recria um conjunto fictício, sempre o mesmo — por isso recusa rodar com `NODE_ENV=production`. As senhas vêm de `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD` no `backend/.env`; as de `e2e/.env` têm de ser as mesmas.
@@ -155,6 +183,33 @@ npm run dev     # sobe a API em http://localhost:3000
 | `qa` | `qa2@exemplo.test` | `SEED_QA_PASSWORD` |
 
 Não há cadastro público: o seed é a origem do primeiro `lead`, e as demais contas o líder cria por `POST /api/auth/register`.
+
+### Criar contas
+
+Não há tela de cadastro, por escopo: a conta nova entra pela API, com o token de um `lead`. Com a API no ar, entre como `lead` e cadastre:
+
+```bash
+TOKEN=$(curl -s http://localhost:3000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"lead@exemplo.test","password":"SENHA_DO_LEAD"}' \
+  | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).token")
+
+curl -s http://localhost:3000/api/auth/register \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"name":"Nova Pessoa","email":"nova.pessoa@exemplo.test","password":"senha-de-teste","role":"qa"}'
+```
+
+`SENHA_DO_LEAD` é o `SEED_LEAD_PASSWORD` do `backend/.env`. No Windows, rode no Git Bash: no PowerShell, `curl` é outro comando, e as aspas do JSON não chegam inteiras ao `curl.exe`. Ou use a [coleção do Postman](docs/postman/task-manager.postman_collection.json), que faz os dois passos e guarda o token sozinha.
+
+| Campo | Regra |
+|---|---|
+| `name` | De 2 a 120 caracteres |
+| `email` | Formato de e-mail, único entre os usuários |
+| `password` | De 8 caracteres a 72 bytes — o limite do bcrypt; letra acentuada conta dois |
+| `role` | `qa` ou `lead`; omitido, a conta nasce `qa` |
+
+A resposta é `201` com o usuário, sem a senha. Fora disso: `400 VALIDATION_ERROR`, com o campo em `details`; `401` sem token, ou com ele vencido — e `401 TOKEN_INVALID` quando o login falhou e o `TOKEN` ficou `undefined`: confira a senha do lead; `403 FORBIDDEN` com o token de um `qa`; `409 EMAIL_TAKEN` com um e-mail que já tem conta.
 
 ## Frontend
 
@@ -192,6 +247,18 @@ A suíte não roda o seed — ele apaga a base. Antes do primeiro teste, ela con
 | `factories/` | Massa com faker |
 | `support/` | Variáveis de ambiente, conferência inicial e rótulos que a lista mostra |
 
+## Problemas comuns
+
+| Sintoma | Causa | O que fazer |
+|---|---|---|
+| Conexão recusada na porta 3000 (`ECONNREFUSED`) | API fora do ar | `npm run dev` na raiz |
+| No `npm run dev`, o log `[api]` mostra um erro e `Waiting for file changes`, e a interface segue no ar sem conseguir entrar | A API caiu — banco fora, `.env` incompleto — e o `node --watch` fica esperando uma alteração de arquivo em vez de encerrar, por isso a interface não cai junto | Corrigir a causa que o log `[api]` aponta, `Ctrl+C` e `npm run dev` de novo |
+| No `npm run dev`, o log `[api]` mostra `EADDRINUSE` | Outra API já ocupa a porta 3000 — e a interface passa a falar com ela, sem aviso | Encerrar o processo da porta, como no caso da 5173, e `npm run dev` de novo |
+| `npm test` do backend aborta apontando o banco | MongoDB fora do ar | `npm run db:up` |
+| `INVALID_CREDENTIALS` com uma conta do seed | Senha do seed alterada no `backend/.env` depois do último seed: o banco guarda o hash da senha antiga | `npm run seed` de novo — ele apaga e recria a base |
+| A suíte E2E para antes do primeiro teste, pedindo o seed | Senhas do `e2e/.env` diferentes das do `backend/.env`, ou seed não rodado | Igualar as senhas e rodar `npm run seed` |
+| `Port 5173 is already in use`, e o `npm run dev` encerra a API junto | Outro Vite no ar | Encerrar o processo da porta — `netstat -ano \| findstr :5173` no Windows, `lsof -i :5173` no Linux e no Mac |
+
 ## Documentação
 
 | Documento | Conteúdo |
@@ -200,3 +267,4 @@ A suíte não roda o seed — ele apaga a base. Antes do primeiro teste, ela con
 | [Contrato da API](.claude/knowledge/conventions/api_contract.md) | Rotas, corpos, formato de erro, status HTTP |
 | [docs/decisions.md](docs/decisions.md) | Log de decisões técnicas, com motivo e alternativa descartada |
 | [docs/handoff.md](docs/handoff.md) | Estado do projeto e ordem de execução |
+| [docs/postman/](docs/postman/task-manager.postman_collection.json) | Coleção do Postman com todas as rotas: importe, preencha as senhas do seed e rode o login |
