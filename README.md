@@ -209,7 +209,7 @@ curl -s http://localhost:3000/api/auth/register \
 | `password` | De 8 caracteres a 72 bytes — o limite do bcrypt; letra acentuada conta dois |
 | `role` | `qa` ou `lead`; omitido, a conta nasce `qa` |
 
-A resposta é `201` com o usuário, sem a senha. Fora disso: `400 VALIDATION_ERROR`, com o campo em `details`; `401` sem token, ou com ele vencido; `403 FORBIDDEN` com o token de um `qa`; `409 EMAIL_TAKEN` com um e-mail que já tem conta.
+A resposta é `201` com o usuário, sem a senha. Fora disso: `400 VALIDATION_ERROR`, com o campo em `details`; `401` sem token, ou com ele vencido — e `401 TOKEN_INVALID` quando o login falhou e o `TOKEN` ficou `undefined`: confira a senha do lead; `403 FORBIDDEN` com o token de um `qa`; `409 EMAIL_TAKEN` com um e-mail que já tem conta.
 
 ## Frontend
 
@@ -252,6 +252,8 @@ A suíte não roda o seed — ele apaga a base. Antes do primeiro teste, ela con
 | Sintoma | Causa | O que fazer |
 |---|---|---|
 | Conexão recusada na porta 3000 (`ECONNREFUSED`) | API fora do ar | `npm run dev` na raiz |
+| No `npm run dev`, o log `[api]` mostra um erro e `Waiting for file changes`, e a interface segue no ar sem conseguir entrar | A API caiu — banco fora, `.env` incompleto — e o `node --watch` fica esperando uma alteração de arquivo em vez de encerrar, por isso a interface não cai junto | Corrigir a causa que o log `[api]` aponta, `Ctrl+C` e `npm run dev` de novo |
+| No `npm run dev`, o log `[api]` mostra `EADDRINUSE` | Outra API já ocupa a porta 3000 — e a interface passa a falar com ela, sem aviso | Encerrar o processo da porta, como no caso da 5173, e `npm run dev` de novo |
 | `npm test` do backend aborta apontando o banco | MongoDB fora do ar | `npm run db:up` |
 | `INVALID_CREDENTIALS` com uma conta do seed | Senha do seed alterada no `backend/.env` depois do último seed: o banco guarda o hash da senha antiga | `npm run seed` de novo — ele apaga e recria a base |
 | A suíte E2E para antes do primeiro teste, pedindo o seed | Senhas do `e2e/.env` diferentes das do `backend/.env`, ou seed não rodado | Igualar as senhas e rodar `npm run seed` |

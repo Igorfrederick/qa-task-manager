@@ -103,6 +103,7 @@ Subida por um comando, 21/10:
 - `docs/postman/`: coleção com todas as rotas; cada login guarda o token, e o Create guarda o `_id` da tarefa
 - Verificado: o `dev` sobe os dois, com o proxy do Vite chegando à API, e encerra sem deixar processo; com a porta 5173 ocupada, o Vite falha e o `--kill-others-on-fail` derruba a API junto. A coleção, pelo Newman, 12 requisições no status do contrato. Num clone limpo da branch, `npm run setup` sem vulnerabilidade, seed e o `curl` do README, com `201` e, repetido, `409 EMAIL_TAKEN`. Tudo contra a base descartável `task-manager-verify` e as portas 3100 e 5174
 - Não verificado: o `Ctrl+C` num terminal interativo — o encerramento foi conferido derrubando o processo do `concurrently`
+- Limite conhecido, achado do `code-reviewer`: o `--kill-others-on-fail` só derruba a API quando o Vite cai. A API roda com `node --watch`, que, quando ela cai — banco fora, `.env` incompleto, porta 3000 ocupada —, fica esperando alteração de arquivo em vez de encerrar, e a interface segue no ar. Tratado na documentação, em "Problemas comuns" do README; trocar o `dev` da raiz por `npm start` faria a API cair junto, mas tiraria o recarregamento do backend
 
 ---
 
