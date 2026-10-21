@@ -21,7 +21,7 @@ package.json Só scripts: sobe API e frontend com um comando; cada frente manté
 backend/     API REST em camadas (routes → controllers → services → models), com testes em tests/
 frontend/    SPA React, uma pasta por tela em src/pages
 e2e/         Suíte Playwright com Page Object Model, um page por tela, testes por jornada
-docs/        Log de decisões técnicas e documento de retomada
+docs/        Log de decisões técnicas, documento de retomada e coleção do Postman da API
 .claude/     Agentes e base de conhecimento — convenções e checklists — usados na construção
 ```
 

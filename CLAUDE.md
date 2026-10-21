@@ -208,6 +208,7 @@ e2e/
 docs/
   decisions.md       log de decisões técnicas
   handoff.md         estado do projeto e ordem de execução
+  postman/           coleção do Postman com as rotas da API
 ```
 
 **Regra de camada no backend:** controller não contém regra de negócio; service não conhece `req`/`res`; model não conhece service. Violação disso é o erro mais visível na avaliação de "arquitetura em camadas".
