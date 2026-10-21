@@ -167,6 +167,9 @@ Os checklists são a **forma executável** das convenções: a lista item a item
 ## 6. Estrutura de pastas
 
 ```
+package.json         só scripts, sem workspaces: npm run dev sobe API e frontend juntos
+docker-compose.yml   MongoDB de desenvolvimento e teste
+
 backend/
   src/
     config/          conexão, variáveis de ambiente

@@ -17,6 +17,7 @@ Entregável das etapas 1, 2 e 3 de um PDI de QA — frontend, backend e E2E; as 
 ## Estrutura
 
 ```
+package.json Só scripts: sobe API e frontend com um comando; cada frente mantém as próprias dependências
 backend/     API REST em camadas (routes → controllers → services → models), com testes em tests/
 frontend/    SPA React, uma pasta por tela em src/pages
 e2e/         Suíte Playwright com Page Object Model, um page por tela, testes por jornada
