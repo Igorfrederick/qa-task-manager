@@ -3,7 +3,7 @@
   "private": true,
   "description": "Atalhos para subir o Task Manager pela raiz — cada frente segue com as próprias dependências",
   "scripts": {
-    "setup": "npm ci --prefix backend && npm ci --prefix frontend && npm ci --prefix e2e",
+    "setup": "npm ci && npm ci --prefix backend && npm ci --prefix frontend && npm ci --prefix e2e",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "seed": "npm run seed --prefix backend",
