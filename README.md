@@ -17,12 +17,13 @@ Entregável das etapas 1, 2 e 3 de um PDI de QA — frontend, backend e E2E; as 
 ## Estrutura
 
 ```
-package.json Só scripts: sobe API e frontend com um comando; cada frente mantém as próprias dependências
-backend/     API REST em camadas (routes → controllers → services → models), com testes em tests/
-frontend/    SPA React, uma pasta por tela em src/pages
-e2e/         Suíte Playwright com Page Object Model, um page por tela, testes por jornada
-docs/        Log de decisões técnicas, documento de retomada e coleção do Postman da API
-.claude/     Agentes e base de conhecimento — convenções e checklists — usados na construção
+package.json        Só scripts: sobe API e frontend com um comando; cada frente mantém as próprias dependências
+docker-compose.yml  MongoDB de desenvolvimento e teste
+backend/            API REST em camadas (routes → controllers → services → models), com testes em tests/
+frontend/           SPA React, uma pasta por tela em src/pages
+e2e/                Suíte Playwright com Page Object Model, um page por tela, testes por jornada
+docs/               Log de decisões técnicas, documento de retomada e coleção do Postman da API
+.claude/            Agentes e base de conhecimento — convenções e checklists — usados na construção
 ```
 
 ## O que a aplicação faz
@@ -165,12 +166,14 @@ As senhas do seed, `SEED_LEAD_PASSWORD` e `SEED_QA_PASSWORD`, têm ao menos 8 ca
 ```bash
 cd backend
 npm ci
-npm test        # suíte de service e API, sem navegador; exige o banco em pé
+npm test        # suíte de service e API, sem navegador; exige o banco em pé, em base própria
 npm run seed    # recria a base com dado fictício: um lead, dois qa e tarefas dos três
 npm run dev     # sobe a API em http://localhost:3000
 ```
 
 Da raiz, `npm test --prefix backend` e `npm run seed` fazem o mesmo que os dois primeiros, e `npm run dev` sobe a API junto com a interface.
+
+A suíte do backend roda na base `task-manager-test`, e não na do `backend/.env`: rodar os testes não apaga nem altera o que o seed criou. A base de teste só muda quando `MONGODB_URI` está definida no próprio terminal — `tests/setup.js` a fixa antes de ler o `.env`.
 
 ### Seed
 
