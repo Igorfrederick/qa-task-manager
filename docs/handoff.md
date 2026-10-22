@@ -4,7 +4,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 
 **Como usar:** abra o Claude Code na raiz do repositório e comece com algo assim:
 
-> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Confira se o PR da branch `chore/subida-um-comando` foi mergeado, e veja o que resta em §4 Pendências.
+> Leia `CLAUDE.md`, `docs/handoff.md` e `docs/decisions.md`. Veja o que resta em §4 Pendências.
 
 ---
 
@@ -17,7 +17,7 @@ Documento de retomada para começar o trabalho neste repositório numa sessão n
 | 3 | Frontend — três telas | Concluído em 07/10/2026 — 3.1 (PR #4) e 3.2 (PR #5) mergeadas |
 | 4 | E2E | Concluído em 07/10/2026 — 4.1 (PR #6) e 4.2 (PR #7) mergeadas |
 | 5 | Entrega — README final, `revisor-pdi`, limpeza | Concluído em 07/10/2026 — PR #8 mergeado: passada única do `revisor-pdi` sem CRITICAL nem HIGH, com os achados tratados ou registrados, e o projeto verificado num clone limpo seguindo só o README |
-| **—** | **Subida por um comando — `package.json` na raiz, README com passo a passo, criação de conta e problemas comuns, coleção do Postman** | **Concluído em 21/10/2026** na branch `chore/subida-um-comando`; aguarda PR, `code-reviewer` e merge |
+| — | Subida por um comando — `package.json` na raiz, README com passo a passo, criação de conta e problemas comuns, coleção do Postman | Concluído em 21/10/2026 — PR #9 mergeado, com uma passada do `code-reviewer` sem CRITICAL nem HIGH; nova leitura do `revisor-pdi` em 22/10, abaixo |
 
 **Prazo: 09/10/2026** — 12/10 é feriado. Avaliador: Murilo Morato, tech lead.
 
@@ -105,6 +105,12 @@ Subida por um comando, 21/10:
 - Não verificado: o `Ctrl+C` num terminal interativo — o encerramento foi conferido derrubando o processo do `concurrently`
 - Limite conhecido, achado do `code-reviewer`: o `--kill-others-on-fail` só derruba a API quando o Vite cai. A API roda com `node --watch`, que, quando ela cai — banco fora, `.env` incompleto, porta 3000 ocupada —, fica esperando alteração de arquivo em vez de encerrar, e a interface segue no ar. Tratado na documentação, em "Problemas comuns" do README; trocar o `dev` da raiz por `npm start` faria a API cair junto, mas tiraria o recarregamento do backend
 
+Nova leitura do `revisor-pdi`, 22/10, na `main` depois do PR #9:
+
+- O projeto atende a todos os critérios da rubrica das etapas 1 a 3; nenhum CRITICAL nem HIGH. Backend 133 de 133, typecheck do E2E e build do frontend; a suíte E2E não foi reexecutada
+- 1 MEDIUM e 5 LOW, todos de documentação e histórico, tratados na branch `docs/ajustes-revisor`: este handoff, que ainda dava o PR #9 como aberto; a coleção do Postman, que falhava na segunda execução pelo e-mail fixo do cadastro; o README, sobre a base da suíte do backend e o `docker-compose.yml` na estrutura; e um exemplo de seletor, `error-toast`, que não existe no frontend. O corte cedo do `b2b7334`, corrigido pelo `0ca99bf`, fica no histórico, que já foi empurrado
+- Os itens "não aplicados, por decisão de 07/10", em §4, seguem válidos e não foram reabertos
+
 ---
 
 ## 2. Plano por fatias
@@ -190,7 +196,7 @@ O Passo 5 decidiu atualizar as dependências do backend e registrou três decis�
 
 | # | Pendência | Por que importa |
 |---|---|---|
-| 1 | **PR da subida por um comando** — abrir a `chore/subida-um-comando`, passar o `code-reviewer` e mergear | A `main` é o que o avaliador lê no GitHub |
+| — | Nenhuma em aberto | — |
 
 O caminho do `docker compose`, pendente até o Passo 4, foi verificado em 07/10: a máquina de desenvolvimento ganhou WSL 2 e Docker Desktop, e um clone limpo subiu e passou em tudo seguindo só o README. O MongoDB do zip, em `%USERPROFILE%\mongodb`, deixa de ser necessário; ele e o compose usam a mesma porta, 27017, e não rodam juntos.
 
