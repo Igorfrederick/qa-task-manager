@@ -184,7 +184,7 @@ O Passo 5 decidiu atualizar as dependências do backend e registrou três decis�
 | Sex 09/10 | Passo 5 — entrega |
 | 10 – 12/10 | Folga |
 
-**Real:** o Passo 2 fechou em 07/10, dois dias depois do previsto, e os Passos 3, 4 e 5 fecharam no mesmo dia — a entrega fica pronta dois dias antes do prazo, faltando só o merge do Passo 5.
+**Real:** o Passo 2 fechou em 07/10, dois dias depois do previsto, e os Passos 3, 4 e 5 fecharam no mesmo dia — a entrega fica pronta dois dias antes do prazo.
 
 **Se atrasar, corte nesta ordem:** filtros da lista; coluna de dono na lista do líder (a API mantém o campo); rodadas extras de revisão.
 
