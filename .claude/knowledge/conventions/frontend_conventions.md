@@ -78,7 +78,7 @@ task-list-delete-button-{taskId}
 task-filter-status-select
 task-form-title-input
 task-form-save-button
-error-toast
+task-list-error-message
 ```
 
 O identificador dinâmico usa o `_id` da tarefa, não índice de posição — índice muda quando a ordenação ou o filtro mudam.
