@@ -178,7 +178,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Nova Pessoa\",\n  \"email\": \"nova.pessoa.{{$timestamp}}@exemplo.test\",\n  \"password\": \"troque-esta-senha\",\n  \"role\": \"qa\"\n}"
+              "raw": "{\n  \"name\": \"Nova Pessoa\",\n  \"email\": \"nova.pessoa.{{$randomUUID}}@exemplo.test\",\n  \"password\": \"troque-esta-senha\",\n  \"role\": \"qa\"\n}"
             },
             "url": "{{baseUrl}}/auth/register"
           }
