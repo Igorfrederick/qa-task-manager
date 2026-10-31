@@ -7,8 +7,8 @@ const DESCRIPTION_MAX_LENGTH = 2000
 
 /**
  * Formulário de tarefa, com os mesmos limites e mensagens do schema de
- * criação da API. O status não está aqui: concluir e reabrir são ações da
- * lista.
+ * criação da API, o `createTaskSchema` de backend/src/validators/task.js. O
+ * status não está aqui: concluir e reabrir são ações da lista.
  */
 export const taskSchema = z.object({
   title: z
