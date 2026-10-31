@@ -40,8 +40,9 @@ for (const role of ['qa', 'lead'] as const) {
   })
 }
 
-// Token expirado fica na API, em backend/tests/: forjá-lo pediria o
-// JWT_SECRET na suíte, e a tela trata todo 401 do mesmo jeito.
+// Token expirado fica na API, em backend/tests/api/auth.me.test.js: forjá-lo
+// pediria o JWT_SECRET na suíte, e a tela não olha o `code` do 401 — o
+// expirado faria aqui o mesmo caminho do adulterado. Decisão de 30/10/2026.
 test.describe('token recusado pela API ao abrir a aplicação', () => {
   const refusedTokens = [
     { case: 'malformado', build: () => 'nao-e-um-jwt' },
@@ -58,6 +59,8 @@ test.describe('token recusado pela API ao abrir a aplicação', () => {
       taskListPage,
       sessions,
     }) => {
+      // O /login põe a página na origem da aplicação, ainda sem sessão, para
+      // gravar o token no localStorage dela.
       await loginPage.goto()
       await writeStoredToken(page, build(sessions))
       const meResponse = page.waitForResponse((response) => isMeCall(response.url()))

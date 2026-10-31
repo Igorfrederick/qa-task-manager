@@ -3,8 +3,11 @@ import type { Locator, Page } from '@playwright/test'
 import type { TaskPriority, TaskStatus } from '../services/TaskService'
 
 /**
- * Tela /tasks, com o cabeçalho da sessão — nome do usuário e saída — que
- * aparece sobre ela. Locators por data-cy e ações de baixo nível; sem asserção.
+ * Tela /tasks. Locators por data-cy e ações de baixo nível; sem asserção.
+ *
+ * Inclui o cabeçalho da sessão — nome do usuário e saída. Ele é do layout
+ * comum às telas autenticadas, e não uma tela própria: fica neste Page Object
+ * porque é a partir da lista que os testes o usam.
  *
  * Cada tarefa se localiza pelo `_id`: as contas do seed são compartilhadas
  * entre testes em paralelo, e a lista mostra também as tarefas dos outros.
