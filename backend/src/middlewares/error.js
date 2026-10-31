@@ -25,7 +25,6 @@ export function notFoundHandler(_req, _res, next) {
 
 // A assinatura de quatro parâmetros é o que faz o Express reconhecer isto como
 // handler de erro; `next` fica sem uso e não pode ser removido.
-// eslint-disable-next-line no-unused-vars
 export function errorHandler(error, _req, res, _next) {
   // Lançado deliberadamente por uma camada nossa, com status e mensagem do
   // catálogo. `instanceof`, e não "tem `status` e `code`": erro do driver do

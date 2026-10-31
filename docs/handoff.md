@@ -203,11 +203,12 @@ O caminho do `docker compose`, pendente até o Passo 4, foi verificado em 07/10:
 **Não aplicado, por decisão de 07/10** — registrado para quem retomar depois da entrega:
 
 - Com a API fora, a restauração da sessão falha em silêncio e o `/login` não diz por quê; pelo proxy, a API fora responde `502` sem corpo, que aparece como `UNEXPECTED_RESPONSE` em vez de `NETWORK_ERROR` — revisão da 3.1 e achado L5 do `revisor-pdi`
-- Comentário `eslint-disable` em `backend/src/middlewares/error.js`, para um linter que o projeto não roda — achado L6 do `revisor-pdi`
 - Teste E2E de token adulterado no `storageState` levando ao `/login` — hoje verificado só à mão, na 3.1
 - `TaskListItem` com módulo CSS próprio — revisão da 3.2
 - Conferir no `globalSetup` que o `API_PROXY_TARGET` do frontend aponta para a mesma API de `API_URL` — revisão da 4.1
 - Outra aba que entra como outro usuário: a aba já aberta segue com o usuário antigo até recarregar — fora do v1
+
+Aplicado depois da entrega, em 30/10: o comentário `eslint-disable` em `backend/src/middlewares/error.js`, para um linter que o projeto não roda, sai do código — achado L6 do `revisor-pdi`.
 
 ---
 
