@@ -1,3 +1,4 @@
+import { buildTask } from '../../factories/taskFactory'
 import { expect, test } from '../../fixtures/test'
 import type { Role, Session } from '../../services/AuthService'
 import { readStoredToken, writeStoredToken } from '../../support/storedToken'
@@ -71,4 +72,29 @@ test.describe('token recusado pela API ao abrir a aplicação', () => {
       expect(await readStoredToken(page)).toBeNull()
     })
   }
+})
+
+test.describe('token recusado pela API no meio do uso', () => {
+  test.use({ role: 'qa' })
+
+  test('concluir com o token adulterado: volta ao /login, e a tarefa segue aberta', async ({
+    page,
+    loginPage,
+    taskListPage,
+    taskApi,
+    sessions,
+  }) => {
+    const task = await taskApi.qa.create(buildTask({ status: 'open' }))
+    await taskListPage.goto()
+    // A lista carregou com o token válido: só a ação usa o adulterado.
+    await expect(taskListPage.taskRow(task._id)).toBeVisible()
+    await writeStoredToken(page, withForeignSubject(sessions.qa.token, sessions.lead.user._id))
+
+    await taskListPage.completeTask(task._id)
+
+    await expect(page).toHaveURL('/login')
+    await expect(loginPage.emailInput).toBeEditable()
+    expect(await readStoredToken(page)).toBeNull()
+    expect((await taskApi.qa.get(task._id)).status).toBe('open')
+  })
 })
