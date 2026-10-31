@@ -50,7 +50,7 @@ Cada linha diz **o que** garantir e **onde** está a regra por extenso. Leia a f
 - **Cada jornada roda em `desktop` e `mobile`**; a suíte sobe a aplicação, mas nunca roda o seed. → `e2e_conventions.md` §Setup e teardown
 - **Exclusão pela tela passa pelo diálogo nativo:** a ação do Page Object aceita o diálogo antes do clique. → `e2e_conventions.md` §O que fica no Page Object
 - **Jornadas principais e regras cobertas na interface** — criar, editar, concluir, excluir, filtrar, escopo por dono e validação do formulário. A prova de cada regra na API é do `backend/tests/`; a da interface é sua. → `checklist_e2e.md` §Cobertura das regras de negócio
-- **Login e autenticação cobertos na interface:** login válido, login inválido e rota protegida sem sessão. `401` e `403` de API ficam em `backend/tests/`. → `checklist_e2e.md` §Cobertura das regras de negócio › Além das regras
+- **Login e autenticação cobertos na interface:** login válido, login inválido, rota protegida sem sessão e token recusado — malformado ou adulterado — de volta ao `/login`. `401` e `403` de API ficam em `backend/tests/`, e o token expirado também, porque forjá-lo pediria o `JWT_SECRET` na suíte (`docs/decisions.md`, 30/10/2026). → `checklist_e2e.md` §Cobertura das regras de negócio › Além das regras
 - **Nenhum dado real, segredo ou credencial no código.** Senha só com hash, segredo só por variável de ambiente, e **nenhum dado real da Nextar** — sem nome de cliente, sem chave real de tarefa do Jira, sem conteúdo de bug real. Seed, massa e exemplo usam dado fictício. → `CLAUDE.md` §4 › Segurança — não negociável
 - Nada da lista de não-escopo do v1 sem sinalizar antes. → `CLAUDE.md` §2
 - Nenhuma biblioteca nova sem justificar e registrar em `docs/decisions.md`.

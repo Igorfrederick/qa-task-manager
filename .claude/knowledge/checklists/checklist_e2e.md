@@ -82,6 +82,7 @@ Autenticação e autorização são critério próprio da rubrica e ficam fora d
 - [ ] Login com credenciais válidas leva a `/tasks` (E2E)
 - [ ] Login com credencial inválida permanece em `/login` com o erro exibido (E2E); na API, e-mail inexistente e senha errada respondem igual (`backend/tests/`)
 - [ ] Rota protegida sem sessão redireciona para `/login` (E2E)
+- [ ] Token recusado pela API, ao abrir a aplicação ou numa ação, leva ao `/login` e sai do navegador, sem aplicar a ação (E2E); o expirado responde `TOKEN_EXPIRED` (`backend/tests/`)
 - [ ] Token ausente ou inválido responde `401`, distinto do `403` (`backend/tests/`)
 - [ ] `qa` tentando criar conta responde `403` (`backend/tests/`)
 - [ ] Erro da API asseverado pelo `code`, nunca pela mensagem em português; erro de validação do formulário, sem `code`, pelo texto do campo
