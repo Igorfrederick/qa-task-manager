@@ -67,7 +67,7 @@ Cada critério da rubrica das etapas 1 a 3, e onde ele aparece no repositório. 
 
 | Critério | Onde ver |
 |---|---|
-| Suíte cobrindo login e autenticação | `e2e/tests/auth/` — login válido nos dois perfis, credencial inválida conferida pelo `code`, validação do formulário, sessão restaurada, sair e rotas protegidas; o `401` e o `403` por perfil, na API, em `backend/tests/api/` |
+| Suíte cobrindo login e autenticação | `e2e/tests/auth/` — login válido nos dois perfis, credencial inválida conferida pelo `code`, validação do formulário, sessão restaurada, sair, token malformado ou adulterado de volta ao `/login` — ao abrir a aplicação e no meio de uma ação, que não é aplicada — e rotas protegidas; o `401` e o `403` por perfil, na API, em `backend/tests/api/` |
 | Suíte cobrindo funcionalidades principais | `e2e/tests/tasks/` — criar, validar, editar, concluir, reabrir, excluir e filtrar, com a sessão do `qa`; escopo por dono nos dois perfis: o `qa` não vê nem abre a tarefa do `lead`, e o `lead` vê a do `qa`, com o dono, e a conclui |
 | Testes isolados de backend | `backend/tests/` — services e API, com Vitest e supertest, sem navegador, contra um MongoDB real |
 | Organização por feature ou jornada | `e2e/tests/auth/` e `e2e/tests/tasks/`, um arquivo por jornada; um Page Object por tela em `e2e/pages/` |

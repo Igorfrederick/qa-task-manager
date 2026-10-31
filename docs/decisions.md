@@ -8,6 +8,18 @@ Formato de cada entrada: decisão, motivo, alternativa descartada.
 
 ---
 
+## [30/10/2026] Token recusado no E2E: malformado e adulterado; o expirado fica na API
+
+**Decisão:** a suíte E2E prova que um token recusado pela API leva ao `/login` e sai do navegador, em dois casos de `TOKEN_INVALID`: um token malformado, e o token do `qa` com o `sub` do `lead` e a assinatura original. O caso adulterado roda também no meio do uso, numa ação da lista, que não é aplicada. O token expirado não entra no E2E: o `TOKEN_EXPIRED` é provado na API, em `backend/tests/api/auth.me.test.js`.
+
+**Motivo:** forjar um token vencido pede o `JWT_SECRET`, e o segredo do backend não deve chegar ao `e2e/.env` — a suíte autentica pela API, como qualquer cliente. A tela trata todo `401` do mesmo jeito, pelo handler do `services/api.js`, sem olhar o `code`: o expirado percorreria na interface o mesmo caminho do adulterado. O adulterado, com o `sub` de outra pessoa, é a tentativa que importa barrar, e só exige o token que a fixture já tem.
+
+**Alternativa descartada:** `JWT_SECRET` no `e2e/.env`, para assinar um token vencido — segredo do backend espalhado para um teste que não prova nada além do adulterado. `JWT_EXPIRES_IN` curto na API do E2E, esperando o token vencer — teste lento e dependente de relógio, e a API do E2E é a mesma do desenvolvimento quando já está no ar.
+
+**Decidido por:** Igor Frederick, em 30/10/2026.
+
+---
+
 ## [21/10/2026] `package.json` na raiz, com `concurrently`, sobe API e frontend juntos
 
 **Decisão:** um `package.json` na raiz, só de scripts — `setup`, `db:up`, `db:down`, `seed` e `dev`. O `dev` roda o `npm run dev` do backend e o do frontend em paralelo pelo `concurrently` 9, com o log de cada um prefixado e `--kill-others-on-fail`. A raiz não declara `workspaces`. O seed e o banco ficam fora do `dev`.

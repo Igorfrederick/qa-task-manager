@@ -7,9 +7,7 @@ import { ApiCallError } from '../services/ApiCallError'
 import { AuthService, type Role, type Session } from '../services/AuthService'
 import { TaskService } from '../services/TaskService'
 import { env } from '../support/env'
-
-// Mesma chave de frontend/src/utils/tokenStorage.js.
-const TOKEN_STORAGE_KEY = 'task-manager.token'
+import { TOKEN_STORAGE_KEY } from '../support/storedToken'
 
 type Sessions = Record<Role, Session>
 

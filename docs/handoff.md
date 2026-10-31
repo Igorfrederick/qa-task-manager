@@ -203,12 +203,14 @@ O caminho do `docker compose`, pendente até o Passo 4, foi verificado em 07/10:
 **Não aplicado, por decisão de 07/10** — registrado para quem retomar depois da entrega:
 
 - Com a API fora, a restauração da sessão falha em silêncio e o `/login` não diz por quê; pelo proxy, a API fora responde `502` sem corpo, que aparece como `UNEXPECTED_RESPONSE` em vez de `NETWORK_ERROR` — revisão da 3.1 e achado L5 do `revisor-pdi`
-- Teste E2E de token adulterado no `storageState` levando ao `/login` — hoje verificado só à mão, na 3.1
 - `TaskListItem` com módulo CSS próprio — revisão da 3.2
 - Conferir no `globalSetup` que o `API_PROXY_TARGET` do frontend aponta para a mesma API de `API_URL` — revisão da 4.1
 - Outra aba que entra como outro usuário: a aba já aberta segue com o usuário antigo até recarregar — fora do v1
 
-Aplicado depois da entrega, em 30/10: o comentário `eslint-disable` em `backend/src/middlewares/error.js`, para um linter que o projeto não roda, sai do código — achado L6 do `revisor-pdi`.
+Aplicado depois da entrega, em 30/10:
+
+- O comentário `eslint-disable` em `backend/src/middlewares/error.js`, para um linter que o projeto não roda, sai do código — achado L6 do `revisor-pdi`
+- Teste E2E de token recusado levando ao `/login`, até então verificado só à mão, na 3.1: malformado e adulterado ao abrir a aplicação, e adulterado no meio de uma ação, em `e2e/tests/auth/session.spec.ts`. O expirado fica na API — entrada de 30/10 em `docs/decisions.md`. A suíte passa a 32 testes, 64 execuções. Estabilidade: 320 de 320 com `--repeat-each=5` em paralelo, e 64 de 64 com `--workers=1`; depois das 384 execuções, a base voltou às 8 tarefas do seed
 
 ---
 
