@@ -35,9 +35,8 @@ import { AppError } from '../utils/errors.js'
  * @throws {AppError} `EMAIL_TAKEN` quando o e-mail já está cadastrado
  */
 export async function registerUser({ name, email, password, role }) {
-  // Normaliza aqui, e não só no schema da rota: o seed e os testes chamam o
-  // service direto, e a checagem de existência precisa comparar o e-mail que
-  // de fato será gravado.
+  // O `lowercase` e o `trim` do model já valem no filtro e na gravação; a
+  // variável só deixa explícito que a checagem compara o e-mail gravado.
   const normalizedEmail = email.trim().toLowerCase()
 
   const alreadyExists = await User.exists({ email: normalizedEmail })

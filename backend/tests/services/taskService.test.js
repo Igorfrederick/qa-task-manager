@@ -114,8 +114,7 @@ describe('taskService', () => {
 
   describe('updateTask', () => {
     it('recusa descrição acima do limite mesmo sem o schema de entrada', async () => {
-      // Chamado direto, sem o schema de entrada: quem barra é o model, pelo
-      // runValidators da edição.
+      // Quem barra é o model, pelo runValidators da edição.
       const own = await Task.create({ title: 'Tarefa da QA', userId: qa.id })
 
       const error = await updateTask(authenticated(qa), own.id, {
@@ -139,8 +138,7 @@ describe('taskService', () => {
     })
 
     it('recusa status fora do domínio mesmo sem o schema de entrada', async () => {
-      // Chamado direto, sem o schema de entrada: quem barra aqui é o
-      // runValidators, não o Zod.
+      // Quem barra aqui é o runValidators, não o Zod.
       const own = await Task.create({ title: 'Tarefa da QA', userId: qa.id })
 
       const error = await updateTask(authenticated(qa), own.id, { status: 'doing' }).catch((e) => e)

@@ -64,7 +64,7 @@ A ferramenta é **Vitest com supertest** — decisão de 01/10/2026 em `docs/dec
 - Nunca em texto puro, nunca em log, nunca em resposta de API
 - `passwordHash` jamais retorna ao cliente — remover na serialização, não confiar em o controller lembrar
 
-**Duas barreiras, porque elas falham em situações diferentes:** `select: false` no campo, que impede a query de trazer o hash; e `transform` removendo o campo em `toJSON` **e** em `toObject`, que protege o caminho que a primeira barreira abre de propósito — `.select('+passwordHash')`, de que o login precisa. `toObject` também, e não só `toJSON`: `res.json()` chama `toJSON`, mas espalhar o documento ou logá-lo não chama.
+**Duas barreiras, porque elas falham em situações diferentes:** `select: false` no campo, que impede a query de trazer o hash; e `transform` removendo o campo em `toJSON` **e** em `toObject`, que protege os caminhos que a primeira barreira não cobre — o `.select('+passwordHash')`, de que o login precisa, e o documento recém-criado, que traz o hash em memória, porque `select: false` só vale para consulta. `toObject` também, e não só `toJSON`: `res.json()` chama `toJSON`, mas espalhar o documento ou logá-lo não chama.
 
 **`lean()` é proibido em query que retorne `User`.** `lean()` devolve objeto plano, não documento Mongoose, e o `transform` não se aplica a ele — a segunda barreira desaparece sem erro e sem aviso. Quando a leitura precisar do ganho de `lean()`, projetar os campos explicitamente em vez de confiar na serialização.
 
