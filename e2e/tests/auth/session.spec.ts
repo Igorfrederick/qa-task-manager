@@ -89,9 +89,16 @@ test.describe('token recusado pela API no meio do uso', () => {
     // A lista carregou com o token válido: só a ação usa o adulterado.
     await expect(taskListPage.taskRow(task._id)).toBeVisible()
     await writeStoredToken(page, withForeignSubject(sessions.qa.token, sessions.lead.user._id))
+    const updateResponse = page.waitForResponse(
+      (response) =>
+        response.request().method() === 'PATCH' && new URL(response.url()).pathname === `/api/tasks/${task._id}`,
+    )
 
     await taskListPage.completeTask(task._id)
 
+    const response = await updateResponse
+    expect(response.status()).toBe(401)
+    expect((await response.json()).error.code).toBe('TOKEN_INVALID')
     await expect(page).toHaveURL('/login')
     await expect(loginPage.emailInput).toBeEditable()
     expect(await readStoredToken(page)).toBeNull()
