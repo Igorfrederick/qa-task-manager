@@ -24,6 +24,8 @@ if (missing.length > 0) {
   )
 }
 
+// Ausente ou não numérico cai no padrão, sem erro: só as obrigatórias
+// interrompem a importação.
 function toInteger(value, fallback) {
   const parsed = Number.parseInt(value, 10)
   return Number.isNaN(parsed) ? fallback : parsed

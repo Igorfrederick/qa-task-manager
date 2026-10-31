@@ -30,10 +30,14 @@ import { AppError } from '../utils/errors.js'
  *
  * @param {{ name: string, email: string, password: string, role?: string }} data
  *        já validados pelo schema Zod no middleware
- * @returns {Promise<import('mongoose').Document>} documento sem `passwordHash`
+ * @returns {Promise<import('mongoose').Document>} documento criado; `passwordHash`
+ *          fica fora da serialização pelo transform do schema
  * @throws {AppError} `EMAIL_TAKEN` quando o e-mail já está cadastrado
  */
 export async function registerUser({ name, email, password, role }) {
+  // Normaliza aqui, e não só no schema da rota: o seed e os testes chamam o
+  // service direto, e a checagem de existência precisa comparar o e-mail que
+  // de fato será gravado.
   const normalizedEmail = email.trim().toLowerCase()
 
   const alreadyExists = await User.exists({ email: normalizedEmail })
@@ -44,8 +48,9 @@ export async function registerUser({ name, email, password, role }) {
   const passwordHash = await bcrypt.hash(password, env.bcryptSaltRounds)
 
   try {
-    // create devolve o documento sem `passwordHash` selecionado; ainda assim o
-    // transform do schema é a barreira que vale, porque não depende disto.
+    // O documento que o `create` devolve carrega `passwordHash` em memória —
+    // `select: false` só vale para consulta. Quem o tira da resposta é o
+    // transform do schema.
     return await User.create({ name, email: normalizedEmail, passwordHash, role })
   } catch (error) {
     // A consulta acima é verificação, não garantia: entre ela e a escrita cabe
