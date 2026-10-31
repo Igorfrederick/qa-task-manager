@@ -36,6 +36,11 @@ export function setUnauthorizedHandler(handler) {
 /**
  * Única porta de saída para a API. O caminho é relativo: em desenvolvimento,
  * o proxy do Vite repassa /api ao backend.
+ *
+ * `path` vem sem o prefixo `/api`. Responde o corpo JSON, ou `null` no 204;
+ * toda falha é `ApiError`, com status 0 quando o `fetch` não obtém resposta.
+ * Com a API fora, o proxy do Vite responde 502 sem corpo, que sai como
+ * `UNEXPECTED_RESPONSE`.
  */
 export async function request(path, { method = 'GET', body } = {}) {
   const headers = {}

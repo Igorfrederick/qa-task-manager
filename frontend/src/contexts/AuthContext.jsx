@@ -9,6 +9,10 @@ export const AuthContext = createContext(null)
 /**
  * Sessão do usuário. O token fica no navegador, por `tokenStorage`; o
  * usuário, só em memória, como a API o devolveu.
+ *
+ * `login` rejeita com o `ApiError` da API, para a tela mostrar o `message`.
+ * `logout` só encerra a sessão, sem navegar: quem leva ao /login é quem chama
+ * ou, quando a sessão cai por um 401, o `ProtectedRoute`, ao ver `user` vazio.
  */
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -26,8 +30,9 @@ export function AuthProvider({ children }) {
 
   // Página recarregada: o token guardado precisa de um usuário. Sem a
   // confirmação da API, não há sessão. Token recusado volta 401, e quem apaga
-  // o token é o handler acima, que confere se ele ainda é o guardado; outra
-  // falha, como servidor fora, deixa o token para a próxima carga.
+  // o token é o handler acima, que o `request` só chama se o token recusado
+  // ainda for o guardado; outra falha, como servidor fora, deixa o token para
+  // a próxima carga.
   useEffect(() => {
     if (!tokenStorage.get()) return
     authService

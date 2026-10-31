@@ -6,6 +6,10 @@ import * as taskService from '../services/taskService.js'
  * Tarefas da listagem para os filtros dados, com carregamento e erro.
  * `reload` busca de novo com os mesmos filtros: depois de uma ação, a tarefa
  * alterada pode ter saído do filtro, e quem sabe a lista certa é a API.
+ *
+ * Filtro vazio é "todos". Enquanto uma busca não volta, `tasks` mantém a
+ * lista anterior — a tela decide como mostrá-la. `error` é o `message` da
+ * falha, pronto para exibir.
  */
 export function useTasks({ status, priority }) {
   const [tasks, setTasks] = useState([])

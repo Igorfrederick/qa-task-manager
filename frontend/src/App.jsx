@@ -17,6 +17,7 @@ export default function App() {
           <Route path="/tasks/:id" element={<TaskFormPage />} />
         </Route>
       </Route>
+      {/* Sem rota própria, o "/" cai aqui, como qualquer endereço desconhecido. */}
       <Route path="*" element={<Navigate to="/tasks" replace />} />
     </Routes>
   )

@@ -20,6 +20,7 @@ export type Task = {
   description: string
   status: TaskStatus
   priority: TaskPriority
+  /** `null` quando o dono não existe mais na base: o populate não encontra o usuário. */
   owner: { _id: string; name: string } | null
   createdAt: string
   updatedAt: string

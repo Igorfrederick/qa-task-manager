@@ -75,8 +75,9 @@ export async function getTask(user, id) {
  *
  * Campo não enviado chega como `undefined`, e o Mongoose descarta chave
  * `undefined` no update: o que não foi enviado fica como está.
- * `runValidators` aplica os enums do schema também na edição — por padrão, o
- * Mongoose só os confere na criação.
+ * `runValidators` aplica os validadores do schema — enums e limites de
+ * tamanho — também na edição: por padrão, o Mongoose não valida o update por
+ * consulta, como o `findOneAndUpdate`.
  *
  * @param {{ id: string, role: string }} user usuário autenticado
  * @param {string} id já validado no formato pelo schema de parâmetro

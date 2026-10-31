@@ -8,7 +8,8 @@ export default defineConfig({
     // faltar variável obrigatória, e .env não é versionado.
     setupFiles: ['tests/setup.js'],
     // Verifica a conexão uma vez antes de tudo: sem isto, a ausência do banco
-    // se apresenta como 15 timeouts em vez de uma mensagem com a causa.
+    // se apresenta como um timeout em cada arquivo que abre conexão, em vez
+    // de uma mensagem com a causa.
     globalSetup: ['tests/globalSetup.js'],
     // Sem paralelismo entre arquivos: a suíte compartilha uma única conexão
     // com o banco de teste, e arquivos concorrentes disputariam as coleções.

@@ -26,7 +26,8 @@ const UNKNOWN_USER_HASH = bcrypt.hashSync('senha-que-nenhum-usuario-tem', env.bc
 export async function authenticate({ email, password }) {
   // `+passwordHash`: o campo é `select: false`, e este é o único lugar que
   // precisa lê-lo. O `transform` do schema o remove quando o usuário for
-  // serializado na resposta.
+  // serializado na resposta. O `lowercase` e o `trim` do model já valem no
+  // filtro; a normalização aqui só deixa isso explícito.
   const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+passwordHash')
 
   const passwordMatches = await bcrypt.compare(password, user?.passwordHash ?? UNKNOWN_USER_HASH)

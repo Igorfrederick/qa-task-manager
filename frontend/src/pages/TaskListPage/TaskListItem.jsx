@@ -4,7 +4,8 @@ import styles from './TaskListPage.module.css'
 
 /**
  * Uma tarefa da lista, com as ações sobre ela. `showOwner` é o líder, que vê
- * as tarefas do time; `isBusy` trava as ações enquanto uma delas não volta.
+ * as tarefas do time; `isBusy` trava as ações enquanto a ação sobre ela ou a
+ * recarga da lista não volta.
  */
 export default function TaskListItem({ task, showOwner, isBusy, onToggleStatus, onEdit, onDelete }) {
   const id = task._id

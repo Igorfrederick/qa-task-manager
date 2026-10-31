@@ -70,7 +70,9 @@ export default function TaskForm({ id }) {
       }
       navigate(listPath)
     } catch (error) {
-      // A API valida de novo: o campo que ela recusar mostra o erro nele.
+      // A API valida de novo: o campo que ela recusar mostra o erro nele. A
+      // tarefa que sumiu leva à tela de não encontrada; o resto, à mensagem
+      // geral.
       const fieldErrors = error.details?.filter(({ field }) => TASK_FORM_FIELDS.includes(field)) ?? []
       if (error.code === 'VALIDATION_ERROR' && fieldErrors.length > 0) {
         fieldErrors.forEach(({ field, issue }) => setError(field, { message: issue }))

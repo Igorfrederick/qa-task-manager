@@ -30,10 +30,13 @@ import { AppError } from '../utils/errors.js'
  *
  * @param {{ name: string, email: string, password: string, role?: string }} data
  *        já validados pelo schema Zod no middleware
- * @returns {Promise<import('mongoose').Document>} documento sem `passwordHash`
+ * @returns {Promise<import('mongoose').Document>} documento criado; `passwordHash`
+ *          fica fora da serialização pelo transform do schema
  * @throws {AppError} `EMAIL_TAKEN` quando o e-mail já está cadastrado
  */
 export async function registerUser({ name, email, password, role }) {
+  // O `lowercase` e o `trim` do model já valem no filtro e na gravação; a
+  // variável só deixa explícito que a checagem compara o e-mail gravado.
   const normalizedEmail = email.trim().toLowerCase()
 
   const alreadyExists = await User.exists({ email: normalizedEmail })
@@ -44,8 +47,9 @@ export async function registerUser({ name, email, password, role }) {
   const passwordHash = await bcrypt.hash(password, env.bcryptSaltRounds)
 
   try {
-    // create devolve o documento sem `passwordHash` selecionado; ainda assim o
-    // transform do schema é a barreira que vale, porque não depende disto.
+    // O documento que o `create` devolve carrega `passwordHash` em memória —
+    // `select: false` só vale para consulta. Quem o tira da resposta é o
+    // transform do schema.
     return await User.create({ name, email: normalizedEmail, passwordHash, role })
   } catch (error) {
     // A consulta acima é verificação, não garantia: entre ela e a escrita cabe

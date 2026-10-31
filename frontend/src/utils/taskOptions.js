@@ -1,8 +1,8 @@
 /**
  * Valores de status e prioridade do contrato, com o rótulo de cada um na
  * interface. Fonte única para os filtros, o formulário, as etiquetas e as
- * comparações da lista: valor novo no domínio entra aqui. Os nomes seguem
- * os de backend/src/utils/taskEnums.js.
+ * comparações da lista: valor novo no domínio entra aqui. `TASK_STATUS` e
+ * `TASK_PRIORITY` repetem os de backend/src/utils/taskEnums.js.
  */
 export const TASK_STATUS = Object.freeze({
   OPEN: 'open',
